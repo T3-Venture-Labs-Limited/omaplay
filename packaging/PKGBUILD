@@ -114,12 +114,17 @@ sha256sums=('803baccd4f69c606111c46c2f707173fa5b4d1d747da3f986f3d98d2f775f45e'
 
 prepare() {
   cd "$srcdir/vlc-$_vlc_commit"
-  # git apply, not patch(1): the series carries binary image diffs. It works on a plain source tree.
+  # git apply, not patch(1): the series carries binary image diffs. Inside another repository (an AUR
+  # checkout is one) git apply resolves paths from that repository's root and silently skips the files,
+  # so give the source tree its own repository first.
+  git init -q .
   local p
   for p in "$srcdir/$pkgname-$pkgver"/patches/*.patch; do
     echo "applying ${p##*/}"
     git apply --whitespace=nowarn "$p"
   done
+  # Fail loudly if the series did not land.
+  grep -q "option('product_name'" meson_options.txt || { echo "patches were not applied" >&2; return 1; }
 }
 
 build() {
