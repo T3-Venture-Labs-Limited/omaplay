@@ -26,7 +26,7 @@ Catppuccin Latte (light), Nord and Solitude. Tools: `bin/harness` (cage sandbox)
 |---|---|---|
 | Interface uses theme accent and background | Verified | Catppuccin `#89b4fa` and Solitude `#798186`, sampled from pixels |
 | Light theme | Verified | Catppuccin Latte: light surfaces, dark text. Light-scheme icon variants not separately checked |
-| Theme changes during playback | Partly | a real `omarchy theme set nord`: colours changed and restored, playback continued; an already-open dialog was not re-checked |
+| Theme changes during playback | Verified | a real `omarchy theme set nord`: colours changed and restored, playback continued; an open Preferences dialog recolours live too |
 | Theme directory replaced through symlink swap | Verified | unit tests (file and directory swaps, twice) and Omarchy's `rm -rf; mv` sequence in the sandbox |
 | Low-contrast accent | Partly | unit test for the widget palette and the clamp; the QML palette pass was not measured in the UI |
 | Default Omarchy rounding | Verified | fake `hyprctl` returning 0: square corners |
@@ -44,7 +44,7 @@ Catppuccin Latte (light), Nord and Solitude. Tools: `bin/harness` (cage sandbox)
 | Menu action relocated by redesign | Verified | the eight menus' code is identical to stock; the overflow menu lists all eight |
 | Command-line options unchanged | Verified | option set identical to the stock baseline; options such as `--start-time` ran |
 | Animations disabled | Verified | frame burst: first frame differs 58% with animations, 2.6% without |
-| Window under Hyprland | Verified | `hyprctl clients` class `omaplay` (tested under the previous working name; identical code path); no window buttons drawn |
+| Window under Hyprland | Verified | `hyprctl clients`: class `omaplay`, title "… — omaplay", native Wayland; no window buttons drawn |
 | Media library unavailable | Verified | Open File with its six-entry dropdown, and a Recent list |
 | Controls auto-hide | Verified | visible at 1.2 s and 2.4 s, hidden at 4.4 s (cursor hiding itself not observable in cage) |
 | Controls reappear | Verified | pointer move brought them back |
