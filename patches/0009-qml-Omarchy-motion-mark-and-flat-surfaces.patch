@@ -1,0 +1,1094 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 15:45:36 +0530
+Subject: [PATCH 09/17] qml: Omarchy motion, mark and flat surfaces
+
+OmarchyTheme watches Omarchy's no-animations flag; MainCtx exposes omarchyStyle and
+omarchyAnimations. VLCStyle durations are capped at 300 ms in an Omarchy build and
+become 0 when animations are off. Ease-in, ease-in-out and bounce curves become
+ease-out, and the floating notification no longer scales from zero. The cone in the
+top bars and the empty state is replaced by an accent-tinted play mark, the play
+button is a flat accent ring on theme surfaces, keyboard focus is drawn in the accent,
+and the stock palettes' pure black/white outer surfaces follow the theme.
+---
+ modules/gui/qt/maininterface/mainctx.cpp      | 17 ++++++-
+ modules/gui/qt/maininterface/mainctx.hpp      |  7 +++
+ .../gui/qt/maininterface/qml/MainDisplay.qml  |  6 +--
+ .../qt/maininterface/qml/NoMedialibHome.qml   | 27 +++--------
+ .../maininterface/qml/SideNavigationPane.qml  |  2 +-
+ .../gui/qt/maininterface/qml/UpdatePane.qml   |  4 +-
+ modules/gui/qt/medialibrary/qml/Bookmarks.qml |  2 +-
+ modules/gui/qt/medialibrary/qml/HomePage.qml  |  2 +-
+ .../gui/qt/medialibrary/qml/MusicArtist.qml   |  2 +-
+ .../gui/qt/network/qml/BrowseHomeDisplay.qml  |  2 +-
+ modules/gui/qt/player/qml/MiniPlayer.qml      |  2 +-
+ modules/gui/qt/player/qml/PlayerView.qml      |  6 +--
+ modules/gui/qt/player/qml/SliderBar.qml       | 10 ++---
+ modules/gui/qt/player/qml/TracksMenu.qml      |  2 +-
+ .../qml/controlbarcontrols/PlayButton.qml     | 13 +++---
+ .../qml/controlbarcontrols/RecordButton.qml   |  2 +-
+ .../gui/qt/playlist/qml/PlaylistDelegate.qml  |  2 +-
+ modules/gui/qt/playlist/qml/PlaylistPane.qml  |  2 +-
+ modules/gui/qt/style/AcrylicController.qml    |  2 +-
+ modules/gui/qt/style/VLCStyle.qml             | 16 ++++---
+ modules/gui/qt/style/omarchytheme.cpp         | 39 +++++++++++-----
+ modules/gui/qt/style/omarchytheme.hpp         | 13 +++++-
+ modules/gui/qt/style/systempalette.cpp        | 26 ++++++++---
+ modules/gui/qt/style/systempalette.hpp        |  2 +
+ modules/gui/qt/tests/test_qt_omarchytheme.cpp | 34 ++++++++++++++
+ .../qt/util/qml/FadeControllerStateGroup.qml  |  2 +-
+ modules/gui/qt/widgets/qml/BannerCone.qml     | 45 +++++++++++++++----
+ modules/gui/qt/widgets/qml/DrawerExt.qml      |  2 +-
+ modules/gui/qt/widgets/qml/FadingEdge.qml     |  4 +-
+ .../qt/widgets/qml/FloatingNotification.qml   | 26 +++++------
+ modules/gui/qt/widgets/qml/GridItem.qml       |  2 +-
+ modules/gui/qt/widgets/qml/ListViewExt.qml    |  2 +-
+ modules/gui/qt/widgets/qml/MediaCover.qml     |  2 +-
+ modules/gui/qt/widgets/qml/PlayCover.qml      |  2 +-
+ modules/gui/qt/widgets/qml/ProgressBarExt.qml |  4 +-
+ modules/gui/qt/widgets/qml/SearchBox.qml      |  2 +-
+ 36 files changed, 226 insertions(+), 109 deletions(-)
+
+diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
+index 3b192261d9..0b67e5272f 100644
+--- a/modules/gui/qt/maininterface/mainctx.cpp
++++ b/modules/gui/qt/maininterface/mainctx.cpp
+@@ -368,16 +368,31 @@ bool MainCtx::hasVLM() const {
+ #endif
+ }
+ 
++bool MainCtx::omarchyStyle() const
++{
++    return VLC_OMARCHY_DEFAULT;
++}
++
++bool MainCtx::omarchyAnimations()
++{
++#if VLC_OMARCHY_DEFAULT
++    return omarchyTheme()->animationsEnabled();
++#else
++    return true;
++#endif
++}
++
+ OmarchyTheme *MainCtx::omarchyTheme()
+ {
+     if (!m_omarchyTheme)
+     {
+-        m_omarchyTheme = new OmarchyTheme(OmarchyTheme::defaultPath(), this);
++        m_omarchyTheme = new OmarchyTheme(OmarchyTheme::defaultPath(), OmarchyTheme::defaultNoAnimationsFlag(), this);
+         // One warning per start-up, e.g. when the theme file does not exist.
+         for (const QString &warning : m_omarchyTheme->warnings())
+             msg_Warn(p_intf, "%s", qtu(warning));
+         // A theme switch changes the light/dark hint that QtWidgets dialogs follow.
+         connect(m_omarchyTheme, &OmarchyTheme::changed, this, &MainCtx::applyQtColorScheme);
++        connect(m_omarchyTheme, &OmarchyTheme::animationsChanged, this, &MainCtx::omarchyAnimationsChanged);
+     }
+     return m_omarchyTheme;
+ }
+diff --git a/modules/gui/qt/maininterface/mainctx.hpp b/modules/gui/qt/maininterface/mainctx.hpp
+index 4f3feee380..bae3f3d979 100644
+--- a/modules/gui/qt/maininterface/mainctx.hpp
++++ b/modules/gui/qt/maininterface/mainctx.hpp
+@@ -120,6 +120,10 @@ class MainCtx : public QObject
+     Q_PROPERTY(bool hasFirstrun READ hasFirstrun CONSTANT FINAL)
+     /// Hyprland's window corner radius in pixels, or -1 to keep VLC's own radii.
+     Q_PROPERTY(int omarchyRadius READ omarchyRadius CONSTANT FINAL)
++    /// True in a build that follows Omarchy (omarchy_default); QML uses it to pick Omarchy's motion rules.
++    Q_PROPERTY(bool omarchyStyle READ omarchyStyle CONSTANT FINAL)
++    /// False while `omarchy toggle animations off` is in effect. Always true outside an Omarchy build.
++    Q_PROPERTY(bool omarchyAnimations READ omarchyAnimations NOTIFY omarchyAnimationsChanged FINAL)
+     Q_PROPERTY(int  csdBorderSize READ CSDBorderSize NOTIFY useClientSideDecorationChanged FINAL)
+     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu WRITE setHasToolbarMenu NOTIFY hasToolbarMenuChanged FINAL)
+     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT FINAL)
+@@ -251,6 +255,8 @@ public:
+     bool useClientSideDecoration() const;
+     bool hasFirstrun() const;
+     int omarchyRadius() const { return m_omarchyRadius; }
++    bool omarchyStyle() const;
++    bool omarchyAnimations();
+     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
+     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
+     inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }
+@@ -562,6 +568,7 @@ protected slots:
+     void onVOutChanged( bool );
+ 
+ signals:
++    void omarchyAnimationsChanged();
+     void fullscreenInterfaceToggled( bool );
+     void setInterfaceVisibible(bool, bool requestActivate = false);
+     void setInterfaceFullScreen( bool );
+diff --git a/modules/gui/qt/maininterface/qml/MainDisplay.qml b/modules/gui/qt/maininterface/qml/MainDisplay.qml
+index 117018933f..5f59b711b2 100644
+--- a/modules/gui/qt/maininterface/qml/MainDisplay.qml
++++ b/modules/gui/qt/maininterface/qml/MainDisplay.qml
+@@ -697,7 +697,7 @@ FocusScope {
+                 NumberAnimation {
+                     property: "width"
+                     duration: VLCStyle.duration_short
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                 }
+             }
+ 
+@@ -779,7 +779,7 @@ FocusScope {
+                     NumberAnimation {
+                         property: "width"
+                         duration: VLCStyle.duration_short
+-                        easing.type: Easing.InOutSine
++                        easing.type: Easing.OutCubic
+                     }
+                 }
+             }
+@@ -906,7 +906,7 @@ FocusScope {
+             id: heightBehavior
+ 
+             NumberAnimation {
+-                easing.type: Easing.InOutSine
++                easing.type: Easing.OutCubic
+                 duration: VLCStyle.duration_long
+             }
+         }
+diff --git a/modules/gui/qt/maininterface/qml/NoMedialibHome.qml b/modules/gui/qt/maininterface/qml/NoMedialibHome.qml
+index bc9f0877dd..38296cc3d9 100644
+--- a/modules/gui/qt/maininterface/qml/NoMedialibHome.qml
++++ b/modules/gui/qt/maininterface/qml/NoMedialibHome.qml
+@@ -21,6 +21,7 @@ import QtQuick.Window
+ import VLC.MainInterface
+ import VLC.Util
+ import VLC.Style
++import VLC.Widgets as Widgets
+ 
+ FocusScope {
+     id: root
+@@ -98,29 +99,13 @@ FocusScope {
+         state: orientation === Qt.Vertical ? "vertical" : "horizontal"
+ 
+ 
+-        Image {
++        Widgets.BannerCone {
+             id: cone
+ 
+-            property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
+-
+-            sourceSize: Qt.size(0, orientation === Qt.Vertical ? VLCStyle.colWidth(1)
+-                                                               : button.implicitHeight * 1.618 * _eDPR) // 1.618 = golden ratio approximation
+-
+-            source: MainCtx.useXmasCone() ? "qrc:///logo/vlc48-xmas.png" // TODO: new xmas cone designs
+-                                          : "qrc:///misc/cone.svg"
+-
+-            Connections {
+-                target: MainCtx
+-
+-                function onIntfDevicePixelRatioChanged() {
+-                    // Update the DPR:
+-                    // Normally, this is not done, as we display the images at the size we
+-                    // want, and we don't want to re-load all images on DPR change. But
+-                    // in this case we depend on the implicit size, so we should re-load
+-                    // the image with the updated DPR:
+-                    cone._eDPR = MainCtx.effectiveDevicePixelRatio(cone.Window.window)
+-                }
+-            }
++            readonly property real _size: orientation === Qt.Vertical ? VLCStyle.colWidth(1)
++                                                                       : button.implicitHeight * 1.618 // golden ratio approximation
++            sourceSize: Qt.size(_size, _size)
++            color: theme.accent
+         }
+ 
+         OpenFileSplitButton {
+diff --git a/modules/gui/qt/maininterface/qml/SideNavigationPane.qml b/modules/gui/qt/maininterface/qml/SideNavigationPane.qml
+index 9fdb2eb651..8daea6d3f5 100644
+--- a/modules/gui/qt/maininterface/qml/SideNavigationPane.qml
++++ b/modules/gui/qt/maininterface/qml/SideNavigationPane.qml
+@@ -126,7 +126,7 @@ T.Pane {
+                                                                                                                               : "transparent"
+ 
+                 component DelegateAnimation : NumberAnimation {
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                     duration: VLCStyle.duration_long
+                 }
+ 
+diff --git a/modules/gui/qt/maininterface/qml/UpdatePane.qml b/modules/gui/qt/maininterface/qml/UpdatePane.qml
+index ed58c37a3b..a7b3af9bfd 100644
+--- a/modules/gui/qt/maininterface/qml/UpdatePane.qml
++++ b/modules/gui/qt/maininterface/qml/UpdatePane.qml
+@@ -125,7 +125,7 @@ T.Pane {
+                 Behavior on iconRotation {
+                     // WARNING: Can't use `RotationAnimator` because it expects property to be "rotation".
+                     RotationAnimation {
+-                        easing.type: Easing.InOutSine
++                        easing.type: Easing.OutCubic
+                         duration: heightAnimation.duration
+                     }
+                 }
+@@ -299,7 +299,7 @@ T.Pane {
+                 NumberAnimation {
+                     id: heightAnimation
+ 
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                     duration: VLCStyle.duration_long
+                 }
+             }
+diff --git a/modules/gui/qt/medialibrary/qml/Bookmarks.qml b/modules/gui/qt/medialibrary/qml/Bookmarks.qml
+index 4d5b356bc1..a86eb1665b 100644
+--- a/modules/gui/qt/medialibrary/qml/Bookmarks.qml
++++ b/modules/gui/qt/medialibrary/qml/Bookmarks.qml
+@@ -66,7 +66,7 @@ Item {
+                     target: control
+                     properties: "opacity"
+                     to: 1
+-                    duration: VLCStyle.duration_short; easing.type: Easing.InSine
++                    duration: VLCStyle.duration_short; easing.type: Easing.OutCubic
+                 }
+             }
+         }
+diff --git a/modules/gui/qt/medialibrary/qml/HomePage.qml b/modules/gui/qt/medialibrary/qml/HomePage.qml
+index 17a1f4a63a..f971645f10 100644
+--- a/modules/gui/qt/medialibrary/qml/HomePage.qml
++++ b/modules/gui/qt/medialibrary/qml/HomePage.qml
+@@ -116,7 +116,7 @@ Widgets.PageExt {
+             // NOTE: Usage of `SmoothedAnimation` is intentional here.
+             SmoothedAnimation {
+                 duration: VLCStyle.duration_veryLong
+-                easing.type: Easing.InOutSine
++                easing.type: Easing.OutCubic
+             }
+         }
+ 
+diff --git a/modules/gui/qt/medialibrary/qml/MusicArtist.qml b/modules/gui/qt/medialibrary/qml/MusicArtist.qml
+index 6e77b8f378..5cf6758e47 100644
+--- a/modules/gui/qt/medialibrary/qml/MusicArtist.qml
++++ b/modules/gui/qt/medialibrary/qml/MusicArtist.qml
+@@ -1023,7 +1023,7 @@ FocusScope {
+                 // NOTE: Usage of `SmoothedAnimation` is intentional here.
+                 SmoothedAnimation {
+                     duration: VLCStyle.duration_veryLong
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                 }
+             }
+ 
+diff --git a/modules/gui/qt/network/qml/BrowseHomeDisplay.qml b/modules/gui/qt/network/qml/BrowseHomeDisplay.qml
+index 3e1b0d4af1..2976ec637e 100644
+--- a/modules/gui/qt/network/qml/BrowseHomeDisplay.qml
++++ b/modules/gui/qt/network/qml/BrowseHomeDisplay.qml
+@@ -143,7 +143,7 @@ Widgets.PageExt {
+             // NOTE: Usage of `SmoothedAnimation` is intentional here.
+             SmoothedAnimation {
+                 duration: VLCStyle.duration_veryLong
+-                easing.type: Easing.InOutSine
++                easing.type: Easing.OutCubic
+             }
+         }
+ 
+diff --git a/modules/gui/qt/player/qml/MiniPlayer.qml b/modules/gui/qt/player/qml/MiniPlayer.qml
+index 34dfa68fb1..3baadfb893 100644
+--- a/modules/gui/qt/player/qml/MiniPlayer.qml
++++ b/modules/gui/qt/player/qml/MiniPlayer.qml
+@@ -87,7 +87,7 @@ ControlBar {
+         enabled: false
+         NumberAnimation {
+             id: animation
+-            easing.type: Easing.InOutSine
++            easing.type: Easing.OutCubic
+             duration: VLCStyle.duration_long
+         }
+     }
+diff --git a/modules/gui/qt/player/qml/PlayerView.qml b/modules/gui/qt/player/qml/PlayerView.qml
+index e6688db224..1c04107564 100644
+--- a/modules/gui/qt/player/qml/PlayerView.qml
++++ b/modules/gui/qt/player/qml/PlayerView.qml
+@@ -498,7 +498,7 @@ FocusScope {
+                             NumberAnimation {
+                                 duration: VLCStyle.duration_long
+ 
+-                                easing.type: Easing.InOutSine
++                                easing.type: Easing.OutCubic
+                             }
+ 
+                             Component.onCompleted: {
+@@ -522,7 +522,7 @@ FocusScope {
+                             NumberAnimation {
+                                 duration: VLCStyle.duration_long
+ 
+-                                easing.type: Easing.InOutSine
++                                easing.type: Easing.OutCubic
+                             }
+ 
+                             Component.onCompleted: {
+@@ -1088,7 +1088,7 @@ FocusScope {
+                 NumberAnimation {
+                     property: "width"
+                     duration: VLCStyle.duration_short
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                 }
+             }
+         }
+diff --git a/modules/gui/qt/player/qml/SliderBar.qml b/modules/gui/qt/player/qml/SliderBar.qml
+index 59a79a5518..cc8973fd71 100644
+--- a/modules/gui/qt/player/qml/SliderBar.qml
++++ b/modules/gui/qt/player/qml/SliderBar.qml
+@@ -391,7 +391,7 @@ T.ProgressBar {
+                             PropertyAction { targets: control; property: "_currentChapterHovered" }
+                             NumberAnimation {
+                                 targets: [seekpointsRect, progressRepRect]; properties: "height, y, radius"
+-                                duration: VLCStyle.duration_short; easing.type: Easing.InSine
++                                duration: VLCStyle.duration_short; easing.type: Easing.OutCubic
+                             }
+                         }
+                     }
+@@ -546,7 +546,7 @@ T.ProgressBar {
+                     from: 0.0
+                     to: bufferRect.bufferFrames
+                     duration: VLCStyle.durationSliderBouncing
+-                    easing.type: "OutBounce"
++                    easing.type: Easing.OutCubic
+                 }
+                 PauseAnimation {
+                     duration: VLCStyle.duration_veryLong
+@@ -555,7 +555,7 @@ T.ProgressBar {
+                     from: bufferRect.bufferFrames
+                     to: 0.0
+                     duration: VLCStyle.durationSliderBouncing
+-                    easing.type: "OutBounce"
++                    easing.type: Easing.OutCubic
+                 }
+                 PauseAnimation {
+                     duration: VLCStyle.duration_veryLong
+@@ -607,7 +607,7 @@ T.ProgressBar {
+                     NumberAnimation {
+                         target: sliderHandle; properties: "implicitWidth,implicitHeight"
+                         to: sliderHandle._size
+-                        duration: VLCStyle.duration_short; easing.type: Easing.InSine
++                        duration: VLCStyle.duration_short; easing.type: Easing.OutCubic
+                     }
+                 }
+             },
+@@ -618,7 +618,7 @@ T.ProgressBar {
+                     NumberAnimation {
+                         target: sliderHandle; properties: "implicitWidth,implicitHeight"
+                         to: sliderHandle._size * (0.8 * control._hoveredScalingFactor)
+-                        duration: VLCStyle.duration_short; easing.type: Easing.InSine
++                        duration: VLCStyle.duration_short; easing.type: Easing.OutCubic
+                     }
+                 }
+             }
+diff --git a/modules/gui/qt/player/qml/TracksMenu.qml b/modules/gui/qt/player/qml/TracksMenu.qml
+index a378d15be1..3c92779af5 100644
+--- a/modules/gui/qt/player/qml/TracksMenu.qml
++++ b/modules/gui/qt/player/qml/TracksMenu.qml
+@@ -44,7 +44,7 @@ T.Popup {
+     Behavior on width {
+         SmoothedAnimation {
+             duration: VLCStyle.duration_veryShort
+-            easing.type: Easing.InOutSine
++            easing.type: Easing.OutCubic
+         }
+     }
+ 
+diff --git a/modules/gui/qt/player/qml/controlbarcontrols/PlayButton.qml b/modules/gui/qt/player/qml/controlbarcontrols/PlayButton.qml
+index abc7acccd4..1ea2b95b46 100644
+--- a/modules/gui/qt/player/qml/controlbarcontrols/PlayButton.qml
++++ b/modules/gui/qt/player/qml/controlbarcontrols/PlayButton.qml
+@@ -93,7 +93,7 @@ T.Control {
+         reversible: true
+         NumberAnimation {
+             properties: "opacity"
+-            easing.type: Easing.InOutSine
++            easing.type: Easing.OutCubic
+             duration: VLCStyle.duration_veryShort
+         }
+     }
+@@ -218,7 +218,7 @@ T.Control {
+         }
+ 
+         color: cursorInside ? theme.accent
+-                            : "black"  //foreground is always black
++                            : theme.fg.primary
+ 
+         font.pixelSize: Math.round(parent.height / 1.7)
+ 
+@@ -234,7 +234,7 @@ T.Control {
+ 
+             ColorAnimation {
+                 duration: VLCStyle.duration_veryShort
+-                easing.type: Easing.InOutSine
++                easing.type: Easing.OutCubic
+             }
+         }
+     }
+@@ -260,10 +260,7 @@ T.Control {
+ 
+             radius: width / 2
+ 
+-            gradient: Gradient {
+-                GradientStop { position: 0.0; color: "#e25b01" }
+-                GradientStop { position: 1.0; color: "#f89a06" }
+-            }
++            color: theme.accent
+ 
+             Widgets.RoundedRectangleShadow {
+                 id: hoverShadow
+@@ -280,7 +277,7 @@ T.Control {
+             Rectangle {
+                 id: innerRectangle
+ 
+-                color: "white"
++                color: theme.bg.primary
+ 
+                 anchors.fill: parent
+                 anchors.margins: _diminished ? (parent.width / 2)
+diff --git a/modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml b/modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml
+index 387634296f..def2fab72e 100644
+--- a/modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml
++++ b/modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml
+@@ -52,7 +52,7 @@ Widgets.IconToolButton {
+                 to: "#00FF0000"//use "red" transparent
+                 //this is an animation and not a transisition, we explicitly want a long duration
+                 duration: 1000
+-                easing.type: Easing.InSine
++                easing.type: Easing.OutCubic
+             }
+ 
+             ColorAnimation  {
+diff --git a/modules/gui/qt/playlist/qml/PlaylistDelegate.qml b/modules/gui/qt/playlist/qml/PlaylistDelegate.qml
+index 292aa90af9..19cd645e1e 100644
+--- a/modules/gui/qt/playlist/qml/PlaylistDelegate.qml
++++ b/modules/gui/qt/playlist/qml/PlaylistDelegate.qml
+@@ -208,7 +208,7 @@ T.Control {
+                     // WARNING: OpacityAnimator is not used because `visible` is not immediately respected in that case.
+                     NumberAnimation {
+                         duration: VLCStyle.duration_short
+-                        easing.type: Easing.InSine
++                        easing.type: Easing.OutCubic
+                     }
+                 }
+ 
+diff --git a/modules/gui/qt/playlist/qml/PlaylistPane.qml b/modules/gui/qt/playlist/qml/PlaylistPane.qml
+index 8f380534b7..346a8bcc53 100644
+--- a/modules/gui/qt/playlist/qml/PlaylistPane.qml
++++ b/modules/gui/qt/playlist/qml/PlaylistPane.qml
+@@ -456,7 +456,7 @@ T.Pane {
+                 // NOTE: Usage of `SmoothedAnimation` is intentional here.
+                 SmoothedAnimation {
+                     duration: VLCStyle.duration_veryLong
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                 }
+             }
+ 
+diff --git a/modules/gui/qt/style/AcrylicController.qml b/modules/gui/qt/style/AcrylicController.qml
+index 9b1eed45c2..eef63de355 100644
+--- a/modules/gui/qt/style/AcrylicController.qml
++++ b/modules/gui/qt/style/AcrylicController.qml
+@@ -32,7 +32,7 @@ Item {
+     Behavior on uiTransluency {
+         NumberAnimation {
+             duration: VLCStyle.duration_long
+-            easing.type: Easing.InOutSine
++            easing.type: Easing.OutCubic
+         }
+     }
+ 
+diff --git a/modules/gui/qt/style/VLCStyle.qml b/modules/gui/qt/style/VLCStyle.qml
+index 40ba4a64e9..07aa9e79d1 100644
+--- a/modules/gui/qt/style/VLCStyle.qml
++++ b/modules/gui/qt/style/VLCStyle.qml
+@@ -287,19 +287,25 @@ QtObject {
+ 
+     readonly property int dragDelta: MainCtx.dp(12, scale)
+ 
+-    // durations. Values are aligned on Kirigami
++    // durations. Values are aligned on Kirigami.
++    //
++    // In an Omarchy build every animation is capped at 300 ms and disappears entirely while
++    // `omarchy toggle animations off` is in effect; the stock values apply otherwise.
++    readonly property bool omarchyStyle: MainCtx.omarchyStyle
++    readonly property bool animationsEnabled: MainCtx.omarchyAnimations
++    function duration(ms) { return animationsEnabled ? ms : 0 }
+ 
+     //should be used for animation that benefits from a longer animation than duration_long
+-    readonly property int duration_veryLong: 400
++    readonly property int duration_veryLong: duration(omarchyStyle ? 300 : 400)
+ 
+     //should be used for longer animation (opening/closing panes & dialogs)
+-    readonly property int duration_long: 200
++    readonly property int duration_long: duration(omarchyStyle ? 180 : 200)
+ 
+     //should be used for short animations (hovering, accuenting UI event)
+-    readonly property int duration_short: 100
++    readonly property int duration_short: duration(100)
+ 
+     //should be used for near instant animations
+-    readonly property int duration_veryShort: 50
++    readonly property int duration_veryShort: duration(50)
+ 
+     /* human time reaction, how much time before the user should be informed that something
+      * is going on, or before something should be automatically automated,
+diff --git a/modules/gui/qt/style/omarchytheme.cpp b/modules/gui/qt/style/omarchytheme.cpp
+index f57e4e76e4..0b5394c4ab 100644
+--- a/modules/gui/qt/style/omarchytheme.cpp
++++ b/modules/gui/qt/style/omarchytheme.cpp
+@@ -99,6 +99,14 @@ int OmarchyTheme::hyprlandRounding()
+                                                               QStringLiteral("decoration:rounding"), QStringLiteral("-j")}));
+ }
+ 
++QString OmarchyTheme::defaultNoAnimationsFlag()
++{
++    QString state = qEnvironmentVariable("XDG_STATE_HOME");
++    if (state.isEmpty())
++        state = QDir::homePath() + QStringLiteral("/.local/state");
++    return state + QStringLiteral("/omarchy/toggles/hypr/no-animations.lua");
++}
++
+ QString OmarchyTheme::defaultPath()
+ {
+     QString state = qEnvironmentVariable("XDG_STATE_HOME");
+@@ -107,9 +115,10 @@ QString OmarchyTheme::defaultPath()
+     return state + QStringLiteral("/omarchy/current/theme/colors.toml");
+ }
+ 
+-OmarchyTheme::OmarchyTheme(const QString &colorsPath, QObject *parent)
++OmarchyTheme::OmarchyTheme(const QString &colorsPath, const QString &noAnimationsFlag, QObject *parent)
+     : QObject(parent)
+     , m_path(colorsPath)
++    , m_flagPath(noAnimationsFlag)
+     , m_watcher(new QFileSystemWatcher(this))
+ {
+     m_debounce.setSingleShot(true);
+@@ -118,6 +127,7 @@ OmarchyTheme::OmarchyTheme(const QString &colorsPath, QObject *parent)
+     connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &OmarchyTheme::onFsEvent);
+     connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &OmarchyTheme::onFsEvent);
+ 
++    m_animations = !QFileInfo::exists(m_flagPath);
+     applyDefaults();
+     QFile f(m_path);
+     if (f.open(QIODevice::ReadOnly)) {
+@@ -311,7 +321,7 @@ bool OmarchyTheme::sameColoursAs(const OmarchyTheme &o) const
+ void OmarchyTheme::reload()
+ {
+     // Parse into a scratch object so "nothing changed" can be detected without a repaint.
+-    OmarchyTheme fresh(m_path);
++    OmarchyTheme fresh(m_path, m_flagPath);
+     // The scratch object's watcher and timer die with it.
+     const bool same = sameColoursAs(fresh);
+ 
+@@ -319,6 +329,13 @@ void OmarchyTheme::reload()
+     // warnings() describes the file as it is now.
+     m_warnings = fresh.m_warnings;
+     rearmWatcher();
++
++    const bool animations = !QFileInfo::exists(m_flagPath);
++    if (animations != m_animations)
++    {
++        m_animations = animations;
++        emit animationsChanged();
++    }
+     if (same)
+         return;
+ 
+@@ -341,14 +358,13 @@ void OmarchyTheme::rearmWatcher()
+     // QFileSystemWatcher forgets a path as soon as it is deleted or replaced, so add everything
+     // again after every event: the file, its directory, and the directories above it that a
+     // switch may replace (.../current/theme and .../current).
+-    const QStringList wanted = [&] {
+-        QStringList l;
+-        const QFileInfo fi(m_path);
++    // Walk up by path, not with QDir::cdUp(), which refuses to leave a directory that does not
++    // exist yet. Watch the nearest three existing directories above a file, so something that
++    // appears later (a first theme, a replaced .../current, the toggles directory) is noticed.
++    const auto watchAround = [](const QString &file, QStringList &l) {
++        const QFileInfo fi(file);
+         if (fi.exists())
+             l << fi.absoluteFilePath();
+-        // Walk up by path, not with QDir::cdUp(), which refuses to leave a directory that does
+-        // not exist yet. Watch the nearest three directories that exist, so a theme that appears
+-        // later (or a replaced .../current) is noticed.
+         QString dir = fi.absolutePath();
+         int watched = 0;
+         for (int depth = 0; depth < 8 && watched < 3; ++depth) {
+@@ -361,8 +377,11 @@ void OmarchyTheme::rearmWatcher()
+                 break;
+             dir = up;
+         }
+-        return l;
+-    }();
++    };
++    QStringList wanted;
++    watchAround(m_path, wanted);
++    watchAround(m_flagPath, wanted);
++    wanted.removeDuplicates();
+ 
+     const QStringList have = m_watcher->files() + m_watcher->directories();
+     QStringList missing;
+diff --git a/modules/gui/qt/style/omarchytheme.hpp b/modules/gui/qt/style/omarchytheme.hpp
+index 43587bcd69..ecabeef975 100644
+--- a/modules/gui/qt/style/omarchytheme.hpp
++++ b/modules/gui/qt/style/omarchytheme.hpp
+@@ -38,10 +38,17 @@ public:
+     /// Number of steps in the background ramp (matches VLC's darkGrey200..800).
+     static constexpr int RampSteps = 7;
+ 
+-    explicit OmarchyTheme(const QString &colorsPath = defaultPath(), QObject *parent = nullptr);
++    explicit OmarchyTheme(const QString &colorsPath = defaultPath(),
++                          const QString &noAnimationsFlag = defaultNoAnimationsFlag(),
++                          QObject *parent = nullptr);
+ 
+     /// $XDG_STATE_HOME/omarchy/current/theme/colors.toml
+     static QString defaultPath();
++    /// $XDG_STATE_HOME/omarchy/toggles/hypr/no-animations.lua, which `omarchy toggle animations off` creates.
++    static QString defaultNoAnimationsFlag();
++
++    /// False while Omarchy's "animations off" flag file exists.
++    bool animationsEnabled() const { return m_animations; }
+ 
+     const QString &path() const { return m_path; }
+     /// False when the file is missing or unreadable and the fallback is in use.
+@@ -88,6 +95,8 @@ public:
+ signals:
+     /// The theme's colours differ from what they were before the last reload.
+     void changed();
++    /// The animations toggle was switched.
++    void animationsChanged();
+ 
+ private slots:
+     void onFsEvent();
+@@ -100,6 +109,8 @@ private:
+     bool sameColoursAs(const OmarchyTheme &other) const;
+ 
+     QString m_path;
++    QString m_flagPath;
++    bool m_animations = true;
+     QFileSystemWatcher *m_watcher = nullptr;
+     QTimer m_debounce;
+ 
+diff --git a/modules/gui/qt/style/systempalette.cpp b/modules/gui/qt/style/systempalette.cpp
+index e6d6bb4d49..f705ee021d 100644
+--- a/modules/gui/qt/style/systempalette.cpp
++++ b/modules/gui/qt/style/systempalette.cpp
+@@ -477,6 +477,7 @@ void SystemPalette::makeLightPalette()
+ {
+     m_isDark = false;
+     const QColor fgDark = m_fgOverride.isValid() ? m_fgOverride : QColor(Qt::black);
++    const QColor bgEdge = m_bgEdgeOverride.isValid() ? m_bgEdgeOverride : QColor(Qt::white);
+ 
+     typedef ColorContext C;
+ 
+@@ -486,7 +487,7 @@ void SystemPalette::makeLightPalette()
+     {
+         C::ColorSet CS = C::View;
+         setColor(CS, C::Bg, C::Primary, C::Normal, lightGrey100 );
+-        setColor(CS, C::Bg, C::Secondary, C::Normal, Qt::white );
++        setColor(CS, C::Bg, C::Secondary, C::Normal, bgEdge );
+ 
+         setColor(CS, C::Fg, C::Primary, C::Normal, darkGrey300);
+         setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgDark, 0.3));
+@@ -648,7 +649,7 @@ void SystemPalette::makeLightPalette()
+     {
+         C::ColorSet CS = C::ComboBox;
+         setColor(CS, C::Fg, C::Primary, C::Normal, fgDark);
+-        setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(Qt::white, 0.8));
++        setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(bgEdge, 0.8));
+         setColor(CS, C::Bg, C::Secondary, C::Normal, lightGrey500);
+     }
+ 
+@@ -692,6 +693,7 @@ void SystemPalette::makeDarkPalette()
+ {
+     m_isDark = true;
+     const QColor fgLight = m_fgOverride.isValid() ? m_fgOverride : QColor(Qt::white);
++    const QColor bgEdge = m_bgEdgeOverride.isValid() ? m_bgEdgeOverride : QColor(Qt::black);
+ 
+     m_colorMap.clear();
+ 
+@@ -700,7 +702,7 @@ void SystemPalette::makeDarkPalette()
+     {
+         C::ColorSet CS = C::View;
+         setColor(CS, C::Bg, C::Primary, C::Normal, darkGrey300 );
+-        setColor(CS, C::Bg, C::Secondary, C::Normal, Qt::black );
++        setColor(CS, C::Bg, C::Secondary, C::Normal, bgEdge );
+ 
+         setColor(CS, C::Fg, C::Primary, C::Normal, fgLight );
+         setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgLight, 0.3) );
+@@ -735,8 +737,8 @@ void SystemPalette::makeDarkPalette()
+     //window banner & miniplayer
+     {
+         C::ColorSet CS = C::Window;
+-        setColor(CS, C::Bg, C::Primary, C::Normal, Qt::black); //FIXME
+-        setColor(CS, C::Bg, C::Secondary, C::Normal, Qt::black);
++        setColor(CS, C::Bg, C::Primary, C::Normal, bgEdge); //FIXME
++        setColor(CS, C::Bg, C::Secondary, C::Normal, bgEdge);
+         setColor(CS, C::Decoration, C::Border, C::Normal, darkGrey800); //FIXME not a predef
+     }
+ 
+@@ -765,7 +767,7 @@ void SystemPalette::makeDarkPalette()
+     {
+         C::ColorSet CS = C::ToolButton;
+         setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
+-        setColor(CS, C::Bg, C::Secondary, C::Normal, Qt::black);
++        setColor(CS, C::Bg, C::Secondary, C::Normal, bgEdge);
+ 
+         setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgLight, 0.6));
+         setColor(CS, C::Fg, C::Primary, C::Focused, fgLight);
+@@ -905,6 +907,7 @@ void SystemPalette::makeDarkPalette()
+ void SystemPalette::restoreStockColors()
+ {
+     m_fgOverride = QColor();
++    m_bgEdgeOverride = QColor();
+     if (!m_stock)
+         return;
+     orange500 = m_stock->orange500;
+@@ -955,6 +958,8 @@ void SystemPalette::makeOmarchyPalette()
+     orange500 = theme->accent();
+     orange800 = theme->accent().lighter(150);
+     m_fgOverride = theme->foreground();
++    // The stock palettes use pure black / white for their outermost surfaces; use the theme's own.
++    m_bgEdgeOverride = theme->widgetPalette(false).value(QPalette::Base);
+ 
+     if (theme->isDark())
+     {
+@@ -971,6 +976,15 @@ void SystemPalette::makeOmarchyPalette()
+         makeLightPalette();
+     }
+ 
++    // Keyboard focus is drawn in the accent, not plain white or black, so it is visible on every
++    // theme. Focus rings are not text, so 3:1 against the surface is enough.
++    {
++        typedef ColorContext C;
++        const QColor viewBg = getColor(C::View, C::Bg, C::Primary, C::Normal);
++        setColor(C::View, C::Decoration, C::VisualFocus, C::Focused,
++                 OmarchyTheme::ensureContrast(theme->accent(), viewBg, 3.0));
++    }
++
+     applyContrastSafety();
+ }
+ 
+diff --git a/modules/gui/qt/style/systempalette.hpp b/modules/gui/qt/style/systempalette.hpp
+index c3b84ea2d2..111eda24af 100644
+--- a/modules/gui/qt/style/systempalette.hpp
++++ b/modules/gui/qt/style/systempalette.hpp
+@@ -188,6 +188,8 @@ private:
+ 
+     /// Theme foreground used by the stock palettes while the Omarchy scheme is active; invalid otherwise.
+     QColor m_fgOverride;
++    /// Theme colour for the stock palettes' outermost surfaces (pure black or white); invalid otherwise.
++    QColor m_bgEdgeOverride;
+     /// The stock base colours, saved before the Omarchy scheme overwrites them.
+     struct StockColors {
+         QColor orange500, orange800, dark[7], light[7];
+diff --git a/modules/gui/qt/tests/test_qt_omarchytheme.cpp b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+index f018d687b7..7fe680d0c7 100644
+--- a/modules/gui/qt/tests/test_qt_omarchytheme.cpp
++++ b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+@@ -309,6 +309,40 @@ private slots:
+         QCOMPARE(disabled.value(QPalette::Window), active.value(QPalette::Window));
+     }
+ 
++    void animationsFollowTheOmarchyToggleFile()
++    {
++        install(darkToml);
++        const QString flag = root() + "/toggles/hypr/no-animations.lua";
++        OmarchyTheme theme(colorsPath(), flag);
++        QVERIFY(theme.animationsEnabled());           // no flag file means animations are on
++        QSignalSpy spy(&theme, &OmarchyTheme::animationsChanged);
++
++        // `omarchy toggle animations off` copies a flag file into place.
++        QVERIFY(QDir().mkpath(root() + "/toggles/hypr"));
++        QVERIFY(writeFile(flag, "hl.config({})\n"));
++        QTRY_VERIFY_WITH_TIMEOUT(spy.count() >= 1, 3000);
++        QVERIFY(!theme.animationsEnabled());
++
++        // and turning them back on removes it.
++        const int before = spy.count();
++        QVERIFY(QFile::remove(flag));
++        QTRY_VERIFY_WITH_TIMEOUT(spy.count() > before, 3000);
++        QVERIFY(theme.animationsEnabled());
++    }
++
++    void animationFlagDoesNotRepaintColours()
++    {
++        install(darkToml);
++        const QString flag = root() + "/toggles/hypr/no-animations.lua";
++        OmarchyTheme theme(colorsPath(), flag);
++        QSignalSpy colours(&theme, &OmarchyTheme::changed);
++        QSignalSpy anim(&theme, &OmarchyTheme::animationsChanged);
++        QVERIFY(QDir().mkpath(root() + "/toggles/hypr"));
++        QVERIFY(writeFile(flag, "x"));
++        QTRY_VERIFY_WITH_TIMEOUT(anim.count() >= 1, 3000);
++        QCOMPARE(colours.count(), 0);
++    }
++
+     void doesNotEmitChangedWhenNothingChanged()
+     {
+         install(darkToml);
+diff --git a/modules/gui/qt/util/qml/FadeControllerStateGroup.qml b/modules/gui/qt/util/qml/FadeControllerStateGroup.qml
+index b70fd3a1fa..22ee531027 100644
+--- a/modules/gui/qt/util/qml/FadeControllerStateGroup.qml
++++ b/modules/gui/qt/util/qml/FadeControllerStateGroup.qml
+@@ -61,7 +61,7 @@ StateGroup {
+                     property: "opacity"
+ 
+                     duration: VLCStyle.duration_long
+-                    easing.type: Easing.InSine
++                    easing.type: Easing.OutCubic
+                 }
+ 
+                 PropertyAction {
+diff --git a/modules/gui/qt/widgets/qml/BannerCone.qml b/modules/gui/qt/widgets/qml/BannerCone.qml
+index 0d86baaff6..5d7164dfa3 100644
+--- a/modules/gui/qt/widgets/qml/BannerCone.qml
++++ b/modules/gui/qt/widgets/qml/BannerCone.qml
+@@ -19,21 +19,48 @@
+ import QtQuick
+ 
+ 
+-import VLC.MainInterface
+-import VLC.Widgets as Widgets
+-import VLC.Style
+-import VLC.Util
++import QtQuick
+ 
+-Image {
++import VLC.Style
++
++/*
++ * The interface mark. Upstream shows the VLC cone here; omaplay draws a theme-tinted play glyph in
++ * an outlined circle instead, so the interface carries no cone branding and follows the palette.
++ * The name and the sourceSize/color API are kept so the callers stay untouched.
++ */
++Item {
+     id: root
+ 
+     required property color color
+ 
+-    sourceSize: Qt.size(VLCStyle.icon_normal, VLCStyle.icon_normal)
++    property size sourceSize: Qt.size(VLCStyle.icon_normal, VLCStyle.icon_normal)
+ 
+-    mipmap: MainCtx.useXmasCone()
+-    source: MainCtx.useXmasCone() ? "qrc:///logo/vlc48-xmas.png" // TODO: new xmas cone for designs?
+-                                  : "qrc:///misc/cone.svg"
++    implicitWidth: sourceSize.width
++    implicitHeight: sourceSize.height
+ 
+     focus: false
++
++    Rectangle {
++        anchors.fill: parent
++
++        radius: width / 2
++        color: "transparent"
++
++        border.color: root.color
++        border.width: Math.max(1, Math.round(root.width / 14))
++    }
++
++    Text {
++        anchors.centerIn: parent
++        // The glyph is drawn slightly left of centre in its em box; nudge it so it looks centred.
++        anchors.horizontalCenterOffset: root.width * 0.04
++
++        text: VLCIcons.play_filled
++        font.family: VLCIcons.fontFamily
++        font.pixelSize: Math.round(root.width * 0.46)
++        color: root.color
++
++        textFormat: Text.PlainText
++        Accessible.ignored: true
++    }
+ }
+diff --git a/modules/gui/qt/widgets/qml/DrawerExt.qml b/modules/gui/qt/widgets/qml/DrawerExt.qml
+index 0d39fd06dd..82db36efad 100644
+--- a/modules/gui/qt/widgets/qml/DrawerExt.qml
++++ b/modules/gui/qt/widgets/qml/DrawerExt.qml
+@@ -108,7 +108,7 @@ FocusScope {
+                     property: root._toChange
+ 
+                     duration: VLCStyle.duration_short
+-                    easing.type: Easing.InSine
++                    easing.type: Easing.OutCubic
+                 }
+ 
+                 PropertyAction{
+diff --git a/modules/gui/qt/widgets/qml/FadingEdge.qml b/modules/gui/qt/widgets/qml/FadingEdge.qml
+index 726b271f1b..71059afb79 100644
+--- a/modules/gui/qt/widgets/qml/FadingEdge.qml
++++ b/modules/gui/qt/widgets/qml/FadingEdge.qml
+@@ -130,7 +130,7 @@ Item {
+             // NOTE: Do not use `OpacityAnimator` here, interrupting the fade stalls the UI (QTBUG-151700).
+             NumberAnimation {
+                 duration: VLCStyle.duration_short
+-                easing.type: Easing.InOutSine
++                easing.type: Easing.OutCubic
+             }
+         }
+ 
+@@ -293,7 +293,7 @@ Item {
+                 // FIXME: Is it fixed with Qt 6?
+                 NumberAnimation {
+                     duration: VLCStyle.duration_veryShort
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                 }
+             }
+ 
+diff --git a/modules/gui/qt/widgets/qml/FloatingNotification.qml b/modules/gui/qt/widgets/qml/FloatingNotification.qml
+index b53a927ad9..61d52b1da0 100644
+--- a/modules/gui/qt/widgets/qml/FloatingNotification.qml
++++ b/modules/gui/qt/widgets/qml/FloatingNotification.qml
+@@ -37,7 +37,7 @@ Column {
+     Behavior on y {
+         NumberAnimation {
+             duration: VLCStyle.duration_short
+-            easing.type: Easing.InOutQuad
++            easing.type: Easing.OutCubic
+         }
+     }
+ 
+@@ -76,7 +76,9 @@ Column {
+ 
+             radius: VLCStyle.dp(3, VLCStyle.scale)
+ 
+-            scale: 0
++            // Never scale from zero: start just below full size and fade in.
++            scale: 0.96
++            opacity: 0
+ 
+             state: "HIDDEN"
+ 
+@@ -89,6 +91,7 @@ Column {
+                         target: delegate
+                         visible: true
+                         scale: 1
++                        opacity: 1
+                     }
+                 },
+                 State {
+@@ -96,7 +99,8 @@ Column {
+                     PropertyChanges {
+                         target: delegate
+                         visible: false
+-                        scale: 0
++                        scale: 0.96
++                        opacity: 0
+                     }
+                 }
+             ]
+@@ -107,11 +111,9 @@ Column {
+                     to: "HIDDEN"
+ 
+                     SequentialAnimation {
+-                        NumberAnimation {
+-                            target: delegate
+-                            property: "scale"
+-                            duration: VLCStyle.duration_short
+-                            easing.type: Easing.InOutQuad
++                        ParallelAnimation {
++                            NumberAnimation { target: delegate; property: "scale"; duration: VLCStyle.duration_short; easing.type: Easing.OutCubic }
++                            NumberAnimation { target: delegate; property: "opacity"; duration: VLCStyle.duration_short; easing.type: Easing.OutCubic }
+                         }
+ 
+                         PropertyAction {
+@@ -135,11 +137,9 @@ Column {
+                             property: "visible"
+                         }
+ 
+-                        NumberAnimation {
+-                            target: delegate
+-                            property: "scale"
+-                            duration: VLCStyle.duration_short
+-                            easing.type: Easing.InOutQuad
++                        ParallelAnimation {
++                            NumberAnimation { target: delegate; property: "scale"; duration: VLCStyle.duration_short; easing.type: Easing.OutCubic }
++                            NumberAnimation { target: delegate; property: "opacity"; duration: VLCStyle.duration_short; easing.type: Easing.OutCubic }
+                         }
+                     }
+                 }
+diff --git a/modules/gui/qt/widgets/qml/GridItem.qml b/modules/gui/qt/widgets/qml/GridItem.qml
+index 9ac60c37e8..1312c791f8 100644
+--- a/modules/gui/qt/widgets/qml/GridItem.qml
++++ b/modules/gui/qt/widgets/qml/GridItem.qml
+@@ -144,7 +144,7 @@ T.ItemDelegate {
+                 NumberAnimation {
+                     properties: "opacity"
+                     duration: VLCStyle.duration_long
+-                    easing.type: Easing.InSine
++                    easing.type: Easing.OutCubic
+                 }
+             }
+         },
+diff --git a/modules/gui/qt/widgets/qml/ListViewExt.qml b/modules/gui/qt/widgets/qml/ListViewExt.qml
+index eb2abc0787..69eb8be60a 100644
+--- a/modules/gui/qt/widgets/qml/ListViewExt.qml
++++ b/modules/gui/qt/widgets/qml/ListViewExt.qml
+@@ -528,7 +528,7 @@ ListView {
+         // NOTE: Usage of `SmoothedAnimation` is intentional here.
+         SmoothedAnimation {
+             duration: VLCStyle.duration_veryLong
+-            easing.type: Easing.InOutSine
++            easing.type: Easing.OutCubic
+         }
+     }
+ 
+diff --git a/modules/gui/qt/widgets/qml/MediaCover.qml b/modules/gui/qt/widgets/qml/MediaCover.qml
+index 9f14793089..f7f2083c9a 100644
+--- a/modules/gui/qt/widgets/qml/MediaCover.qml
++++ b/modules/gui/qt/widgets/qml/MediaCover.qml
+@@ -188,7 +188,7 @@ Item {
+                 NumberAnimation {
+                     duration: VLCStyle.duration_short
+ 
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                 }
+             }
+ 
+diff --git a/modules/gui/qt/widgets/qml/PlayCover.qml b/modules/gui/qt/widgets/qml/PlayCover.qml
+index f5057ac0eb..415a3755fb 100644
+--- a/modules/gui/qt/widgets/qml/PlayCover.qml
++++ b/modules/gui/qt/widgets/qml/PlayCover.qml
+@@ -63,7 +63,7 @@ Item {
+         NumberAnimation {
+             duration: VLCStyle.duration_short
+ 
+-            easing.type: Easing.InOutSine
++            easing.type: Easing.OutCubic
+         }
+     }
+ 
+diff --git a/modules/gui/qt/widgets/qml/ProgressBarExt.qml b/modules/gui/qt/widgets/qml/ProgressBarExt.qml
+index de48843fce..ab3145530c 100644
+--- a/modules/gui/qt/widgets/qml/ProgressBarExt.qml
++++ b/modules/gui/qt/widgets/qml/ProgressBarExt.qml
+@@ -111,7 +111,7 @@ T.ProgressBar {
+                         to: 1.0
+ 
+                         duration: VLCStyle.durationSliderBouncing
+-                        easing.type: Easing.OutBounce
++                        easing.type: Easing.OutCubic
+                     }
+ 
+                     NumberAnimation {
+@@ -119,7 +119,7 @@ T.ProgressBar {
+                         to: 0
+ 
+                         duration: VLCStyle.durationSliderBouncing
+-                        easing.type: Easing.OutBounce
++                        easing.type: Easing.OutCubic
+                     }
+                 }
+             }
+diff --git a/modules/gui/qt/widgets/qml/SearchBox.qml b/modules/gui/qt/widgets/qml/SearchBox.qml
+index a9ffb332b0..3ac0f1e786 100644
+--- a/modules/gui/qt/widgets/qml/SearchBox.qml
++++ b/modules/gui/qt/widgets/qml/SearchBox.qml
+@@ -133,7 +133,7 @@ FocusScope {
+                     id: animation
+ 
+                     property: "height"
+-                    easing.type: Easing.InOutSine
++                    easing.type: Easing.OutCubic
+                     duration: VLCStyle.duration_long
+                 }
+ 

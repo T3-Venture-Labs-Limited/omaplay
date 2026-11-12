@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:20:16 +0530
+Subject: [PATCH 02/17] Use configurable user directory name and desktop id
+
+The XDG config, data and cache directories, the Qt interface QSettings
+organisation and the Wayland/desktop file name come from build options instead
+of a hard-coded "vlc", so a branded build shares no state with stock VLC.
+---
+ modules/gui/qt/qt.cpp | 4 ++--
+ src/posix/dirs.c      | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/modules/gui/qt/qt.cpp b/modules/gui/qt/qt.cpp
+index b5fb7d6528..9727bb7f45 100644
+--- a/modules/gui/qt/qt.cpp
++++ b/modules/gui/qt/qt.cpp
+@@ -966,7 +966,7 @@ static void *Thread( void *obj )
+ #else
+             QSettings::NativeFormat,
+ #endif
+-            QSettings::UserScope, "vlc", "vlc-qt-interface" );
++            QSettings::UserScope, VLC_USER_DIR_NAME, "vlc-qt-interface" );
+ 
+     // It is guaranteed that the returned format is supported, if a format is returned.
+     static const auto createCompatibleOpenGLFormat = []() -> std::optional<QSurfaceFormat> {
+@@ -1252,7 +1252,7 @@ static void *Thread( void *obj )
+     else
+         app.setWindowIcon( QIcon::fromTheme( "vlc", QIcon( ":/logo/vlc256.png" ) ) );
+ 
+-    app.setDesktopFileName( PACKAGE );
++    app.setDesktopFileName( VLC_DESKTOP_ID );
+ 
+     DialogErrorModel::getInstance( p_intf );
+     VLCDialogModel::getInstance( p_intf );
+diff --git a/src/posix/dirs.c b/src/posix/dirs.c
+index d8ec536ac0..75b1f7764f 100644
+--- a/src/posix/dirs.c
++++ b/src/posix/dirs.c
+@@ -147,14 +147,14 @@ static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
+     const char *home = getenv (var);
+     if (home != NULL)
+     {
+-        if (asprintf (&psz_dir, "%s/vlc", home) == -1)
++        if (asprintf (&psz_dir, "%s/" VLC_USER_DIR_NAME, home) == -1)
+             psz_dir = NULL;
+         return psz_dir;
+     }
+ 
+     char *psz_home = config_GetHomeDir ();
+     if( psz_home == NULL
+-     || asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
++     || asprintf( &psz_dir, "%s/%s/" VLC_USER_DIR_NAME, psz_home, xdg_default ) == -1 )
+         psz_dir = NULL;
+     free (psz_home);
+     return psz_dir;

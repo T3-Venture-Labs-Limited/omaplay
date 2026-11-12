@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 17:46:03 +0530
+Subject: [PATCH 14/17] qt: readable message severity colours on dark themes
+
+The Messages dialog coloured severities with darkRed, darkBlue, darkGreen and darkGray, which are
+unreadable on a dark base. Use lighter equivalents when the widget's own base is dark.
+---
+ modules/gui/qt/dialogs/messages/messages.cpp | 29 ++++++++++++++++----
+ 1 file changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/modules/gui/qt/dialogs/messages/messages.cpp b/modules/gui/qt/dialogs/messages/messages.cpp
+index 2406eca878..b5914bcb23 100644
+--- a/modules/gui/qt/dialogs/messages/messages.cpp
++++ b/modules/gui/qt/dialogs/messages/messages.cpp
+@@ -46,6 +46,23 @@
+ #include "dialogs/messages/messages.hpp"
+ #include "dialogs/dialogs/dialogmodel.hpp"
+ 
++namespace {
++// The severity colours are dark variants meant for a light background. On a dark one (an Omarchy
++// theme) they are unreadable, so use lighter equivalents when the widget's own base is dark.
++QColor severityColor(const QWidget *w, Qt::GlobalColor light)
++{
++    if (w->palette().color(QPalette::Base).lightness() >= 128)
++        return light;
++    switch (light) {
++    case Qt::darkRed:   return QColor(0xff, 0x7b, 0x7b);
++    case Qt::darkBlue:  return QColor(0x7f, 0xb2, 0xff);
++    case Qt::darkGreen: return QColor(0x86, 0xdc, 0x96);
++    case Qt::darkGray:  return QColor(0xb0, 0xb0, 0xb0);
++    default:            return light;
++    }
++}
++} // namespace
++
+ enum {
+     MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,
+ };
+@@ -191,7 +208,7 @@ void MessagesDialog::addError(int row){
+     QTextCharFormat format;
+ 
+     format.setProperty( QTextFormat::FontItalic, true );
+-    format.setForeground( Qt::darkRed );
++    format.setForeground( severityColor( errorsList, Qt::darkRed ) );
+     errorsList->textCursor().insertText( errors->data(errors->index(row, 0), DialogErrorModel::DIALOG_TITLE).toString()+": ", format );
+ 
+     format.setProperty( QTextFormat::FontItalic, false );
+@@ -264,27 +281,27 @@ void MessagesDialog::sinkMessage( const MsgEvent *msg )
+     /* Insert the prefix */
+     QTextCharFormat format;
+     format.setProperty( QTextFormat::FontItalic, true );
+-    format.setForeground( Qt::darkBlue );
++    format.setForeground( severityColor( messages, Qt::darkBlue ) );
+ 
+     messages->textCursor().insertText( msg->module, format );
+ 
+     switch ( msg->priority )
+     {
+         case VLC_MSG_INFO:
+-            format.setForeground( Qt::darkBlue );
++            format.setForeground( severityColor( messages, Qt::darkBlue ) );
+             messages->textCursor().insertText( " info: ", format );
+             break;
+         case VLC_MSG_ERR:
+-            format.setForeground( Qt::darkRed );
++            format.setForeground( severityColor( messages, Qt::darkRed ) );
+             messages->textCursor().insertText( " error: ", format );
+             break;
+         case VLC_MSG_WARN:
+-            format.setForeground( Qt::darkGreen );
++            format.setForeground( severityColor( messages, Qt::darkGreen ) );
+             messages->textCursor().insertText( " warning: ", format );
+             break;
+         case VLC_MSG_DBG:
+         default:
+-            format.setForeground( Qt::darkGray );
++            format.setForeground( severityColor( messages, Qt::darkGray ) );
+             messages->textCursor().insertText( " debug: ", format );
+             break;
+     }

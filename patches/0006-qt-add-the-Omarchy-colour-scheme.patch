@@ -1,0 +1,809 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:36:15 +0530
+Subject: [PATCH 06/17] qt: add the Omarchy colour scheme
+
+Append an Omarchy scheme to ColorSchemeModel (stock System/Day/Night keep their
+indices) and let omarchy_default make it the default and stop the first-run
+wizard overriding it. SystemPalette::makeOmarchyPalette() substitutes the theme's
+colours for the base colours of the stock palettes and lets upstream derive every
+state; foreground lines read the theme foreground, and a final pass raises any
+text/background pair below 4.5:1. MainCtx owns the OmarchyTheme, warns once when
+the theme file is missing, and maps the scheme to Qt::ColorScheme from the theme
+mode. Covered by test_qt_color_scheme_model.
+---
+ config.h.meson                                |   1 +
+ meson.build                                   |   1 +
+ meson_options.txt                             |   4 +
+ .../qt/dialogs/firstrun/firstrunwizard.cpp    |   4 +
+ modules/gui/qt/maininterface/mainctx.cpp      |  67 ++++--
+ modules/gui/qt/maininterface/mainctx.hpp      |   5 +
+ modules/gui/qt/meson.build                    |  20 ++
+ modules/gui/qt/style/systempalette.cpp        | 215 +++++++++++++-----
+ modules/gui/qt/style/systempalette.hpp        |  12 +
+ .../qt/tests/test_qt_color_scheme_model.cpp   |  74 ++++++
+ modules/gui/qt/util/color_scheme_model.cpp    |  14 +-
+ modules/gui/qt/util/color_scheme_model.hpp    |   3 +-
+ 12 files changed, 342 insertions(+), 78 deletions(-)
+ create mode 100644 modules/gui/qt/tests/test_qt_color_scheme_model.cpp
+
+diff --git a/config.h.meson b/config.h.meson
+index a86cbc70e0..b96e2f6f8b 100644
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -525,6 +525,7 @@
+ #mesondefine VLC_APP_IDENTITY
+ #mesondefine VLC_HW_DEC_DEFAULT
+ #mesondefine VLC_WIZARD_SETS_CSD
++#mesondefine VLC_OMARCHY_DEFAULT
+ 
+ /* Define to the version of this package. */
+ #mesondefine PACKAGE_VERSION
+diff --git a/meson.build b/meson.build
+index dd06424b6e..9410c18264 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1037,6 +1037,7 @@ cdata.set_quoted('VLC_MPRIS_NAME',      get_option('mpris_name'))
+ cdata.set_quoted('VLC_APP_IDENTITY',    get_option('app_identity'))
+ cdata.set10('VLC_HW_DEC_DEFAULT',      get_option('hw_dec_default'))
+ cdata.set10('VLC_WIZARD_SETS_CSD',     get_option('csd_wizard'))
++cdata.set10('VLC_OMARCHY_DEFAULT',      get_option('omarchy_default'))
+ cdata.set_quoted('COPYRIGHT_YEARS',     vlc_copyright_years)
+ cdata.set_quoted('COPYRIGHT_MESSAGE',   f'Copyright © @vlc_copyright_years@ the VideoLAN team')
+ 
+diff --git a/meson_options.txt b/meson_options.txt
+index ad21b342d9..e8e5f6e71c 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -886,3 +886,7 @@ option('csd_wizard',
+     type : 'boolean',
+     value : true,
+     description : 'Let the first-run wizard turn client-side decorations on (stock behaviour)')
++option('omarchy_default',
++    type : 'boolean',
++    value : false,
++    description : 'Make the Omarchy colour scheme the default and keep the first-run wizard from overriding it')
+diff --git a/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp b/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
+index bb16f7cb38..2ca7a8c830 100644
+--- a/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
++++ b/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
+@@ -143,7 +143,9 @@ void FirstRunWizard::finish()
+     config_PutInt( "qt-privacy-ask", 0 );
+ 
+     /* Colour Page settings */
++#if !VLC_OMARCHY_DEFAULT
+     p_intf->p_mi->getColorScheme()->setCurrentIndex( colorSchemeGroup->checkedId() );
++#endif
+ 
+     /* Layout Page settings */
+     config_PutInt( "qt-menubar", ui.layoutGroup->checkedId() );
+@@ -328,7 +330,9 @@ void FirstRunWizard::reject()
+     config_PutInt( "qt-privacy-ask", 0 );
+ 
+     /* Colour Page settings */
++#if !VLC_OMARCHY_DEFAULT
+     p_intf->p_mi->getColorScheme()->setCurrentIndex( 0 );
++#endif
+ 
+     /* Layout Page settings */
+     config_PutInt( "qt-menubar", 0 );
+diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
+index 5267f028e2..79e28893b4 100644
+--- a/modules/gui/qt/maininterface/mainctx.cpp
++++ b/modules/gui/qt/maininterface/mainctx.cpp
+@@ -43,6 +43,7 @@
+ #include "util/qt_dirs.hpp"                     // toNativeSeparators
+ 
+ #include "util/color_scheme_model.hpp"
++#include "style/omarchytheme.hpp"
+ #include "util/model_recovery_agent.hpp"
+ 
+ #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
+@@ -160,28 +161,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
+     settings = getSettings();
+     m_colorScheme = new ColorSchemeModel(this);
+ 
+-    connect(m_colorScheme, &ColorSchemeModel::currentChanged, qGuiApp, [colorScheme = m_colorScheme]() {
+-        QStyleHints *const styleHints = qGuiApp->styleHints();
+-        if (unlikely(!styleHints))
+-            return;
+-
+-        Qt::ColorScheme scheme;
+-        switch (colorScheme->currentScheme())
+-        {
+-        case ColorSchemeModel::ColorScheme::Day:
+-            scheme = Qt::ColorScheme::Light;
+-            break;
+-        case ColorSchemeModel::ColorScheme::Night:
+-            scheme = Qt::ColorScheme::Dark;
+-            break;
+-        case ColorSchemeModel::ColorScheme::System:
+-        default:
+-            styleHints->unsetColorScheme();
+-            return;
+-        }
+-
+-        styleHints->setColorScheme(scheme);
+-    });
++    connect(m_colorScheme, &ColorSchemeModel::currentChanged, this, &MainCtx::applyQtColorScheme);
+ 
+     m_sort = new SortCtx(this);
+     m_search = new SearchCtx(this);
+@@ -382,6 +362,47 @@ bool MainCtx::hasVLM() const {
+ #endif
+ }
+ 
++OmarchyTheme *MainCtx::omarchyTheme()
++{
++    if (!m_omarchyTheme)
++    {
++        m_omarchyTheme = new OmarchyTheme(OmarchyTheme::defaultPath(), this);
++        // One warning per start-up, e.g. when the theme file does not exist.
++        for (const QString &warning : m_omarchyTheme->warnings())
++            msg_Warn(p_intf, "%s", qtu(warning));
++        // A theme switch changes the light/dark hint that QtWidgets dialogs follow.
++        connect(m_omarchyTheme, &OmarchyTheme::changed, this, &MainCtx::applyQtColorScheme);
++    }
++    return m_omarchyTheme;
++}
++
++void MainCtx::applyQtColorScheme()
++{
++    QStyleHints *const styleHints = qGuiApp->styleHints();
++    if (unlikely(!styleHints))
++        return;
++
++    Qt::ColorScheme scheme;
++    switch (m_colorScheme->currentScheme())
++    {
++    case ColorSchemeModel::ColorScheme::Day:
++        scheme = Qt::ColorScheme::Light;
++        break;
++    case ColorSchemeModel::ColorScheme::Night:
++        scheme = Qt::ColorScheme::Dark;
++        break;
++    case ColorSchemeModel::ColorScheme::Omarchy:
++        scheme = omarchyTheme()->isDark() ? Qt::ColorScheme::Dark : Qt::ColorScheme::Light;
++        break;
++    case ColorSchemeModel::ColorScheme::System:
++    default:
++        styleHints->unsetColorScheme();
++        return;
++    }
++
++    styleHints->setColorScheme(scheme);
++}
++
+ bool MainCtx::useClientSideDecoration() const
+ {
+     //don't show CSD when interface is fullscreen
+@@ -500,7 +521,7 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
+ 
+     loadFromSettings(m_lyricsMode, "MainWindow/lyrics-mode", true, this, &MainCtx::lyricsModeChanged);
+ 
+-    const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", 0 ).toInt();
++    const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", m_colorScheme->currentIndex() ).toInt();
+     m_colorScheme->setCurrentIndex(colorSchemeIndex);
+ 
+     /* user interface scale factor */
+diff --git a/modules/gui/qt/maininterface/mainctx.hpp b/modules/gui/qt/maininterface/mainctx.hpp
+index ce48d0cdc2..6466e58d46 100644
+--- a/modules/gui/qt/maininterface/mainctx.hpp
++++ b/modules/gui/qt/maininterface/mainctx.hpp
+@@ -66,6 +66,7 @@ class SortCtx;
+ class VLCSystray;
+ class MediaLib;
+ class ColorSchemeModel;
++class OmarchyTheme;
+ class VLCVarChoiceModel;
+ class SidePanelCtx;
+ #ifdef UPDATE_CHECK
+@@ -242,6 +243,8 @@ public:
+     inline bool albumSections() const { return m_albumSections; }
+     inline bool lyricsMode() const { return m_lyricsMode; }
+     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
++    /// The active Omarchy theme, created on first use. Owned by this object.
++    OmarchyTheme* omarchyTheme();
+     bool hasVLM() const;
+     bool useClientSideDecoration() const;
+     bool hasFirstrun() const;
+@@ -446,6 +449,8 @@ protected:
+     bool                 m_hasGridListMode = false;
+     Grouping             m_grouping = GROUPING_NONE;
+     ColorSchemeModel*    m_colorScheme = nullptr;
++    OmarchyTheme*        m_omarchyTheme = nullptr;
++    void applyQtColorScheme();
+     bool                 m_windowTitlebar = true;
+     // NOTE: Ideally this should be a QVLCBool.
+     bool                 m_hasToolbarMenu = false;
+diff --git a/modules/gui/qt/meson.build b/modules/gui/qt/meson.build
+index b1d612cde3..3200c8de5f 100644
+--- a/modules/gui/qt/meson.build
++++ b/modules/gui/qt/meson.build
+@@ -1363,6 +1363,26 @@ if qt6_dep.found()
+             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
+         }
+ 
++        vlc_tests += {
++            'name': 'test_qt_color_scheme_model',
++            'sources': files(
++                'tests/vlc_stub_modules.cpp',
++                'tests/test_qt_color_scheme_model.cpp',
++                'util/color_scheme_model.hpp',
++                'util/color_scheme_model.cpp'
++            ),
++            'moc_sources': files(
++                'tests/test_qt_color_scheme_model.cpp'
++            ),
++            'moc_headers': files(
++                'util/color_scheme_model.hpp'
++            ),
++            'suite': ['qt'],
++            'include_directories' : qt_include_dir,
++            'link_with': [libvlccore, libvlc],
++            'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
++        }
++
+         vlc_tests += {
+             'name': 'test_qt_omarchytheme',
+             'sources': files(
+diff --git a/modules/gui/qt/style/systempalette.cpp b/modules/gui/qt/style/systempalette.cpp
+index f7430f42b2..e6d6bb4d49 100644
+--- a/modules/gui/qt/style/systempalette.cpp
++++ b/modules/gui/qt/style/systempalette.cpp
+@@ -16,6 +16,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+  *****************************************************************************/
+ #include "systempalette.hpp"
++#include "omarchytheme.hpp"
+ #include <QGuiApplication>
+ #include <QPalette>
+ #include <QSettings>
+@@ -383,6 +384,8 @@ void SystemPalette::setCtx(MainCtx* ctx)
+ void SystemPalette::updatePalette()
+ {
+     m_palettePriv.reset();
++    if (m_source != ColorSchemeModel::Omarchy)
++        restoreStockColors();
+     switch(m_source)
+     {
+     case ColorSchemeModel::System:
+@@ -394,6 +397,9 @@ void SystemPalette::updatePalette()
+     case ColorSchemeModel::Night:
+         makeDarkPalette();
+         break;
++    case ColorSchemeModel::Omarchy:
++        makeOmarchyPalette();
++        break;
+     default:
+         break;
+     }
+@@ -470,6 +476,7 @@ QColor SystemPalette::getColor(ColorContext::ColorSet colorSet, ColorContext::Co
+ void SystemPalette::makeLightPalette()
+ {
+     m_isDark = false;
++    const QColor fgDark = m_fgOverride.isValid() ? m_fgOverride : QColor(Qt::black);
+ 
+     typedef ColorContext C;
+ 
+@@ -482,9 +489,9 @@ void SystemPalette::makeLightPalette()
+         setColor(CS, C::Bg, C::Secondary, C::Normal, Qt::white );
+ 
+         setColor(CS, C::Fg, C::Primary, C::Normal, darkGrey300);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.3));
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgDark, 0.3));
+ 
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::black, 0.7));
++        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(fgDark, 0.7));
+ 
+         setColor(CS, C::Bg, C::Negative, C::Normal, QColor("#fde7e9")); //FIXME
+         setColor(CS, C::Fg, C::Negative, C::Normal, Qt::red);
+@@ -533,11 +540,11 @@ void SystemPalette::makeLightPalette()
+         setColor(CS, C::Bg, C::Primary, C::Focused, lightGrey300);
+         setColor(CS, C::Bg, C::Primary, C::Hovered, lightGrey300);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::black, 0.6));
+-        setColor(CS, C::Fg, C::Primary, C::Focused, Qt::black);
+-        setColor(CS, C::Fg, C::Primary, C::Hovered, Qt::black);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.2));
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, Qt::black);
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgDark, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Focused, fgDark);
++        setColor(CS, C::Fg, C::Primary, C::Hovered, fgDark);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgDark, 0.2));
++        setColor(CS, C::Fg, C::Secondary, C::Normal, fgDark);
+     }
+ 
+     //tool button
+@@ -546,11 +553,11 @@ void SystemPalette::makeLightPalette()
+         setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
+         setColor(CS, C::Bg, C::Secondary, C::Normal, lightGrey400);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::black, 0.6));
+-        setColor(CS, C::Fg, C::Primary, C::Focused, Qt::black);
+-        setColor(CS, C::Fg, C::Primary, C::Hovered, Qt::black);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.2));
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, Qt::black);
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgDark, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Focused, fgDark);
++        setColor(CS, C::Fg, C::Primary, C::Hovered, fgDark);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgDark, 0.2));
++        setColor(CS, C::Fg, C::Secondary, C::Normal, fgDark);
+ 
+         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
+         setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
+@@ -564,8 +571,8 @@ void SystemPalette::makeLightPalette()
+         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(lightGrey700, 0.0));
+         setColor(CS, C::Bg, C::Primary, C::Focused, lightGrey700);
+         setColor(CS, C::Bg, C::Primary, C::Hovered, lightGrey700);
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::black);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.2));
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgDark);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgDark, 0.2));
+     }
+ 
+     //Item
+@@ -578,10 +585,10 @@ void SystemPalette::makeLightPalette()
+         setColor(CS, C::Bg, C::Highlight, C::Normal, lightGrey600);
+         setColor(CS, C::Bg, C::Highlight, C::Focused, setColorAlpha(lightGrey600, 0.8));
+         setColor(CS, C::Bg, C::Highlight, C::Hovered, setColorAlpha(lightGrey600, 0.8));
+-        setColor(CS, C::Fg, C::Highlight, C::Normal, Qt::black);
++        setColor(CS, C::Fg, C::Highlight, C::Normal, fgDark);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::black);
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::black, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgDark);
++        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(fgDark, 0.6));
+ 
+         setColor(CS, C::Decoration, C::Indicator, C::Normal, QColor("#9e9e9e")); //FIXME not a predef
+ 
+@@ -595,7 +602,7 @@ void SystemPalette::makeLightPalette()
+         setColor(CS, C::Bg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.2));
+ 
+         setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.3));
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgDark, 0.3));
+ 
+         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
+         setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
+@@ -608,10 +615,10 @@ void SystemPalette::makeLightPalette()
+         C::ColorSet CS = C::ButtonStandard;
+         setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::black, 0.6));
+-        setColor(CS, C::Fg, C::Primary, C::Focused, Qt::black);
+-        setColor(CS, C::Fg, C::Primary, C::Hovered, Qt::black);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::black, 0.3));
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgDark, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Focused, fgDark);
++        setColor(CS, C::Fg, C::Primary, C::Hovered, fgDark);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgDark, 0.3));
+ 
+         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
+         setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
+@@ -623,7 +630,7 @@ void SystemPalette::makeLightPalette()
+     {
+         C::ColorSet CS = C::Tooltip;
+         setColor(CS, C::Bg, C::Primary, C::Normal, lightGrey200);
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::black);
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgDark);
+     }
+ 
+     //slider
+@@ -640,7 +647,7 @@ void SystemPalette::makeLightPalette()
+     //Combo box
+     {
+         C::ColorSet CS = C::ComboBox;
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::black);
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgDark);
+         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(Qt::white, 0.8));
+         setColor(CS, C::Bg, C::Secondary, C::Normal, lightGrey500);
+     }
+@@ -661,7 +668,7 @@ void SystemPalette::makeLightPalette()
+     {
+         C::ColorSet CS = C::Switch;
+         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(Qt::black, 0.05));
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::black, 0.55));
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgDark, 0.55));
+         setColor(CS, C::Decoration, C::Border, C::Normal, setColorAlpha(Qt::black, 0.55));
+ 
+         setColor(CS, C::Bg, C::Secondary, C::Normal, orange800);
+@@ -684,6 +691,7 @@ void SystemPalette::makeLightPalette()
+ void SystemPalette::makeDarkPalette()
+ {
+     m_isDark = true;
++    const QColor fgLight = m_fgOverride.isValid() ? m_fgOverride : QColor(Qt::white);
+ 
+     m_colorMap.clear();
+ 
+@@ -694,10 +702,10 @@ void SystemPalette::makeDarkPalette()
+         setColor(CS, C::Bg, C::Primary, C::Normal, darkGrey300 );
+         setColor(CS, C::Bg, C::Secondary, C::Normal, Qt::black );
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white );
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::white, 0.3) );
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgLight );
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgLight, 0.3) );
+ 
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::white, 0.6));
++        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(fgLight, 0.6));
+ 
+         setColor(CS, C::Bg, C::Negative, C::Normal, QColor(Qt::darkRed));
+         setColor(CS, C::Fg, C::Negative, C::Normal, Qt::red);
+@@ -746,11 +754,11 @@ void SystemPalette::makeDarkPalette()
+         setColor(CS, C::Bg, C::Primary, C::Focused, darkGrey800);
+         setColor(CS, C::Bg, C::Primary, C::Hovered, darkGrey800);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::white, 0.6));
+-        setColor(CS, C::Fg, C::Primary, C::Focused, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Hovered, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::white, 0.2));
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, Qt::white);
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgLight, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Focused, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Hovered, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgLight, 0.2));
++        setColor(CS, C::Fg, C::Secondary, C::Normal, fgLight);
+     }
+ 
+     //tool button
+@@ -759,11 +767,11 @@ void SystemPalette::makeDarkPalette()
+         setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
+         setColor(CS, C::Bg, C::Secondary, C::Normal, Qt::black);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::white, 0.6));
+-        setColor(CS, C::Fg, C::Primary, C::Focused, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Hovered, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::white, 0.2));
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, Qt::white);
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgLight, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Focused, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Hovered, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgLight, 0.2));
++        setColor(CS, C::Fg, C::Secondary, C::Normal, fgLight);
+ 
+         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
+         setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
+@@ -777,8 +785,8 @@ void SystemPalette::makeDarkPalette()
+         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(darkGrey800, 0.0));
+         setColor(CS, C::Bg, C::Primary, C::Focused, darkGrey800);
+         setColor(CS, C::Bg, C::Primary, C::Hovered, darkGrey800);
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::white, 0.2));
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgLight, 0.2));
+     }
+ 
+     //Item
+@@ -791,10 +799,10 @@ void SystemPalette::makeDarkPalette()
+         setColor(CS, C::Bg, C::Highlight, C::Normal, darkGrey800);
+         setColor(CS, C::Bg, C::Highlight, C::Focused, setColorAlpha(darkGrey800, 0.8));
+         setColor(CS, C::Bg, C::Highlight, C::Hovered, setColorAlpha(darkGrey800, 0.8));
+-        setColor(CS, C::Fg, C::Highlight, C::Normal, Qt::white);
++        setColor(CS, C::Fg, C::Highlight, C::Normal, fgLight);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white);
+-        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(Qt::white, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgLight);
++        setColor(CS, C::Fg, C::Secondary, C::Normal, setColorAlpha(fgLight, 0.6));
+ 
+         setColor(CS, C::Decoration, C::Indicator, C::Normal, QColor("#666666"));  //FIXME not a predef
+     }
+@@ -806,8 +814,8 @@ void SystemPalette::makeDarkPalette()
+         setColor(CS, C::Bg, C::Primary, C::Pressed, QColor("#e67a30"));  //FIXME not a predef
+         setColor(CS, C::Bg, C::Primary, C::Disabled, setColorAlpha(Qt::white, 0.2));
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::white, 0.3));
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgLight, 0.3));
+ 
+         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
+         setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
+@@ -820,10 +828,10 @@ void SystemPalette::makeDarkPalette()
+         C::ColorSet CS = C::ButtonStandard;
+         setColor(CS, C::Bg, C::Primary, C::Normal, Qt::transparent);
+ 
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::white, 0.6));
+-        setColor(CS, C::Fg, C::Primary, C::Focused, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Hovered, Qt::white);
+-        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(Qt::white, 0.3));
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgLight, 0.6));
++        setColor(CS, C::Fg, C::Primary, C::Focused, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Hovered, fgLight);
++        setColor(CS, C::Fg, C::Primary, C::Disabled, setColorAlpha(fgLight, 0.3));
+ 
+         setColor(CS, C::Decoration, C::Border, C::Normal, Qt::transparent);
+         setColor(CS, C::Decoration, C::Border, C::Focused, Qt::transparent);
+@@ -835,7 +843,7 @@ void SystemPalette::makeDarkPalette()
+     {
+         C::ColorSet CS = C::Tooltip;
+         setColor(CS, C::Bg, C::Primary, C::Normal, darkGrey200);
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white);
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgLight);
+     }
+ 
+     //slider
+@@ -854,7 +862,7 @@ void SystemPalette::makeDarkPalette()
+     //Combo box
+     {
+         C::ColorSet CS = C::ComboBox;
+-        setColor(CS, C::Fg, C::Primary, C::Normal, Qt::white);
++        setColor(CS, C::Fg, C::Primary, C::Normal, fgLight);
+         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(darkGrey300, 0.8));
+         setColor(CS, C::Bg, C::Secondary, C::Normal, darkGrey500);
+     }
+@@ -875,7 +883,7 @@ void SystemPalette::makeDarkPalette()
+     {
+         C::ColorSet CS = C::Switch;
+         setColor(CS, C::Bg, C::Primary, C::Normal, setColorAlpha(Qt::white, 0.05));
+-        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(Qt::white, 0.55));
++        setColor(CS, C::Fg, C::Primary, C::Normal, setColorAlpha(fgLight, 0.55));
+         setColor(CS, C::Decoration, C::Border, C::Normal, setColorAlpha(Qt::white, 0.55));
+         setColor(CS, C::Bg, C::Secondary, C::Normal, orange500);
+         setColor(CS, C::Fg, C::Secondary, C::Normal, Qt::black);
+@@ -894,6 +902,109 @@ void SystemPalette::makeDarkPalette()
+     }
+ }
+ 
++void SystemPalette::restoreStockColors()
++{
++    m_fgOverride = QColor();
++    if (!m_stock)
++        return;
++    orange500 = m_stock->orange500;
++    orange800 = m_stock->orange800;
++    darkGrey200 = m_stock->dark[0]; darkGrey300 = m_stock->dark[1]; darkGrey400 = m_stock->dark[2];
++    darkGrey500 = m_stock->dark[3]; darkGrey600 = m_stock->dark[4]; darkGrey700 = m_stock->dark[5];
++    darkGrey800 = m_stock->dark[6];
++    lightGrey100 = m_stock->light[0]; lightGrey200 = m_stock->light[1]; lightGrey300 = m_stock->light[2];
++    lightGrey400 = m_stock->light[3]; lightGrey500 = m_stock->light[4]; lightGrey600 = m_stock->light[5];
++    lightGrey700 = m_stock->light[6];
++    m_stock.reset();
++}
++
++/**
++ * The Omarchy scheme reuses the stock palettes: it substitutes the theme's colours for the
++ * base colours they are built from, then lets upstream derive every state (hover, pressed,
++ * focused, disabled) as usual. A final pass keeps text readable on whatever surface it sits on.
++ */
++void SystemPalette::makeOmarchyPalette()
++{
++    OmarchyTheme *theme = m_ctx ? m_ctx->omarchyTheme() : nullptr;
++    if (!theme)
++    {
++        // No interface context to find the theme through: behave like the stock dark scheme.
++        makeDarkPalette();
++        return;
++    }
++
++    if (!m_stock)
++    {
++        m_stock = std::make_unique<StockColors>();
++        m_stock->orange500 = orange500;
++        m_stock->orange800 = orange800;
++        const QColor *dark[] = {&darkGrey200, &darkGrey300, &darkGrey400, &darkGrey500, &darkGrey600, &darkGrey700, &darkGrey800};
++        const QColor *light[] = {&lightGrey100, &lightGrey200, &lightGrey300, &lightGrey400, &lightGrey500, &lightGrey600, &lightGrey700};
++        for (int i = 0; i < 7; ++i)
++        {
++            m_stock->dark[i] = *dark[i];
++            m_stock->light[i] = *light[i];
++        }
++    }
++
++    // A theme switch repaints everything. Connect once; the connection is to the theme object,
++    // which MainCtx owns, so it lives as long as this palette can be asked to update.
++    if (!m_omarchyConnection)
++        m_omarchyConnection = connect(theme, &OmarchyTheme::changed, this, &SystemPalette::updatePalette);
++
++    orange500 = theme->accent();
++    orange800 = theme->accent().lighter(150);
++    m_fgOverride = theme->foreground();
++
++    if (theme->isDark())
++    {
++        darkGrey200 = theme->ramp(0); darkGrey300 = theme->ramp(1); darkGrey400 = theme->ramp(2);
++        darkGrey500 = theme->ramp(3); darkGrey600 = theme->ramp(4); darkGrey700 = theme->ramp(5);
++        darkGrey800 = theme->ramp(6);
++        makeDarkPalette();
++    }
++    else
++    {
++        lightGrey100 = theme->ramp(0); lightGrey200 = theme->ramp(1); lightGrey300 = theme->ramp(2);
++        lightGrey400 = theme->ramp(3); lightGrey500 = theme->ramp(4); lightGrey600 = theme->ramp(5);
++        lightGrey700 = theme->ramp(6);
++        makeLightPalette();
++    }
++
++    applyContrastSafety();
++}
++
++void SystemPalette::applyContrastSafety()
++{
++    typedef ColorContext C;
++    constexpr double minRatio = 4.5;
++    static const C::ColorSet sets[] = {C::View, C::Window, C::Item, C::Badge, C::ButtonStandard, C::ButtonAccent,
++                                       C::ToolButton, C::TabButton, C::MenuBar, C::Tooltip, C::Slider,
++                                       C::ComboBox, C::SpinBox, C::TextField, C::Switch};
++    static const C::ColorState states[] = {C::Normal, C::Hovered, C::Pressed, C::Focused};
++    static const C::ColorName names[] = {C::Primary, C::Secondary};
++
++    const auto opaque = [](const QColor &c, const QColor &under) {
++        const double a = c.alphaF();
++        return QColor::fromRgbF(c.redF() * a + under.redF() * (1 - a),
++                                c.greenF() * a + under.greenF() * (1 - a),
++                                c.blueF() * a + under.blueF() * (1 - a));
++    };
++
++    for (const auto set : sets)
++        for (const auto state : states)
++        {
++            const QColor viewBg = getColor(C::View, C::Bg, C::Primary, C::Normal);
++            const QColor bg = opaque(getColor(set, C::Bg, C::Primary, state), viewBg);
++            for (const auto name : names)
++            {
++                const QColor fg = opaque(getColor(set, C::Fg, name, state), bg);
++                if (OmarchyTheme::contrastRatio(fg, bg) < minRatio)
++                    setColor(set, C::Fg, name, state, OmarchyTheme::ensureContrast(fg, bg, minRatio));
++            }
++        }
++}
++
+ void SystemPalette::makeSystemPalette()
+ {
+     if (!m_ctx)
+diff --git a/modules/gui/qt/style/systempalette.hpp b/modules/gui/qt/style/systempalette.hpp
+index dc4672442f..c3b84ea2d2 100644
+--- a/modules/gui/qt/style/systempalette.hpp
++++ b/modules/gui/qt/style/systempalette.hpp
+@@ -167,6 +167,9 @@ signals:
+ 
+ private:
+     void updatePalette();
++    void makeOmarchyPalette();
++    void applyContrastSafety();
++    void restoreStockColors();
+ 
+     void makeLightPalette();
+     void makeDarkPalette();
+@@ -183,6 +186,15 @@ private:
+ 
+     QMap<quint64, QColor> m_colorMap;
+ 
++    /// Theme foreground used by the stock palettes while the Omarchy scheme is active; invalid otherwise.
++    QColor m_fgOverride;
++    /// The stock base colours, saved before the Omarchy scheme overwrites them.
++    struct StockColors {
++        QColor orange500, orange800, dark[7], light[7];
++    };
++    std::unique_ptr<StockColors> m_stock;
++    QMetaObject::Connection m_omarchyConnection;
++
+ };
+ 
+ #undef COLOR_PROPERTY
+diff --git a/modules/gui/qt/tests/test_qt_color_scheme_model.cpp b/modules/gui/qt/tests/test_qt_color_scheme_model.cpp
+new file mode 100644
+index 0000000000..190adf2ab6
+--- /dev/null
++++ b/modules/gui/qt/tests/test_qt_color_scheme_model.cpp
+@@ -0,0 +1,74 @@
++/*****************************************************************************
++ * test_qt_color_scheme_model.cpp : the colour scheme list
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
++
++#include <QTest>
++#include <QSignalSpy>
++
++#include "util/color_scheme_model.hpp"
++
++class TestColorSchemeModel : public QObject
++{
++    Q_OBJECT
++
++private slots:
++    void listsTheStockSchemesAndOmarchy()
++    {
++        ColorSchemeModel model;
++        QCOMPARE(model.rowCount(QModelIndex()), 4);
++
++        QStringList names;
++        for (const auto &item : model.getSchemes())
++            names << item.text;
++        QVERIFY(names.contains("System"));
++        QVERIFY(names.contains("Day"));
++        QVERIFY(names.contains("Night"));
++        QVERIFY(names.contains("Omarchy"));
++    }
++
++    void stockSchemesKeepTheirIndices()
++    {
++        // The first-run wizard writes the indices 0..2 for System, Day and Night.
++        ColorSchemeModel model;
++        model.setCurrentIndex(0);
++        QCOMPARE(model.currentScheme(), ColorSchemeModel::System);
++        model.setCurrentIndex(1);
++        QCOMPARE(model.currentScheme(), ColorSchemeModel::Day);
++        model.setCurrentIndex(2);
++        QCOMPARE(model.currentScheme(), ColorSchemeModel::Night);
++        model.setCurrentIndex(3);
++        QCOMPARE(model.currentScheme(), ColorSchemeModel::Omarchy);
++    }
++
++    void defaultFollowsTheBuildOption()
++    {
++        ColorSchemeModel model;
++#if VLC_OMARCHY_DEFAULT
++        QCOMPARE(model.currentScheme(), ColorSchemeModel::Omarchy);
++#else
++        QCOMPARE(model.currentScheme(), ColorSchemeModel::System);
++#endif
++    }
++
++    void selectingASchemeNotifies()
++    {
++        ColorSchemeModel model;
++        QSignalSpy spy(&model, &ColorSchemeModel::currentChanged);
++        model.setCurrentIndex(2);
++        QCOMPARE(spy.count(), 1);
++        model.setCurrentIndex(2);       // no change, no notification
++        QCOMPARE(spy.count(), 1);
++    }
++};
++
++QTEST_GUILESS_MAIN(TestColorSchemeModel)
++#include "test_qt_color_scheme_model.moc"
+diff --git a/modules/gui/qt/util/color_scheme_model.cpp b/modules/gui/qt/util/color_scheme_model.cpp
+index 1196d7b144..4dd96321c5 100644
+--- a/modules/gui/qt/util/color_scheme_model.cpp
++++ b/modules/gui/qt/util/color_scheme_model.cpp
+@@ -16,14 +16,24 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+  *****************************************************************************/
+ 
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
++
+ #include "color_scheme_model.hpp"
+ 
+ #include "qt.hpp"
+ 
+ ColorSchemeModel::ColorSchemeModel(QObject* parent)
+     : QAbstractListModel(parent)
+-    , m_list {{qtr("System"), ColorScheme::System}, {qtr("Day"), ColorScheme::Day}, {qtr("Night"), ColorScheme::Night}}
+-    , m_currentIndex {0}
++    , m_list {{qtr("System"), ColorScheme::System}, {qtr("Day"), ColorScheme::Day}, {qtr("Night"), ColorScheme::Night}, {qtr("Omarchy"), ColorScheme::Omarchy}}
++    , m_currentIndex {
++#if VLC_OMARCHY_DEFAULT
++          3 /* Omarchy */
++#else
++          0
++#endif
++      }
+ {
+ }
+ 
+diff --git a/modules/gui/qt/util/color_scheme_model.hpp b/modules/gui/qt/util/color_scheme_model.hpp
+index fc66170276..1ab9e56432 100644
+--- a/modules/gui/qt/util/color_scheme_model.hpp
++++ b/modules/gui/qt/util/color_scheme_model.hpp
+@@ -34,7 +34,8 @@ public:
+     {
+         System,
+         Day,
+-        Night
++        Night,
++        Omarchy
+     };
+ 
+     struct Item

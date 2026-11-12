@@ -1,0 +1,12 @@
+Upstream Qt tests at 6b5f85b1d1bb (unmodified), QT_QPA_PLATFORM=offscreen:
+meson test -C build --suite qt --suite qt+test
+
+1/8 qt+test - VLC:base_model_test          OK
+2/8 qt+test - VLC:test_qt_navigation_model OK
+3/8 qt+test - VLC:test_qt_renderer_manager OK
+4/8 qt+test - VLC:test_qt_ml_model         OK
+5/8 qt+test - VLC:test_qt_csd_button_model OK
+6/8 qt - VLC:tst_FSM                       OK
+7/8 qt+test - VLC:test_qt_dialog_model     OK
+8/8 qt+test - VLC:test_qt_thread_runner    OK
+Ok: 8  Fail: 0

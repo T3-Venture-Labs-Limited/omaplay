@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:20:16 +0530
+Subject: [PATCH 03/17] dbus: configurable MPRIS name, identity and desktop
+ entry; wire core D-Bus in meson
+
+The MPRIS bus name, Identity and DesktopEntry and the single-instance hand-off
+name come from build options. The meson build never defined HAVE_DBUS for the
+core, so --dbus and --one-instance were compiled out; detect dbus-1 in
+src/meson.build and define it, matching the autotools build.
+---
+ modules/control/dbus/dbus.c      |  2 +-
+ modules/control/dbus/dbus_root.c |  4 ++--
+ src/meson.build                  | 11 +++++++++++
+ src/posix/specific.c             |  2 +-
+ 4 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/modules/control/dbus/dbus.c b/modules/control/dbus/dbus.c
+index 360b4aeb81..2da7791b7e 100644
+--- a/modules/control/dbus/dbus.c
++++ b/modules/control/dbus/dbus.c
+@@ -70,7 +70,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ 
+-#define DBUS_MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
++#define DBUS_MPRIS_BUS_NAME "org.mpris.MediaPlayer2." VLC_MPRIS_NAME
+ #define DBUS_INSTANCE_ID_PREFIX "instance"
+ 
+ #define SEEK_THRESHOLD 1000 /* µsec */
+diff --git a/modules/control/dbus/dbus_root.c b/modules/control/dbus/dbus_root.c
+index 07ad570dce..edb9173b72 100644
+--- a/modules/control/dbus/dbus_root.c
++++ b/modules/control/dbus/dbus_root.c
+@@ -75,7 +75,7 @@ static int
+ MarshalIdentity( intf_thread_t *p_intf, DBusMessageIter *container )
+ {
+     VLC_UNUSED( p_intf );
+-    const char *psz_id = _("VLC media player");
++    const char *psz_id = VLC_APP_IDENTITY[0] ? VLC_APP_IDENTITY : _("VLC media player");
+ 
+     if (!dbus_message_iter_append_basic( container, DBUS_TYPE_STRING, &psz_id ))
+         return VLC_ENOMEM;
+@@ -158,7 +158,7 @@ static int
+ MarshalDesktopEntry( intf_thread_t *p_intf, DBusMessageIter *container )
+ {
+     VLC_UNUSED( p_intf );
+-    const char* psz_ret = PACKAGE;
++    const char* psz_ret = VLC_DESKTOP_ID;
+ 
+     if (!dbus_message_iter_append_basic( container, DBUS_TYPE_STRING, &psz_ret ))
+         return VLC_ENOMEM;
+diff --git a/src/meson.build b/src/meson.build
+index 09e1a9fa15..b913eb5232 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -43,6 +43,17 @@ libvlccore_deps = [
+     m_lib, dl_lib, threads_dep, intl_dep, socket_libs, iconv_dep, anl_lib, idn_dep
+ ]
+ 
++# The core's D-Bus support (the `dbus` preference and single-instance hand-off in
++# src/posix/specific.c) is built by the autotools build but was never wired up here,
++# so a meson build silently lacks --dbus and --one-instance.
++if host_system in ['linux', 'freebsd', 'netbsd', 'openbsd', 'dragonfly']
++    core_dbus_dep = dependency('dbus-1', version: '>= 1.6.0', required: get_option('dbus'))
++    if core_dbus_dep.found()
++        libvlccore_deps += core_dbus_dep
++        cdata.set('HAVE_DBUS', 1)
++    endif
++endif
++
+ vlccore_cargs = [ '-DMODULE_STRING="core"', '-DHAVE_DYNAMIC_PLUGINS' ]
+ libvlccore_link_args = []
+ 
+diff --git a/src/posix/specific.c b/src/posix/specific.c
+index 067cfe07e1..9ad4222fda 100644
+--- a/src/posix/specific.c
++++ b/src/posix/specific.c
+@@ -42,7 +42,7 @@ static void system_ConfigureDbus(libvlc_int_t *vlc, int argc,
+ /* FIXME: could be replaced by using Unix sockets */
+ #ifdef HAVE_DBUS
+ # define MPRIS_APPEND "/org/mpris/MediaPlayer2/TrackList/Append"
+-# define MPRIS_BUS_NAME "org.mpris.MediaPlayer2.vlc"
++# define MPRIS_BUS_NAME "org.mpris.MediaPlayer2." VLC_MPRIS_NAME
+ # define MPRIS_OBJECT_PATH "/org/mpris/MediaPlayer2"
+ # define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
+ 

@@ -1,0 +1,722 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:29:46 +0530
+Subject: [PATCH 05/17] qt: add OmarchyTheme, a live reader for the Omarchy
+ desktop theme
+
+Qt-only class that parses the flat colors.toml of the active Omarchy theme with
+per-key fallbacks and a built-in dark palette, derives a background ramp and a
+WCAG contrast clamp, and watches the file and its ancestor directories (re-armed
+after every change, debounced) because Omarchy replaces files and directories
+when the theme is switched. Covered by test_qt_omarchytheme.
+---
+ modules/gui/qt/meson.build                    |  21 ++
+ modules/gui/qt/style/omarchytheme.cpp         | 278 ++++++++++++++++++
+ modules/gui/qt/style/omarchytheme.hpp         |  98 ++++++
+ modules/gui/qt/tests/test_qt_omarchytheme.cpp | 261 ++++++++++++++++
+ 4 files changed, 658 insertions(+)
+ create mode 100644 modules/gui/qt/style/omarchytheme.cpp
+ create mode 100644 modules/gui/qt/style/omarchytheme.hpp
+ create mode 100644 modules/gui/qt/tests/test_qt_omarchytheme.cpp
+
+diff --git a/modules/gui/qt/meson.build b/modules/gui/qt/meson.build
+index be8bd8e4d5..b1d612cde3 100644
+--- a/modules/gui/qt/meson.build
++++ b/modules/gui/qt/meson.build
+@@ -114,6 +114,7 @@ moc_headers = files(
+     'network/networksourcesmodel.hpp',
+     'network/networkmediamodel.hpp',
+     'network/standardpathmodel.hpp',
++    'style/omarchytheme.hpp',
+     'style/systempalette.hpp',
+     'style/vlcicons.hpp',
+     'style/colorcontext.hpp',
+@@ -404,6 +405,8 @@ qt_plugin_sources = files(
+     'style/qtthemeprovider.hpp',
+     'style/colorcontext.cpp',
+     'style/colorcontext.hpp',
++    'style/omarchytheme.cpp',
++    'style/omarchytheme.hpp',
+     'style/systempalette.cpp',
+     'style/systempalette.hpp',
+     'style/vlcicons.cpp',
+@@ -1360,6 +1363,24 @@ if qt6_dep.found()
+             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
+         }
+ 
++        vlc_tests += {
++            'name': 'test_qt_omarchytheme',
++            'sources': files(
++                'tests/test_qt_omarchytheme.cpp',
++                'style/omarchytheme.hpp',
++                'style/omarchytheme.cpp'
++            ),
++            'moc_sources': files(
++                'tests/test_qt_omarchytheme.cpp'
++            ),
++            'moc_headers': files(
++                'style/omarchytheme.hpp'
++            ),
++            'suite': ['qt'],
++            'include_directories' : qt_include_dir,
++            'dependencies': [qt6_dep, qtest_qt6_dep]
++        }
++
+         vlc_tests += {
+             'name': 'test_qt_csd_button_model',
+             'sources': files(
+diff --git a/modules/gui/qt/style/omarchytheme.cpp b/modules/gui/qt/style/omarchytheme.cpp
+new file mode 100644
+index 0000000000..be081fc9bd
+--- /dev/null
++++ b/modules/gui/qt/style/omarchytheme.cpp
+@@ -0,0 +1,278 @@
++/*****************************************************************************
++ * omarchytheme.cpp : reads the active Omarchy desktop theme
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#include "omarchytheme.hpp"
++
++#include <QDir>
++#include <QFile>
++#include <QFileInfo>
++#include <QFileSystemWatcher>
++#include <QHash>
++#include <QRegularExpression>
++#include <QStandardPaths>
++#include <QtMath>
++
++namespace {
++
++// Omarchy's own fallback when it is not installed, see the omarchy-app skill.
++const QColor fallbackAccent(0xFF, 0xD6, 0x0A);
++
++// VLC's stock dark palette, used when there is no theme to read.
++const QColor fallbackBackground(0x21, 0x21, 0x21);
++const QColor fallbackForeground(0xFF, 0xFF, 0xFF);
++
++constexpr int debounceMs = 150;
++
++QColor mix(const QColor &a, const QColor &b, double t)
++{
++    return QColor::fromRgbF(a.redF() + (b.redF() - a.redF()) * t,
++                            a.greenF() + (b.greenF() - a.greenF()) * t,
++                            a.blueF() + (b.blueF() - a.blueF()) * t);
++}
++
++double relativeLuminance(const QColor &c)
++{
++    const auto lin = [](double v) {
++        return v <= 0.03928 ? v / 12.92 : qPow((v + 0.055) / 1.055, 2.4);
++    };
++    return 0.2126 * lin(c.redF()) + 0.7152 * lin(c.greenF()) + 0.0722 * lin(c.blueF());
++}
++
++bool parseHexColor(const QString &text, QColor &out)
++{
++    // Accept only #rgb and #rrggbb; QColor would also take names like "red".
++    static const QRegularExpression re(QStringLiteral("^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"));
++    if (!re.match(text).hasMatch())
++        return false;
++    out = QColor(text);
++    return out.isValid();
++}
++
++} // namespace
++
++QString OmarchyTheme::defaultPath()
++{
++    QString state = qEnvironmentVariable("XDG_STATE_HOME");
++    if (state.isEmpty())
++        state = QDir::homePath() + QStringLiteral("/.local/state");
++    return state + QStringLiteral("/omarchy/current/theme/colors.toml");
++}
++
++OmarchyTheme::OmarchyTheme(const QString &colorsPath, QObject *parent)
++    : QObject(parent)
++    , m_path(colorsPath)
++    , m_watcher(new QFileSystemWatcher(this))
++{
++    m_debounce.setSingleShot(true);
++    m_debounce.setInterval(debounceMs);
++    connect(&m_debounce, &QTimer::timeout, this, &OmarchyTheme::reload);
++    connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &OmarchyTheme::onFsEvent);
++    connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &OmarchyTheme::onFsEvent);
++
++    applyDefaults();
++    QFile f(m_path);
++    if (f.open(QIODevice::ReadOnly)) {
++        m_found = true;
++        parse(f.readAll());
++    } else {
++        m_warnings << QStringLiteral("Omarchy theme file not found, using the built-in palette: %1").arg(m_path);
++    }
++    rearmWatcher();
++}
++
++void OmarchyTheme::applyDefaults()
++{
++    m_dark = true;
++    m_accent = fallbackAccent;
++    m_background = fallbackBackground;
++    m_foreground = fallbackForeground;
++    m_darkBackground = m_darkerBackground = m_lighterBackground = QColor();
++    m_selection = mix(m_background, m_foreground, 0.15);
++    m_muted = mix(m_background, m_foreground, 0.35);
++    m_brightForeground = m_foreground;
++}
++
++void OmarchyTheme::parse(const QByteArray &data)
++{
++    QHash<QString, QString> values;
++    const auto lines = QString::fromUtf8(data).split(QLatin1Char('\n'));
++    for (QString line : lines) {
++        // Drop a trailing comment. The values we read never contain '#' after the closing quote.
++        const int quoteEnd = line.lastIndexOf(QLatin1Char('"'));
++        const int hash = line.indexOf(QLatin1Char('#'), quoteEnd < 0 ? 0 : quoteEnd);
++        if (hash >= 0 && (quoteEnd >= 0 || line.trimmed().startsWith(QLatin1Char('#'))))
++            line.truncate(hash);
++        line = line.trimmed();
++        if (line.isEmpty() || line.startsWith(QLatin1Char('[')))
++            continue;
++        const int eq = line.indexOf(QLatin1Char('='));
++        if (eq <= 0)
++            continue;
++        QString key = line.left(eq).trimmed();
++        QString value = line.mid(eq + 1).trimmed();
++        if (value.size() >= 2 && value.startsWith(QLatin1Char('"')) && value.endsWith(QLatin1Char('"')))
++            value = value.mid(1, value.size() - 2);
++        values.insert(key, value);
++    }
++
++    const auto readColor = [&](const char *key, QColor &target) {
++        const auto it = values.constFind(QLatin1String(key));
++        if (it == values.cend())
++            return;
++        QColor c;
++        if (parseHexColor(*it, c))
++            target = c;
++        else
++            m_warnings << QStringLiteral("Ignoring invalid colour for '%1': %2").arg(QLatin1String(key), *it);
++    };
++
++    readColor("accent", m_accent);
++    readColor("selection", m_selection);
++    readColor("muted", m_muted);
++    readColor("background", m_background);
++    readColor("dark_background", m_darkBackground);
++    readColor("darker_background", m_darkerBackground);
++    readColor("lighter_background", m_lighterBackground);
++    readColor("foreground", m_foreground);
++    readColor("bright_foreground", m_brightForeground);
++    if (!values.contains(QStringLiteral("bright_foreground")))
++        m_brightForeground = m_foreground;
++
++    const QString mode = values.value(QStringLiteral("mode")).toLower();
++    if (mode == QLatin1String("dark"))
++        m_dark = true;
++    else if (mode == QLatin1String("light"))
++        m_dark = false;
++    else
++        // Without a mode, judge by the background: it is the surface everything else sits on.
++        m_dark = relativeLuminance(m_background) < relativeLuminance(m_foreground);
++}
++
++QColor OmarchyTheme::ramp(int step) const
++{
++    step = qBound(0, step, RampSteps - 1);
++    // Light themes start at their background and darken. Dark themes start at the theme's own
++    // darkest background (or a darkened background when it has none) and lighten. The remaining
++    // steps walk from the base background towards the foreground in fixed steps, which keeps
++    // hover and pressed states (derived by upstream from neighbouring ramp colours) distinct.
++    if (step == 0) {
++        if (!m_dark)
++            return m_background;
++        return m_darkerBackground.isValid() ? m_darkerBackground : mix(m_background, Qt::black, 0.4);
++    }
++
++    const double t = 0.03 * step;
++    return mix(m_background, m_foreground, t);
++}
++
++double OmarchyTheme::contrastRatio(const QColor &a, const QColor &b)
++{
++    const double la = relativeLuminance(a), lb = relativeLuminance(b);
++    const double hi = qMax(la, lb), lo = qMin(la, lb);
++    return (hi + 0.05) / (lo + 0.05);
++}
++
++QColor OmarchyTheme::ensureContrast(const QColor &fg, const QColor &bg, double minRatio)
++{
++    if (contrastRatio(fg, bg) >= minRatio)
++        return fg;
++
++    // Go the way that gives more room: towards white on a dark background, towards black on a light one.
++    const bool towardsWhite = relativeLuminance(bg) < 0.18;
++    const QColor target = towardsWhite ? QColor(Qt::white) : QColor(Qt::black);
++    QColor best = target;
++    for (int i = 1; i <= 100; ++i) {
++        const QColor c = mix(fg, target, i / 100.0);
++        if (contrastRatio(c, bg) >= minRatio) {
++            best = c;
++            break;
++        }
++    }
++    return best;
++}
++
++void OmarchyTheme::onFsEvent()
++{
++    // Several events arrive for one theme switch (remove, create, rename). Handle them once.
++    m_debounce.start();
++}
++
++bool OmarchyTheme::sameColoursAs(const OmarchyTheme &o) const
++{
++    return m_dark == o.m_dark && m_accent == o.m_accent && m_selection == o.m_selection
++        && m_muted == o.m_muted && m_background == o.m_background
++        && m_darkBackground == o.m_darkBackground && m_darkerBackground == o.m_darkerBackground
++        && m_lighterBackground == o.m_lighterBackground && m_foreground == o.m_foreground
++        && m_brightForeground == o.m_brightForeground && m_found == o.m_found;
++}
++
++void OmarchyTheme::reload()
++{
++    // Parse into a scratch object so "nothing changed" can be detected without a repaint.
++    OmarchyTheme fresh(m_path);
++    // The scratch object's watcher and timer die with it.
++    const bool same = sameColoursAs(fresh);
++
++    // The scratch object was the one that logged problems; carry them over either way so
++    // warnings() describes the file as it is now.
++    m_warnings = fresh.m_warnings;
++    rearmWatcher();
++    if (same)
++        return;
++
++    m_found = fresh.m_found;
++    m_dark = fresh.m_dark;
++    m_accent = fresh.m_accent;
++    m_selection = fresh.m_selection;
++    m_muted = fresh.m_muted;
++    m_background = fresh.m_background;
++    m_darkBackground = fresh.m_darkBackground;
++    m_darkerBackground = fresh.m_darkerBackground;
++    m_lighterBackground = fresh.m_lighterBackground;
++    m_foreground = fresh.m_foreground;
++    m_brightForeground = fresh.m_brightForeground;
++    emit changed();
++}
++
++void OmarchyTheme::rearmWatcher()
++{
++    // QFileSystemWatcher forgets a path as soon as it is deleted or replaced, so add everything
++    // again after every event: the file, its directory, and the directories above it that a
++    // switch may replace (.../current/theme and .../current).
++    const QStringList wanted = [&] {
++        QStringList l;
++        const QFileInfo fi(m_path);
++        if (fi.exists())
++            l << fi.absoluteFilePath();
++        // Walk up by path, not with QDir::cdUp(), which refuses to leave a directory that does
++        // not exist yet. Watch the nearest three directories that exist, so a theme that appears
++        // later (or a replaced .../current) is noticed.
++        QString dir = fi.absolutePath();
++        int watched = 0;
++        for (int depth = 0; depth < 8 && watched < 3; ++depth) {
++            if (QFileInfo(dir).isDir()) {
++                l << dir;
++                ++watched;
++            }
++            const QString up = QFileInfo(dir).absolutePath();
++            if (up == dir)
++                break;
++            dir = up;
++        }
++        return l;
++    }();
++
++    const QStringList have = m_watcher->files() + m_watcher->directories();
++    QStringList missing;
++    for (const QString &p : wanted)
++        if (!have.contains(p))
++            missing << p;
++    if (!missing.isEmpty())
++        m_watcher->addPaths(missing);
++}
+diff --git a/modules/gui/qt/style/omarchytheme.hpp b/modules/gui/qt/style/omarchytheme.hpp
+new file mode 100644
+index 0000000000..87d914e8f1
+--- /dev/null
++++ b/modules/gui/qt/style/omarchytheme.hpp
+@@ -0,0 +1,98 @@
++/*****************************************************************************
++ * omarchytheme.hpp : reads the active Omarchy desktop theme
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#ifndef OMARCHYTHEME_HPP
++#define OMARCHYTHEME_HPP
++
++#include <QObject>
++#include <QColor>
++#include <QString>
++#include <QStringList>
++#include <QTimer>
++
++class QFileSystemWatcher;
++
++/**
++ * The colours of the active Omarchy theme, read from its colors.toml, with a
++ * built-in dark fallback and live updates.
++ *
++ * Omarchy switches theme by replacing files, directories and symlinks under
++ * ~/.local/state/omarchy/current, so a plain file watch would stop working after
++ * the first switch. The watches are therefore re-armed after every change.
++ *
++ * This class deliberately depends on Qt only, so it can be unit tested alone.
++ */
++class OmarchyTheme : public QObject
++{
++    Q_OBJECT
++
++public:
++    /// Number of steps in the background ramp (matches VLC's darkGrey200..800).
++    static constexpr int RampSteps = 7;
++
++    explicit OmarchyTheme(const QString &colorsPath = defaultPath(), QObject *parent = nullptr);
++
++    /// $XDG_STATE_HOME/omarchy/current/theme/colors.toml
++    static QString defaultPath();
++
++    const QString &path() const { return m_path; }
++    /// False when the file is missing or unreadable and the fallback is in use.
++    bool found() const { return m_found; }
++    bool isDark() const { return m_dark; }
++    /// Problems found while reading, one entry per problem. Empty when the file is clean.
++    const QStringList &warnings() const { return m_warnings; }
++
++    QColor accent() const { return m_accent; }
++    QColor selection() const { return m_selection; }
++    QColor muted() const { return m_muted; }
++    QColor background() const { return m_background; }
++    QColor foreground() const { return m_foreground; }
++    QColor brightForeground() const { return m_brightForeground; }
++
++    /**
++     * Background ramp, step 0 .. RampSteps-1. In a dark theme it starts at the
++     * darkest background and gets lighter; in a light theme it starts at the
++     * lightest and gets darker.
++     */
++    QColor ramp(int step) const;
++
++    /// WCAG contrast ratio between two opaque colours, 1 .. 21.
++    static double contrastRatio(const QColor &a, const QColor &b);
++    /// Moves fg towards white or black, whichever side of bg is readable, until
++    /// the ratio against bg reaches minRatio. Returns fg unchanged if it already does.
++    static QColor ensureContrast(const QColor &fg, const QColor &bg, double minRatio = 4.5);
++
++signals:
++    /// The theme's colours differ from what they were before the last reload.
++    void changed();
++
++private slots:
++    void onFsEvent();
++    void reload();
++
++private:
++    void applyDefaults();
++    void parse(const QByteArray &data);
++    void rearmWatcher();
++    bool sameColoursAs(const OmarchyTheme &other) const;
++
++    QString m_path;
++    QFileSystemWatcher *m_watcher = nullptr;
++    QTimer m_debounce;
++
++    bool m_found = false;
++    bool m_dark = true;
++    QStringList m_warnings;
++
++    QColor m_accent, m_selection, m_muted;
++    QColor m_background, m_darkBackground, m_darkerBackground, m_lighterBackground;
++    QColor m_foreground, m_brightForeground;
++};
++
++#endif // OMARCHYTHEME_HPP
+diff --git a/modules/gui/qt/tests/test_qt_omarchytheme.cpp b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+new file mode 100644
+index 0000000000..f69c5c85b3
+--- /dev/null
++++ b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+@@ -0,0 +1,261 @@
++/*****************************************************************************
++ * test_qt_omarchytheme.cpp : tests for the Omarchy theme reader
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#include <QTest>
++#include <QSignalSpy>
++#include <QTemporaryDir>
++#include <QFile>
++#include <QDir>
++
++#include "style/omarchytheme.hpp"
++
++namespace {
++
++const char *darkToml = R"(mode = "dark"
++
++accent = "#798186"
++selection = "#343d41"
++muted = "#4b4e55"
++
++background = "#101315"
++dark_background = "#0c0e10"
++darker_background = "#080a0b"
++lighter_background = "#181c1f"
++
++foreground = "#cacccc"
++bright_foreground = "#a5aeb4"
++)";
++
++const char *lightToml = R"(mode = "light"
++accent = "#3b5bdb"
++background = "#fafafa"
++darker_background = "#ececec"
++foreground = "#222222"
++)";
++
++bool writeFile(const QString &path, const QByteArray &data)
++{
++    QFile f(path);
++    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate))
++        return false;
++    return f.write(data) == data.size();
++}
++
++} // namespace
++
++class TestOmarchyTheme : public QObject
++{
++    Q_OBJECT
++
++    // Nested so the three nearest existing ancestors of the file are all inside the fixture;
++    // otherwise unrelated activity in /tmp would trigger reloads and hide missing re-arming.
++    QString root() const { return m_dir.filePath("state/omarchy"); }
++    QString colorsPath() const { return root() + "/current/theme/colors.toml"; }
++
++    void install(const char *toml)
++    {
++        QVERIFY(QDir().mkpath(root() + "/current/theme"));
++        QVERIFY(writeFile(colorsPath(), toml));
++    }
++
++private slots:
++    void init() { QVERIFY(m_dir.isValid()); QDir(m_dir.path()).removeRecursively(); QVERIFY(QDir().mkpath(root())); }
++
++    void parsesDarkTheme()
++    {
++        install(darkToml);
++        OmarchyTheme theme(colorsPath());
++        QVERIFY(theme.found());
++        QVERIFY(theme.isDark());
++        QCOMPARE(theme.accent(), QColor("#798186"));
++        QCOMPARE(theme.background(), QColor("#101315"));
++        QCOMPARE(theme.foreground(), QColor("#cacccc"));
++        QCOMPARE(theme.selection(), QColor("#343d41"));
++        QVERIFY(theme.warnings().isEmpty());
++    }
++
++    void parsesLightTheme()
++    {
++        install(lightToml);
++        OmarchyTheme theme(colorsPath());
++        QVERIFY(theme.found());
++        QVERIFY(!theme.isDark());
++        QCOMPARE(theme.accent(), QColor("#3b5bdb"));
++        QCOMPARE(theme.background(), QColor("#fafafa"));
++    }
++
++    void infersModeFromBackgroundWhenMissing()
++    {
++        install("background = \"#f0f0f0\"\nforeground = \"#101010\"\n");
++        OmarchyTheme light(colorsPath());
++        QVERIFY(!light.isDark());
++
++        install("background = \"#101010\"\nforeground = \"#f0f0f0\"\n");
++        OmarchyTheme dark(colorsPath());
++        QVERIFY(dark.isDark());
++    }
++
++    void missingFileFallsBackToBuiltInDarkWithOneWarning()
++    {
++        const QString path = root() + "/nowhere/colors.toml";
++        OmarchyTheme theme(path);
++        QVERIFY(!theme.found());
++        QVERIFY(theme.isDark());
++        QCOMPARE(theme.accent(), QColor("#FFD60A"));
++        QCOMPARE(theme.warnings().size(), 1);
++        QVERIFY(theme.warnings().first().contains(path));
++    }
++
++    void malformedAccentFallsBackButOtherKeysApply()
++    {
++        install("mode = \"dark\"\naccent = \"not-a-colour\"\nbackground = \"#202020\"\nforeground = \"#dddddd\"\n");
++        OmarchyTheme theme(colorsPath());
++        QVERIFY(theme.found());
++        QCOMPARE(theme.accent(), QColor("#FFD60A"));
++        QCOMPARE(theme.background(), QColor("#202020"));
++        QCOMPARE(theme.foreground(), QColor("#dddddd"));
++        QVERIFY(!theme.warnings().isEmpty());
++    }
++
++    void ignoresCommentsSectionsAndUnknownKeys()
++    {
++        install("# comment\n[section]\nfuture_key = \"#123456\"\nmode = \"dark\"\n  accent   =   \"#abcdef\"   # trailing\n");
++        OmarchyTheme theme(colorsPath());
++        QCOMPARE(theme.accent(), QColor("#abcdef"));
++    }
++
++    void backgroundRampGetsMonotonicallyLighterInDarkMode()
++    {
++        install(darkToml);
++        OmarchyTheme theme(colorsPath());
++        for (int i = 1; i < OmarchyTheme::RampSteps; ++i)
++            QVERIFY2(theme.ramp(i).lightnessF() > theme.ramp(i - 1).lightnessF(),
++                     qPrintable(QString("step %1").arg(i)));
++        // The first step is the theme's darkest background.
++        QCOMPARE(theme.ramp(0), QColor("#080a0b"));
++    }
++
++    void backgroundRampGetsMonotonicallyDarkerInLightMode()
++    {
++        install(lightToml);
++        OmarchyTheme theme(colorsPath());
++        for (int i = 1; i < OmarchyTheme::RampSteps; ++i)
++            QVERIFY(theme.ramp(i).lightnessF() < theme.ramp(i - 1).lightnessF());
++        QCOMPARE(theme.ramp(0), QColor("#fafafa"));
++    }
++
++    void contrastRatioMatchesWcagReferenceValues()
++    {
++        QVERIFY(qAbs(OmarchyTheme::contrastRatio(Qt::black, Qt::white) - 21.0) < 0.01);
++        QVERIFY(qAbs(OmarchyTheme::contrastRatio(Qt::white, Qt::white) - 1.0) < 0.01);
++        // #777 on white is the well known 4.48:1 example.
++        QVERIFY(qAbs(OmarchyTheme::contrastRatio(QColor("#777777"), Qt::white) - 4.48) < 0.02);
++    }
++
++    void ensureContrastLeavesGoodColoursAlone()
++    {
++        const QColor fg("#ffffff"), bg("#101315");
++        QCOMPARE(OmarchyTheme::ensureContrast(fg, bg), fg);
++    }
++
++    void ensureContrastFixesLowContrastOnDarkAndLight()
++    {
++        const QColor darkBg("#808080");
++        const QColor fixedOnDark = OmarchyTheme::ensureContrast(QColor("#8a8a8a"), darkBg);
++        QVERIFY(OmarchyTheme::contrastRatio(fixedOnDark, darkBg) >= 4.5);
++
++        const QColor lightBg("#f2f2f2");
++        const QColor fixedOnLight = OmarchyTheme::ensureContrast(QColor("#dddddd"), lightBg);
++        QVERIFY(OmarchyTheme::contrastRatio(fixedOnLight, lightBg) >= 4.5);
++        // The fix goes towards the readable side, not across the whole range.
++        QVERIFY(fixedOnLight.lightnessF() < 0.6);
++    }
++
++    void reloadsWhenFileIsEditedInPlace()
++    {
++        install(darkToml);
++        OmarchyTheme theme(colorsPath());
++        QSignalSpy spy(&theme, &OmarchyTheme::changed);
++        QVERIFY(writeFile(colorsPath(), "mode = \"dark\"\naccent = \"#ff0000\"\n"));
++        QTRY_VERIFY_WITH_TIMEOUT(spy.count() >= 1, 3000);
++        QCOMPARE(theme.accent(), QColor("#ff0000"));
++    }
++
++    void keepsWatchingAfterTheFileIsReplacedTwice()
++    {
++        install(darkToml);
++        OmarchyTheme theme(colorsPath());
++        QSignalSpy spy(&theme, &OmarchyTheme::changed);
++
++        for (const char *accent : {"#00ff00", "#0000ff"}) {
++            const QString tmp = colorsPath() + ".new";
++            QVERIFY(writeFile(tmp, QByteArray("mode = \"dark\"\naccent = \"") + accent + "\"\n"));
++            QVERIFY(QFile::remove(colorsPath()));
++            QVERIFY(QFile::rename(tmp, colorsPath()));
++            const int before = spy.count();
++            QTRY_VERIFY_WITH_TIMEOUT(spy.count() > before, 3000);
++            QCOMPARE(theme.accent(), QColor(accent));
++        }
++    }
++
++    void keepsWatchingAfterTheWholeDirectoryIsSwapped()
++    {
++        install(darkToml);
++        OmarchyTheme theme(colorsPath());
++        QSignalSpy spy(&theme, &OmarchyTheme::changed);
++
++        for (const char *accent : {"#112233", "#445566"}) {
++            const QString fresh = root() + "/current/theme.new";
++            QDir(fresh).removeRecursively();
++            QVERIFY(QDir().mkpath(fresh));
++            QVERIFY(writeFile(fresh + "/colors.toml", QByteArray("mode = \"dark\"\naccent = \"") + accent + "\"\n"));
++            QVERIFY(QDir(root() + "/current/theme").removeRecursively());
++            QVERIFY(QDir().rename(fresh, root() + "/current/theme"));
++            const int before = spy.count();
++            QTRY_VERIFY_WITH_TIMEOUT(spy.count() > before, 3000);
++            QCOMPARE(theme.accent(), QColor(accent));
++        }
++    }
++
++    void picksUpAThemeThatAppearsLaterAndKeepsWatchingIt()
++    {
++        // Nothing exists at start-up, as on a machine where Omarchy has not written a theme yet.
++        OmarchyTheme theme(colorsPath());
++        QVERIFY(!theme.found());
++        QSignalSpy spy(&theme, &OmarchyTheme::changed);
++
++        install(darkToml);
++        QTRY_VERIFY_WITH_TIMEOUT(spy.count() >= 1, 3000);
++        QVERIFY(theme.found());
++        QCOMPARE(theme.accent(), QColor("#798186"));
++
++        // Only a re-armed watcher can see an in-place edit of a file that did not exist when it started.
++        const int before = spy.count();
++        QVERIFY(writeFile(colorsPath(), "mode = \"dark\"\naccent = \"#fedcba\"\n"));
++        QTRY_VERIFY_WITH_TIMEOUT(spy.count() > before, 3000);
++        QCOMPARE(theme.accent(), QColor("#fedcba"));
++    }
++
++    void doesNotEmitChangedWhenNothingChanged()
++    {
++        install(darkToml);
++        OmarchyTheme theme(colorsPath());
++        QSignalSpy spy(&theme, &OmarchyTheme::changed);
++        // Re-writing identical content must not repaint the whole interface.
++        QVERIFY(writeFile(colorsPath(), darkToml));
++        QTest::qWait(500);
++        QCOMPARE(spy.count(), 0);
++    }
++
++private:
++    QTemporaryDir m_dir;
++};
++
++QTEST_GUILESS_MAIN(TestOmarchyTheme)
++#include "test_qt_omarchytheme.moc"

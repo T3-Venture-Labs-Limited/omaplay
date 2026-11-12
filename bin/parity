@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Regenerate docs/PARITY.md and docs/parity/inventory.tsv from the pinned source. Exit 1 if any stock option is missing.
+exec python3 "$(dirname "$0")/../tools/parity.py" "$@"

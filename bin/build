@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Configure (first run) and compile vlc/ into build/ with meson. Prefix is /opt/omaplay so the
+# result never overlaps the official vlc package. Extra meson options can be passed through
+# OMA_VLC_MESON_OPTS; `bin/build --reconfigure` re-runs configuration.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+[[ -d vlc/.git ]] || bin/setup
+
+if command -v ccache >/dev/null; then
+  export CC="ccache gcc" CXX="ccache g++"
+fi
+
+reconf=()
+[[ ${1:-} == --reconfigure ]] && { reconf=(--reconfigure); shift; }
+
+if [[ ! -f build/build.ninja || ${#reconf[@]} -gt 0 ]]; then
+  mapfile -t flags < <(bin/meson-flags)
+  # shellcheck disable=SC2086
+  meson setup build vlc "${reconf[@]}" "${flags[@]}" ${OMA_VLC_MESON_OPTS:-}
+fi
+ninja -C build "$@"

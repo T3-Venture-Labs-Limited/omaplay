@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Run omaplay (or the stock build) inside `cage`, a throwaway kiosk compositor with a headless
+# screen, so screenshots are clean and keystrokes can never reach the real desktop.
+#
+#   bin/harness start [--build DIR] [--theme NAME|FILE] [--size WxH] [--wizard] [-- vlc args...]
+#   bin/harness shot NAME            screenshot to build/shots/NAME.png
+#   bin/harness key KEY...           send keys, e.g. ctrl+p  Escape  space
+#   bin/harness click X Y [BUTTON]   click at pixel X,Y of the 1280x720 screen (button 272 left, 273 right)
+#   bin/harness move X Y | scroll X Y DELTA
+#   bin/harness theme NAME|FILE      swap the Omarchy theme the way `omarchy theme set` does
+#   bin/harness status | stop
+#
+# Audio goes to a silent dummy output (AOUT=pulse to use the real one, e.g. for a working volume control).
+# State lives in /tmp/omaplay-h. The app's config, data and cache are fresh on every start unless KEEP_STATE=1.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+H=/tmp/omaplay-h
+mkdir -p "$H" "$root/build/shots"
+
+sock() { cat "$H/socket" 2>/dev/null; }
+alive() { [[ -f $H/cage-pid ]] && kill -0 "$(cat "$H/cage-pid")" 2>/dev/null; }
+
+theme_file() {
+  if [[ -f $1 ]]; then echo "$1"; else echo "/usr/share/omarchy/themes/$1/colors.toml"; fi
+}
+install_theme() {
+  local src; src=$(theme_file "$1"); [[ -f $src ]] || { echo "no such theme: $1" >&2; exit 1; }
+  local cur=$H/state/omarchy/current
+  mkdir -p "$cur"
+  rm -rf "$cur/next-theme"; mkdir -p "$cur/next-theme"; cp "$src" "$cur/next-theme/colors.toml"
+  rm -rf "$cur/theme"; mv "$cur/next-theme" "$cur/theme"
+}
+
+cmd=${1:-}; shift || true
+case $cmd in
+  start)
+    build=$root/build; theme=; size=1280x720; privacy=--no-qt-privacy-ask
+    while [[ $# -gt 0 ]]; do
+      case $1 in
+        --build) build=$(cd "$2" && pwd); shift 2;;
+        --theme) theme=$2; shift 2;;
+        --size) size=$2; shift 2;;
+        --wizard) privacy=; shift;;   # show the first-run wizard instead of skipping it
+        --) shift; break;;
+        *) break;;
+      esac
+    done
+    alive && "$0" stop
+    # KEEP_STATE=1 keeps config, data and cache from the previous run (to test persistence).
+    [[ -n ${KEEP_STATE:-} ]] || rm -rf "$H/cfg" "$H/data" "$H/cache" "$H/state"
+    mkdir -p "$H/cfg" "$H/data" "$H/cache" "$H/state"
+    [[ -n $theme ]] && install_theme "$theme"
+    qargs=$(printf '%q ' "$@")
+    cat > "$H/inner.sh" <<INNER
+#!/bin/bash
+export VLC_LIB_PATH=$build/modules VLC_PLUGIN_PATH=$build/modules QT_QPA_PLATFORM=wayland LIBGL_ALWAYS_SOFTWARE=1
+exec $build/bin/vlc-static -vv --aout=${AOUT:-adummy} $privacy $qargs
+INNER
+    chmod +x "$H/inner.sh"
+    before=$(ls /run/user/1000 | grep -E '^wayland-[0-9]+$' | sort)
+    env -u WAYLAND_DISPLAY -u DISPLAY -u HYPRLAND_INSTANCE_SIGNATURE \
+      WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1 \
+      XDG_CONFIG_HOME=$H/cfg XDG_DATA_HOME=$H/data XDG_CACHE_HOME=$H/cache XDG_STATE_HOME=$H/state \
+      setsid cage -- "$H/inner.sh" > "$H/cage.log" 2>&1 &
+    echo $! > "$H/cage-pid"
+    for _ in $(seq 1 40); do
+      new=$(comm -13 <(echo "$before") <(ls /run/user/1000 | grep -E '^wayland-[0-9]+$' | sort) | head -1)
+      [[ -n $new ]] && break; sleep 0.25
+    done
+    [[ -n ${new:-} ]] || { echo "cage did not start; see $H/cage.log" >&2; exit 1; }
+    echo "$new" > "$H/socket"
+    sleep 5
+    echo "started on $new (output ${size})";;
+  shot)
+    name=${1:?name}; WAYLAND_DISPLAY=$(sock) grim "$root/build/shots/$name.png"; echo "$root/build/shots/$name.png";;
+  key)
+    for k in "$@"; do
+      mods=(); key=$k
+      IFS='+' read -ra parts <<< "$k"; key=${parts[-1]}; unset 'parts[-1]'
+      args=(); for m in "${parts[@]}"; do args+=(-M "$m"); done
+      if (( ${#key} > 1 )); then args+=(-k "$key"); else args+=("$key"); fi
+      for m in "${parts[@]}"; do args+=(-m "$m"); done
+      WAYLAND_DISPLAY=$(sock) wtype "${args[@]}"; sleep 0.4
+    done;;
+  click|move|scroll)
+    vp=$root/build/vptr/vptr
+    if [[ ! -x $vp ]]; then
+      mkdir -p "$root/build/vptr"
+      x=$root/tools/wlr-virtual-pointer-unstable-v1.xml
+      wayland-scanner client-header "$x" "$root/build/vptr/wlr-virtual-pointer-unstable-v1-client-protocol.h"
+      wayland-scanner private-code "$x" "$root/build/vptr/wlr-virtual-pointer-unstable-v1-protocol.c"
+      gcc -O1 -I"$root/build/vptr" -o "$vp" "$root/tools/vptr.c" "$root/build/vptr/wlr-virtual-pointer-unstable-v1-protocol.c" -lwayland-client
+    fi
+    WAYLAND_DISPLAY=$(sock) "$vp" "$cmd" "$@"; sleep 0.5;;
+  theme) install_theme "${1:?theme}"; sleep 1.2;;
+  status) alive && echo "running on $(sock)" || echo "stopped";;
+  stop)
+    if [[ -f $H/cage-pid ]]; then kill "$(cat "$H/cage-pid")" 2>/dev/null || true; fi
+    sleep 1; pkill -x vlc-preparser 2>/dev/null || true
+    rm -f "$H/cage-pid" "$H/socket";;
+  *) sed -n 2,13p "$0"; exit 1;;
+esac

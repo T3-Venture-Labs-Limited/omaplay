@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Check an installed omaplay: it must sit beside the official vlc package without touching it.
+set -uo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+ok=0; bad=0
+check() { if eval "$2" >/dev/null 2>&1; then echo "ok    $1"; ok=$((ok+1)); else echo "FAIL  $1"; bad=$((bad+1)); fi; }
+
+check "omaplay is on PATH"                         "command -v omaplay"
+check "omaplay reports VLC 4.0 underneath"         "omaplay --version 2>&1 | grep -q 'VLC version 4\\.0'"
+check "desktop entry installed"                    "test -f /usr/share/applications/omaplay.desktop"
+check "icon installed"                             "test -f /usr/share/icons/hicolor/scalable/apps/omaplay.svg"
+check "package conflicts with nothing"             "! pacman -Qi omaplay | grep -E '^Conflicts With' | grep -vq None"
+if pacman -Q vlc >/dev/null 2>&1; then
+  check "official vlc still reports 3.x"           "vlc --version 2>&1 | grep -q 'VLC version 3\\.'"
+  check "official vlc package files unmodified"    "! pacman -Qkk vlc 2>&1 | grep -qE '[1-9][0-9]* altered'"
+fi
+
+# Run it for a moment and look at what it loaded, with throwaway settings.
+tmp=$(mktemp -d); export XDG_CONFIG_HOME=$tmp/c XDG_DATA_HOME=$tmp/d XDG_CACHE_HOME=$tmp/k
+clip=$(CLIP=${CLIP:-} XDG_CACHE_HOME=${HOME}/.cache "$root/bin/test-clip")
+/opt/omaplay/bin/vlc -I dummy --vout=dummy --aout=dummy --no-audio --run-time=4 --play-and-exit "$clip" >/dev/null 2>&1 & p=$!
+sleep 2.5
+# awk counts offenders: `grep -v` with no match exits 1, which pipefail would report as a failure.
+check "libvlc loaded from /opt/omaplay (and only there)" "grep -E 'libvlc(core)?\\.so' /proc/$p/maps | awk '\$6 !~ /^\\/opt\\/omaplay\\// {bad++} {n++} END {exit !(n>0 && bad==0)}'"
+check "no library from /usr/lib/libvlc*"           "! grep -q '/usr/lib/libvlc' /proc/$p/maps"
+check "plugins loaded only from /opt/omaplay"      "! grep -q '/usr/lib/vlc/plugins' /proc/$p/maps"
+wait $p
+/opt/omaplay/bin/vlc -I dummy --reset-config --play-and-exit vlc://quit >/dev/null 2>&1
+check "settings are written to an omaplay directory" "test -f '$tmp/c/omaplay/vlcrc'"
+check "nothing is written to a vlc directory"      "! test -e '$tmp/c/vlc'"
+rm -rf "$tmp"
+
+echo; echo "$ok passed, $bad failed"
+[[ $bad -eq 0 ]]

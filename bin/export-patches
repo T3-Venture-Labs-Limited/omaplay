@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Write the commits on branch `omaplay` (on top of the pinned UPSTREAM commit) into patches/
+# as a git format-patch series. Run after committing work in vlc/.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+read -r sha _ < <(grep -v '^#' UPSTREAM | head -n1)
+[[ -d vlc/.git ]] || { echo "vlc/ missing; run bin/setup first" >&2; exit 1; }
+
+if [[ -n $(git -C vlc status --porcelain) ]]; then
+  echo "vlc/ has uncommitted changes; commit them first so they land in the series" >&2
+  exit 1
+fi
+[[ $(git -C vlc rev-parse --abbrev-ref HEAD) == omaplay ]] || { echo "vlc/ is not on branch omaplay" >&2; exit 1; }
+
+rm -f patches/*.patch
+git -C vlc format-patch --no-signature --zero-commit --numbered -o "$root/patches" "$sha..omaplay" >/dev/null
+n=$(ls patches/*.patch 2>/dev/null | wc -l)
+echo "exported $n patch(es) on top of ${sha:0:10}"

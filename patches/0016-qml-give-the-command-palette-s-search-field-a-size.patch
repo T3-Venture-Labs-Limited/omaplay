@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 18:58:29 +0530
+Subject: [PATCH 16/17] qml: give the command palette's search field a size
+
+QtQuick.Templates.TextField has no implicit size, so the field collapsed to zero height: typing
+still filtered the list, but the text and the focus border were invisible.
+---
+ modules/gui/qt/widgets/qml/ActionOverlay.qml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/modules/gui/qt/widgets/qml/ActionOverlay.qml b/modules/gui/qt/widgets/qml/ActionOverlay.qml
+index 4070cfbe5d..794c35bccc 100644
+--- a/modules/gui/qt/widgets/qml/ActionOverlay.qml
++++ b/modules/gui/qt/widgets/qml/ActionOverlay.qml
+@@ -190,6 +190,13 @@ FocusScope {
+                 width: parent.width
+                 focus: true
+ 
++                // The template control has no size of its own; without these it collapses to zero height
++                // and the typed text is invisible (filtering still works).
++                implicitWidth: parent.width
++                implicitHeight: Math.max(VLCStyle.dp(32, VLCStyle.scale),
++                                         contentHeight + topPadding + bottomPadding)
++                verticalAlignment: TextInput.AlignVCenter
++
+                 placeholderText: root.isPalette ? qsTr("Type a command") : qsTr("Filter shortcuts")
+                 color: theme.fg.primary
+                 placeholderTextColor: theme.fg.secondary

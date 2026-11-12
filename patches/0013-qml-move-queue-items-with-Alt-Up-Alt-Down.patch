@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 17:40:45 +0530
+Subject: [PATCH 13/17] qml: move queue items with Alt+Up / Alt+Down
+
+The stock queue can be reordered only by dragging. Alt+Up and Alt+Down move the selected items one
+position, as a shortcut that acts on the visible queue (a key handler on the list never saw the keys:
+focus bounces to the player when a click changes the playing item). Ctrl+Up/Down are VLC's volume keys.
+No-ops at the ends and while a filter is active.
+---
+ modules/gui/qt/playlist/qml/PlaylistPane.qml | 47 ++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+
+diff --git a/modules/gui/qt/playlist/qml/PlaylistPane.qml b/modules/gui/qt/playlist/qml/PlaylistPane.qml
+index 346a8bcc53..23f7282b4a 100644
+--- a/modules/gui/qt/playlist/qml/PlaylistPane.qml
++++ b/modules/gui/qt/playlist/qml/PlaylistPane.qml
+@@ -31,6 +31,53 @@ import VLC.Style
+ T.Pane {
+     id: root
+ 
++    // Moves the selected queue items one position (delta -1 up, +1 down), the keyboard counterpart of
++    // dragging them. Ignored while a filter is active, where a position is ambiguous.
++    function moveSelectedItems(delta) {
++        if (listView.model !== root.model)
++            return
++
++        const selected = selectionModel.selectedIndexesFlat.slice().sort((a, b) => a - b)
++        if (selected.length === 0)
++            return
++
++        const up = delta < 0
++        if (up ? selected[0] <= 0 : selected[selected.length - 1] >= listView.count - 1)
++            return
++
++        if (up)
++            root.model.moveItemsPre(selected, selected[0] - 1)
++        else
++            root.model.moveItemsPost(selected, selected[selected.length - 1] + 1)
++
++        // The playlist reorders asynchronously; keep the same items selected once it has.
++        const moved = []
++        // select() takes ranges as [first, last, first, last, ...]: one range per index.
++        const ranges = []
++        for (let i = 0; i < selected.length; ++i) {
++            moved.push(selected[i] + delta)
++            ranges.push(selected[i] + delta, selected[i] + delta)
++        }
++        Qt.callLater(() => {
++            selectionModel.select(ranges, ItemSelectionModel.ClearAndSelect)
++            listView.currentIndex = moved[0]
++        })
++    }
++
++    // Alt+Up / Alt+Down act on the visible queue wherever the keyboard focus is (Ctrl+Up / Ctrl+Down are
++    // VLC's volume keys). Disabled while text is being typed, like VLC's other global shortcuts.
++    Shortcut {
++        enabled: root.visible && MainCtx.useGlobalShortcuts
++        sequence: "Alt+Up"
++        onActivated: root.moveSelectedItems(-1)
++    }
++
++    Shortcut {
++        enabled: root.visible && MainCtx.useGlobalShortcuts
++        sequence: "Alt+Down"
++        onActivated: root.moveSelectedItems(1)
++    }
++
+     property var model: PlaylistListModel {
+         playlist: MainPlaylistController.playlist
+     }

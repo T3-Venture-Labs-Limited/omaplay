@@ -1,0 +1,266 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:44:56 +0530
+Subject: [PATCH 08/17] qt: theme the QtWidgets dialogs with the Omarchy
+ palette
+
+OmarchyTheme::widgetPalette() maps the theme to QPalette roles (pure data, tested,
+text raised to 4.5:1 against its surface). MainCtx applies it to the application
+palette while the Omarchy scheme is active and restores the style's palette
+otherwise; it is applied once at start-up because currentChanged is silent when the
+saved index equals the default. The busy-progress stylesheet follows the palette
+instead of hard-coded white and orange. Dialog layouts are untouched.
+---
+ modules/gui/qt/maininterface/mainctx.cpp      | 38 +++++++++++++
+ modules/gui/qt/maininterface/mainctx.hpp      |  2 +
+ modules/gui/qt/menus/custom_menus.cpp         |  3 +-
+ modules/gui/qt/style/omarchytheme.cpp         | 53 +++++++++++++++++++
+ modules/gui/qt/style/omarchytheme.hpp         |  9 ++++
+ modules/gui/qt/tests/test_qt_omarchytheme.cpp | 46 ++++++++++++++++
+ 6 files changed, 150 insertions(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
+index d0b85cabbe..3b192261d9 100644
+--- a/modules/gui/qt/maininterface/mainctx.cpp
++++ b/modules/gui/qt/maininterface/mainctx.cpp
+@@ -61,6 +61,8 @@
+ #include "dialogs/toolbar/controlbar_profile_model.hpp"
+ #include "dialogs/help/help.hpp"
+ 
++#include <QApplication>
++#include <QStyle>
+ #include <QKeyEvent>
+ 
+ #include <QUrl>
+@@ -405,6 +407,40 @@ void MainCtx::applyQtColorScheme()
+     }
+ 
+     styleHints->setColorScheme(scheme);
++    applyWidgetPalette();
++}
++
++/**
++ * QtWidgets dialogs (preferences, effects, media information, ...) do not read the QML palette:
++ * they paint from QApplication's palette. Give them the theme's colours while the Omarchy scheme
++ * is active, and the style's own palette again otherwise. Their layouts are untouched.
++ */
++void MainCtx::applyWidgetPalette()
++{
++    if (m_colorScheme->currentScheme() != ColorSchemeModel::ColorScheme::Omarchy)
++    {
++        if (m_widgetPaletteApplied)
++        {
++            QApplication::setPalette(QApplication::style()->standardPalette());
++            m_widgetPaletteApplied = false;
++        }
++        return;
++    }
++
++    const OmarchyTheme *theme = omarchyTheme();
++    QPalette palette = QApplication::style()->standardPalette();
++    const auto active = theme->widgetPalette(false);
++    const auto disabled = theme->widgetPalette(true);
++    for (auto it = active.cbegin(); it != active.cend(); ++it)
++    {
++        palette.setColor(QPalette::Active, it.key(), it.value());
++        palette.setColor(QPalette::Inactive, it.key(), it.value());
++    }
++    for (auto it = disabled.cbegin(); it != disabled.cend(); ++it)
++        palette.setColor(QPalette::Disabled, it.key(), it.value());
++
++    QApplication::setPalette(palette);
++    m_widgetPaletteApplied = true;
+ }
+ 
+ bool MainCtx::useClientSideDecoration() const
+@@ -527,6 +563,8 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
+ 
+     const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", m_colorScheme->currentIndex() ).toInt();
+     m_colorScheme->setCurrentIndex(colorSchemeIndex);
++    // currentChanged is silent when the saved index equals the default, so apply it once explicitly.
++    applyQtColorScheme();
+ 
+     /* user interface scale factor */
+     auto userIntfScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");
+diff --git a/modules/gui/qt/maininterface/mainctx.hpp b/modules/gui/qt/maininterface/mainctx.hpp
+index 3a9cf4a6a4..4f3feee380 100644
+--- a/modules/gui/qt/maininterface/mainctx.hpp
++++ b/modules/gui/qt/maininterface/mainctx.hpp
+@@ -455,6 +455,8 @@ protected:
+     OmarchyTheme*        m_omarchyTheme = nullptr;
+     int                  m_omarchyRadius = -1;
+     void applyQtColorScheme();
++    void applyWidgetPalette();
++    bool                 m_widgetPaletteApplied = false;
+     bool                 m_windowTitlebar = true;
+     // NOTE: Ideally this should be a QVLCBool.
+     bool                 m_hasToolbarMenu = false;
+diff --git a/modules/gui/qt/menus/custom_menus.cpp b/modules/gui/qt/menus/custom_menus.cpp
+index f9cd65648d..d01980d8b2 100644
+--- a/modules/gui/qt/menus/custom_menus.cpp
++++ b/modules/gui/qt/menus/custom_menus.cpp
+@@ -99,7 +99,8 @@ RendererMenu::RendererMenu( QMenu* parent, qt_intf_t* intf, PlayerController* pl
+         }
+         QProgressBar::chunk:horizontal {
+             background: qlineargradient(x1: 0, y1: 0.5, x2: 1, y2: 0.5,
+-                        stop: 0 white, stop: 0.4 orange, stop: 0.6 orange, stop: 1 white);
++                        stop: 0 palette(base), stop: 0.4 palette(highlight),
++                        stop: 0.6 palette(highlight), stop: 1 palette(base));
+         })RAW") );
+     m_statusProgressBar->setRange( 0, 0 );
+     m_statusProgressBar->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Maximum );
+diff --git a/modules/gui/qt/style/omarchytheme.cpp b/modules/gui/qt/style/omarchytheme.cpp
+index 35267990f7..f57e4e76e4 100644
+--- a/modules/gui/qt/style/omarchytheme.cpp
++++ b/modules/gui/qt/style/omarchytheme.cpp
+@@ -197,6 +197,59 @@ void OmarchyTheme::parse(const QByteArray &data)
+         m_dark = relativeLuminance(m_background) < relativeLuminance(m_foreground);
+ }
+ 
++QHash<QPalette::ColorRole, QColor> OmarchyTheme::widgetPalette(bool disabled) const
++{
++    QHash<QPalette::ColorRole, QColor> p;
++    const QColor window = m_background;
++    // Fields sit one step away from the window so they read as inputs; light themes use a paler
++    // field than the window, dark themes a darker one.
++    const QColor base = m_dark ? ramp(0) : mix(m_background, Qt::white, 0.5);
++    const QColor button = m_dark ? ramp(3) : ramp(2);
++    const QColor tooltip = m_dark ? ramp(4) : base;
++
++    const auto text = [&](const QColor &on, const QColor &also = QColor()) {
++        QColor c = ensureContrast(m_foreground, on);
++        return also.isValid() ? ensureContrast(c, also) : c;
++    };
++    const auto dim = [&](const QColor &c, const QColor &on) { return mix(c, on, 0.55); };
++
++    p[QPalette::Window] = window;
++    p[QPalette::Base] = base;
++    p[QPalette::AlternateBase] = ramp(1);
++    p[QPalette::Button] = button;
++    p[QPalette::ToolTipBase] = tooltip;
++    p[QPalette::Light] = m_dark ? ramp(5) : Qt::white;
++    p[QPalette::Midlight] = m_dark ? ramp(4) : ramp(1);
++    p[QPalette::Mid] = m_dark ? ramp(2) : ramp(4);
++    p[QPalette::Dark] = m_dark ? ramp(0) : ramp(5);
++    p[QPalette::Shadow] = Qt::black;
++
++    QColor winText = text(window, base), btnText = text(button), baseText = text(base), tipText = text(tooltip);
++    QColor placeholder = ensureContrast(mix(m_foreground, base, 0.35), base);
++    if (disabled) {
++        winText = dim(winText, window);
++        btnText = dim(btnText, button);
++        baseText = dim(baseText, base);
++        placeholder = dim(placeholder, base);
++    }
++    p[QPalette::WindowText] = winText;
++    p[QPalette::ButtonText] = btnText;
++    p[QPalette::Text] = baseText;
++    p[QPalette::ToolTipText] = tipText;
++    p[QPalette::PlaceholderText] = placeholder;
++    p[QPalette::BrightText] = m_dark ? Qt::white : Qt::black;
++
++    p[QPalette::Highlight] = m_accent;
++    p[QPalette::Accent] = m_accent;
++    const QColor onAccent = relativeLuminance(m_accent) > 0.4 ? QColor(Qt::black) : QColor(Qt::white);
++    p[QPalette::HighlightedText] = ensureContrast(onAccent, m_accent);
++
++    const QColor link = ensureContrast(m_accent, window);
++    p[QPalette::Link] = link;
++    p[QPalette::LinkVisited] = ensureContrast(mix(link, m_foreground, 0.4), window);
++    return p;
++}
++
+ QColor OmarchyTheme::ramp(int step) const
+ {
+     step = qBound(0, step, RampSteps - 1);
+diff --git a/modules/gui/qt/style/omarchytheme.hpp b/modules/gui/qt/style/omarchytheme.hpp
+index ff100fcf6d..43587bcd69 100644
+--- a/modules/gui/qt/style/omarchytheme.hpp
++++ b/modules/gui/qt/style/omarchytheme.hpp
+@@ -12,6 +12,8 @@
+ 
+ #include <QObject>
+ #include <QColor>
++#include <QHash>
++#include <QPalette>
+ #include <QString>
+ #include <QStringList>
+ #include <QTimer>
+@@ -62,6 +64,13 @@ public:
+      */
+     QColor ramp(int step) const;
+ 
++    /**
++     * Colours for QtWidgets, keyed by QPalette::ColorRole, for the active or the disabled colour
++     * group. Pure data so it can be tested without a display; MainCtx applies it to a QPalette.
++     * Text roles are raised to at least 4.5:1 against the surface they sit on.
++     */
++    QHash<QPalette::ColorRole, QColor> widgetPalette(bool disabled) const;
++
+     /// First family of `fc-match monospace` output, which is what `omarchy font current` prints.
+     static QString parseFontFamily(const QByteArray &fcMatchOutput);
+     /// `decoration:rounding` from `hyprctl getoption decoration:rounding -j`, or -1 if unusable.
+diff --git a/modules/gui/qt/tests/test_qt_omarchytheme.cpp b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+index 272a8124ca..f018d687b7 100644
+--- a/modules/gui/qt/tests/test_qt_omarchytheme.cpp
++++ b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+@@ -12,6 +12,7 @@
+ #include <QTemporaryDir>
+ #include <QFile>
+ #include <QDir>
++#include <QPalette>
+ 
+ #include "style/omarchytheme.hpp"
+ 
+@@ -263,6 +264,51 @@ private slots:
+         QCOMPARE(OmarchyTheme::parseRounding(R"({"int": -3})"), -1);
+     }
+ 
++    void widgetPaletteFollowsTheThemeAndKeepsTextReadable_data()
++    {
++        QTest::addColumn<QByteArray>("toml");
++        QTest::newRow("dark") << QByteArray(darkToml);
++        QTest::newRow("light") << QByteArray(lightToml);
++        // A theme whose foreground is barely different from its background.
++        QTest::newRow("low contrast") << QByteArray("mode = \"dark\"\nbackground = \"#303030\"\nforeground = \"#3a3a3a\"\naccent = \"#444444\"\n");
++    }
++
++    void widgetPaletteFollowsTheThemeAndKeepsTextReadable()
++    {
++        QFETCH(QByteArray, toml);
++        install(toml.constData());
++        OmarchyTheme theme(colorsPath());
++        const auto active = theme.widgetPalette(false);
++
++        QCOMPARE(active.value(QPalette::Highlight), theme.accent());
++        QCOMPARE(active.value(QPalette::Accent), theme.accent());
++        QCOMPARE(active.value(QPalette::Window), theme.background());
++
++        const auto ok = [&](QPalette::ColorRole fg, QPalette::ColorRole bg) {
++            const double r = OmarchyTheme::contrastRatio(active.value(fg), active.value(bg));
++            QVERIFY2(r >= 4.5, qPrintable(QString("role %1 on %2: %3").arg(fg).arg(bg).arg(r)));
++        };
++        ok(QPalette::WindowText, QPalette::Window);
++        ok(QPalette::Text, QPalette::Base);
++        ok(QPalette::ButtonText, QPalette::Button);
++        ok(QPalette::HighlightedText, QPalette::Highlight);
++        ok(QPalette::ToolTipText, QPalette::ToolTipBase);
++        ok(QPalette::Link, QPalette::Window);
++        ok(QPalette::PlaceholderText, QPalette::Base);
++    }
++
++    void disabledWidgetTextIsDimmerThanActive()
++    {
++        install(darkToml);
++        OmarchyTheme theme(colorsPath());
++        const auto active = theme.widgetPalette(false);
++        const auto disabled = theme.widgetPalette(true);
++        QVERIFY(OmarchyTheme::contrastRatio(disabled.value(QPalette::Text), disabled.value(QPalette::Base))
++                < OmarchyTheme::contrastRatio(active.value(QPalette::Text), active.value(QPalette::Base)));
++        // Surfaces do not change when disabled.
++        QCOMPARE(disabled.value(QPalette::Window), active.value(QPalette::Window));
++    }
++
+     void doesNotEmitChangedWhenNothingChanged()
+     {
+         install(darkToml);

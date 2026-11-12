@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:20:17 +0530
+Subject: [PATCH 04/17] Make hw-dec default and first-run CSD configurable
+
+hw_dec_default sets the default of the hw-dec preference. csd_wizard=false stops
+the first-run wizard from writing qt-titlebar=0, which switches the interface to
+client-side decorations on compositors that draw none (Hyprland).
+---
+ modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp | 8 ++++++++
+ src/libvlc-module.c                                | 2 +-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp b/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
+index 134de86cc8..bb16f7cb38 100644
+--- a/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
++++ b/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
+@@ -16,6 +16,10 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+  *****************************************************************************/
+ 
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
++
+ #include "firstrunwizard.hpp"
+ #include "util/color_scheme_model.hpp"
+ #include "maininterface/mainctx.hpp"
+@@ -143,7 +147,9 @@ void FirstRunWizard::finish()
+ 
+     /* Layout Page settings */
+     config_PutInt( "qt-menubar", ui.layoutGroup->checkedId() );
++#if VLC_WIZARD_SETS_CSD
+     config_PutInt( "qt-titlebar", ui.layoutGroup->checkedId() );
++#endif
+ 
+     config_PutInt( "qt-pin-controls", ui.layoutGroup->checkedId() );
+ 
+@@ -326,7 +332,9 @@ void FirstRunWizard::reject()
+ 
+     /* Layout Page settings */
+     config_PutInt( "qt-menubar", 0 );
++#if VLC_WIZARD_SETS_CSD
+     config_PutInt( "qt-titlebar", 0 );
++#endif
+     p_intf->p_mi->setPinVideoControls( 0 );
+ 
+     if( p_intf->p_mi->getMediaLibrary() )
+diff --git a/src/libvlc-module.c b/src/libvlc-module.c
+index 096d2a01cb..788b86a53a 100644
+--- a/src/libvlc-module.c
++++ b/src/libvlc-module.c
+@@ -2051,7 +2051,7 @@ vlc_module_begin ()
+     set_subcategory( SUBCAT_INPUT_VCODEC )
+ 
+     add_string( "codec", "any", CODEC_TEXT, CODEC_LONGTEXT )
+-    add_bool( "hw-dec", true, HW_DEC_TEXT, HW_DEC_LONGTEXT )
++    add_bool( "hw-dec", VLC_HW_DEC_DEFAULT, HW_DEC_TEXT, HW_DEC_LONGTEXT )
+     add_obsolete_string( "encoder" ) /* since 4.0.0 */
+     add_module("dec-dev", "decoder device", "any", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)
+ 

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Build the Arch package from this working tree (committed state) with packaging/PKGBUILD, and install it.
+# The release PKGBUILD downloads a tagged tarball of this repository; here the same tarball is made locally
+# with `git archive`, so what you install is exactly what would be published. Needs sudo for pacman -U.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+[[ -z $(git status --porcelain -- patches bin packaging LICENSE) ]] \
+  || { echo "commit your changes to patches/, bin/ or packaging/ first: the package is built from HEAD" >&2; exit 1; }
+
+pkgver=$(sed -n 's/^pkgver=//p' packaging/PKGBUILD)
+work=$root/build/package
+rm -rf "$work"; mkdir -p "$work"
+cp packaging/PKGBUILD packaging/omaplay.install "$work/"
+git archive --format=tar.gz --prefix="omaplay-$pkgver/" -o "$work/omaplay-$pkgver.tar.gz" HEAD
+
+# Reuse a downloaded VLC tarball when there is one.
+vlc_commit=$(sed -n 's/^_vlc_commit=//p' packaging/PKGBUILD)
+for cache in "$root/build" "$HOME/.cache/omaplay-dev"; do
+  [[ -f $cache/vlc-$vlc_commit.tar.gz ]] && cp "$cache/vlc-$vlc_commit.tar.gz" "$work/" && break
+done
+
+cd "$work"
+makepkg -fC --noconfirm
+mkdir -p "$HOME/.cache/omaplay-dev"
+cp -n "vlc-$vlc_commit.tar.gz" "$HOME/.cache/omaplay-dev/" 2>/dev/null || true
+pkg=$(ls -t omaplay-*.pkg.tar.zst | head -n1)
+if [[ ${1:-} == --no-install ]]; then echo "built $work/$pkg"; exit 0; fi
+sudo pacman -U --noconfirm "$pkg"
+echo "installed $pkg; now run bin/verify-install"

@@ -1,0 +1,713 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 16:05:23 +0530
+Subject: [PATCH 10/17] qt: recent media without the media library, 3 s control
+ auto-hide, Omarchy overlay palette
+
+RecentMediaList keeps the last ten played media in the interface settings (VLC 4's own
+list needs the media library) and the empty home screen shows it; titles are escaped
+because file names are untrusted. mouse_hide_timeout makes the control/cursor auto-hide
+delay a build option (3 s here, stock 1 s). VLCStyle's dark palette, used for the
+controls over video, follows the Omarchy theme: the full dark palette for a dark theme,
+dark neutrals with the theme accent for a light one.
+---
+ config.h.meson                                |   1 +
+ meson.build                                   |   1 +
+ meson_options.txt                             |   6 +
+ modules/gui/qt/maininterface/mainctx.cpp      |  16 +++
+ modules/gui/qt/maininterface/mainctx.hpp      |   6 +
+ .../qt/maininterface/qml/NoMedialibHome.qml   |  46 +++++++
+ modules/gui/qt/meson.build                    |  21 +++
+ modules/gui/qt/style/VLCStyle.qml             |   6 +-
+ modules/gui/qt/style/systempalette.cpp        |  42 ++++--
+ modules/gui/qt/style/systempalette.hpp        |   5 +
+ modules/gui/qt/tests/test_qt_recent_media.cpp | 122 ++++++++++++++++++
+ modules/gui/qt/util/recent_media.cpp          | 120 +++++++++++++++++
+ modules/gui/qt/util/recent_media.hpp          |  57 ++++++++
+ src/libvlc-module.c                           |   2 +-
+ 14 files changed, 438 insertions(+), 13 deletions(-)
+ create mode 100644 modules/gui/qt/tests/test_qt_recent_media.cpp
+ create mode 100644 modules/gui/qt/util/recent_media.cpp
+ create mode 100644 modules/gui/qt/util/recent_media.hpp
+
+diff --git a/config.h.meson b/config.h.meson
+index b96e2f6f8b..0684b00998 100644
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -526,6 +526,7 @@
+ #mesondefine VLC_HW_DEC_DEFAULT
+ #mesondefine VLC_WIZARD_SETS_CSD
+ #mesondefine VLC_OMARCHY_DEFAULT
++#mesondefine VLC_MOUSE_HIDE_TIMEOUT
+ 
+ /* Define to the version of this package. */
+ #mesondefine PACKAGE_VERSION
+diff --git a/meson.build b/meson.build
+index 9410c18264..30c5241e5a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1038,6 +1038,7 @@ cdata.set_quoted('VLC_APP_IDENTITY',    get_option('app_identity'))
+ cdata.set10('VLC_HW_DEC_DEFAULT',      get_option('hw_dec_default'))
+ cdata.set10('VLC_WIZARD_SETS_CSD',     get_option('csd_wizard'))
+ cdata.set10('VLC_OMARCHY_DEFAULT',      get_option('omarchy_default'))
++cdata.set('VLC_MOUSE_HIDE_TIMEOUT',    get_option('mouse_hide_timeout'))
+ cdata.set_quoted('COPYRIGHT_YEARS',     vlc_copyright_years)
+ cdata.set_quoted('COPYRIGHT_MESSAGE',   f'Copyright © @vlc_copyright_years@ the VideoLAN team')
+ 
+diff --git a/meson_options.txt b/meson_options.txt
+index e8e5f6e71c..2d3c0692e5 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -890,3 +890,9 @@ option('omarchy_default',
+     type : 'boolean',
+     value : false,
+     description : 'Make the Omarchy colour scheme the default and keep the first-run wizard from overriding it')
++option('mouse_hide_timeout',
++    type : 'integer',
++    value : 1000,
++    min : 100,
++    max : 60000,
++    description : 'Default mouse-hide-timeout in ms: how long until the cursor and player controls auto-hide')
+diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
+index 0b67e5272f..68c37d4741 100644
+--- a/modules/gui/qt/maininterface/mainctx.cpp
++++ b/modules/gui/qt/maininterface/mainctx.cpp
+@@ -44,6 +44,7 @@
+ 
+ #include "util/color_scheme_model.hpp"
+ #include "style/omarchytheme.hpp"
++#include "util/recent_media.hpp"
+ #include "util/model_recovery_agent.hpp"
+ 
+ #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
+@@ -162,6 +163,21 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
+ 
+     settings = getSettings();
+     m_colorScheme = new ColorSchemeModel(this);
++
++    // Recent media do not depend on the media library. The title is usually learned a moment
++    // after the input starts, so it is filled in when the name changes.
++    m_recentMedia = new RecentMediaList(settings, this);
++    if (p_intf->p_mainPlayerController)
++    {
++        PlayerController *player = p_intf->p_mainPlayerController;
++        connect(player, &PlayerController::inputChanged, this, [this, player](bool hasInput) {
++            if (hasInput)
++                m_recentMedia->add(player->getUrl(), player->getName());
++        });
++        connect(player, &PlayerController::nameChanged, this, [this, player](const QString &name) {
++            m_recentMedia->setTitle(player->getUrl(), name);
++        });
++    }
+ #if VLC_OMARCHY_DEFAULT
+     /* Read once: changing Hyprland's rounding is rare and takes effect after a restart. */
+     m_omarchyRadius = OmarchyTheme::hyprlandRounding();
+diff --git a/modules/gui/qt/maininterface/mainctx.hpp b/modules/gui/qt/maininterface/mainctx.hpp
+index bae3f3d979..f8745c8102 100644
+--- a/modules/gui/qt/maininterface/mainctx.hpp
++++ b/modules/gui/qt/maininterface/mainctx.hpp
+@@ -32,6 +32,7 @@
+ #include <QTimer>
+ 
+ Q_MOC_INCLUDE( "dialogs/toolbar/controlbar_profile_model.hpp" )
++Q_MOC_INCLUDE("util/recent_media.hpp")
+ Q_MOC_INCLUDE( "util/csdbuttonmodel.hpp" )
+ Q_MOC_INCLUDE( "playlist/playlist_controller.hpp" )
+ Q_MOC_INCLUDE( "maininterface/mainctx_submodels.hpp" )
+@@ -67,6 +68,7 @@ class VLCSystray;
+ class MediaLib;
+ class ColorSchemeModel;
+ class OmarchyTheme;
++class RecentMediaList;
+ class VLCVarChoiceModel;
+ class SidePanelCtx;
+ #ifdef UPDATE_CHECK
+@@ -122,6 +124,8 @@ class MainCtx : public QObject
+     Q_PROPERTY(int omarchyRadius READ omarchyRadius CONSTANT FINAL)
+     /// True in a build that follows Omarchy (omarchy_default); QML uses it to pick Omarchy's motion rules.
+     Q_PROPERTY(bool omarchyStyle READ omarchyStyle CONSTANT FINAL)
++    /// Recently played media, kept independently of the media library.
++    Q_PROPERTY(RecentMediaList* recentMedia READ recentMedia CONSTANT FINAL)
+     /// False while `omarchy toggle animations off` is in effect. Always true outside an Omarchy build.
+     Q_PROPERTY(bool omarchyAnimations READ omarchyAnimations NOTIFY omarchyAnimationsChanged FINAL)
+     Q_PROPERTY(int  csdBorderSize READ CSDBorderSize NOTIFY useClientSideDecorationChanged FINAL)
+@@ -256,6 +260,7 @@ public:
+     bool hasFirstrun() const;
+     int omarchyRadius() const { return m_omarchyRadius; }
+     bool omarchyStyle() const;
++    RecentMediaList* recentMedia() const { return m_recentMedia; }
+     bool omarchyAnimations();
+     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
+     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
+@@ -460,6 +465,7 @@ protected:
+     ColorSchemeModel*    m_colorScheme = nullptr;
+     OmarchyTheme*        m_omarchyTheme = nullptr;
+     int                  m_omarchyRadius = -1;
++    RecentMediaList*     m_recentMedia = nullptr;
+     void applyQtColorScheme();
+     void applyWidgetPalette();
+     bool                 m_widgetPaletteApplied = false;
+diff --git a/modules/gui/qt/maininterface/qml/NoMedialibHome.qml b/modules/gui/qt/maininterface/qml/NoMedialibHome.qml
+index 38296cc3d9..5cd1844b42 100644
+--- a/modules/gui/qt/maininterface/qml/NoMedialibHome.qml
++++ b/modules/gui/qt/maininterface/qml/NoMedialibHome.qml
+@@ -22,6 +22,7 @@ import VLC.MainInterface
+ import VLC.Util
+ import VLC.Style
+ import VLC.Widgets as Widgets
++import VLC.Playlist
+ 
+ FocusScope {
+     id: root
+@@ -119,10 +120,55 @@ FocusScope {
+ 
+ 
+     ConeNButtons {
++        id: homeButtons
++
+         focus: true
+ 
+         anchors.centerIn: root
+ 
+         Navigation.parentItem: root
+     }
++
++    // Recently played media. VLC 4's own list needs the media library, so this one is ours.
++    Column {
++        id: recent
++
++        readonly property var entries: (MainCtx.recentMedia?.items ?? []).slice(0, 5)
++
++        visible: entries.length > 0
++
++        anchors.top: homeButtons.bottom
++        anchors.topMargin: VLCStyle.margin_large
++        anchors.horizontalCenter: root.horizontalCenter
++
++        spacing: VLCStyle.margin_xxsmall
++
++        // File names are untrusted text, and the label auto-detects rich text: escape the markup.
++        function plain(text) {
++            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;")
++        }
++
++        Text {
++            anchors.horizontalCenter: parent.horizontalCenter
++
++            text: qsTr("Recent")
++            textFormat: Text.PlainText
++            color: theme.fg.secondary
++            font.pixelSize: VLCStyle.fontSize_small
++        }
++
++        Repeater {
++            model: recent.entries
++
++            delegate: Widgets.TextToolButton {
++                required property var modelData
++
++                anchors.horizontalCenter: parent.horizontalCenter
++
++                text: recent.plain(modelData.display)
++
++                onClicked: MainPlaylistController.append([modelData.url], true)
++            }
++        }
++    }
+ }
+diff --git a/modules/gui/qt/meson.build b/modules/gui/qt/meson.build
+index 3200c8de5f..b97350e52a 100644
+--- a/modules/gui/qt/meson.build
++++ b/modules/gui/qt/meson.build
+@@ -116,6 +116,7 @@ moc_headers = files(
+     'network/standardpathmodel.hpp',
+     'style/omarchytheme.hpp',
+     'style/systempalette.hpp',
++    'util/recent_media.hpp',
+     'style/vlcicons.hpp',
+     'style/colorcontext.hpp',
+     'player/input_models.hpp',
+@@ -407,6 +408,8 @@ qt_plugin_sources = files(
+     'style/colorcontext.hpp',
+     'style/omarchytheme.cpp',
+     'style/omarchytheme.hpp',
++    'util/recent_media.cpp',
++    'util/recent_media.hpp',
+     'style/systempalette.cpp',
+     'style/systempalette.hpp',
+     'style/vlcicons.cpp',
+@@ -1383,6 +1386,24 @@ if qt6_dep.found()
+             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
+         }
+ 
++        vlc_tests += {
++            'name': 'test_qt_recent_media',
++            'sources': files(
++                'tests/test_qt_recent_media.cpp',
++                'util/recent_media.hpp',
++                'util/recent_media.cpp'
++            ),
++            'moc_sources': files(
++                'tests/test_qt_recent_media.cpp'
++            ),
++            'moc_headers': files(
++                'util/recent_media.hpp'
++            ),
++            'suite': ['qt'],
++            'include_directories' : qt_include_dir,
++            'dependencies': [qt6_dep, qtest_qt6_dep]
++        }
++
+         vlc_tests += {
+             'name': 'test_qt_omarchytheme',
+             'sources': files(
+diff --git a/modules/gui/qt/style/VLCStyle.qml b/modules/gui/qt/style/VLCStyle.qml
+index 07aa9e79d1..83b8f8116f 100644
+--- a/modules/gui/qt/style/VLCStyle.qml
++++ b/modules/gui/qt/style/VLCStyle.qml
+@@ -43,7 +43,11 @@ QtObject {
+ 
+     readonly property SystemPalette darkPalette: SystemPalette {
+         objectName: "darkPalette"
+-        source: ColorSchemeModel.Night
++        // Over video the controls stay dark. Under the Omarchy scheme that means the theme's own
++        // dark palette (or dark neutrals with the theme's accent for a light theme).
++        source: MainCtx.colorScheme.scheme === ColorSchemeModel.Omarchy ? ColorSchemeModel.Omarchy
++                                                                          : ColorSchemeModel.Night
++        forceDark: true
+         ctx: MainCtx
+     }
+ 
+diff --git a/modules/gui/qt/style/systempalette.cpp b/modules/gui/qt/style/systempalette.cpp
+index f705ee021d..f4094f4e76 100644
+--- a/modules/gui/qt/style/systempalette.cpp
++++ b/modules/gui/qt/style/systempalette.cpp
+@@ -372,6 +372,14 @@ void SystemPalette::setSource(ColorSchemeModel::ColorScheme source)
+     emit sourceChanged();
+ }
+ 
++void SystemPalette::setForceDark(bool force)
++{
++    if (m_forceDark == force)
++        return;
++    m_forceDark = force;
++    updatePalette();
++}
++
+ void SystemPalette::setCtx(MainCtx* ctx)
+ {
+     if (ctx == m_ctx)
+@@ -957,23 +965,35 @@ void SystemPalette::makeOmarchyPalette()
+ 
+     orange500 = theme->accent();
+     orange800 = theme->accent().lighter(150);
+-    m_fgOverride = theme->foreground();
+-    // The stock palettes use pure black / white for their outermost surfaces; use the theme's own.
+-    m_bgEdgeOverride = theme->widgetPalette(false).value(QPalette::Base);
+ 
+-    if (theme->isDark())
++    if (m_forceDark && !theme->isDark())
+     {
+-        darkGrey200 = theme->ramp(0); darkGrey300 = theme->ramp(1); darkGrey400 = theme->ramp(2);
+-        darkGrey500 = theme->ramp(3); darkGrey600 = theme->ramp(4); darkGrey700 = theme->ramp(5);
+-        darkGrey800 = theme->ramp(6);
++        // A light theme still needs dark surfaces over video: keep the stock dark neutrals and
++        // only take the theme's accent.
++        m_fgOverride = QColor();
++        m_bgEdgeOverride = QColor();
+         makeDarkPalette();
+     }
+     else
+     {
+-        lightGrey100 = theme->ramp(0); lightGrey200 = theme->ramp(1); lightGrey300 = theme->ramp(2);
+-        lightGrey400 = theme->ramp(3); lightGrey500 = theme->ramp(4); lightGrey600 = theme->ramp(5);
+-        lightGrey700 = theme->ramp(6);
+-        makeLightPalette();
++        m_fgOverride = theme->foreground();
++        // The stock palettes use pure black / white for their outermost surfaces; use the theme's own.
++        m_bgEdgeOverride = theme->widgetPalette(false).value(QPalette::Base);
++
++        if (theme->isDark())
++        {
++            darkGrey200 = theme->ramp(0); darkGrey300 = theme->ramp(1); darkGrey400 = theme->ramp(2);
++            darkGrey500 = theme->ramp(3); darkGrey600 = theme->ramp(4); darkGrey700 = theme->ramp(5);
++            darkGrey800 = theme->ramp(6);
++            makeDarkPalette();
++        }
++        else
++        {
++            lightGrey100 = theme->ramp(0); lightGrey200 = theme->ramp(1); lightGrey300 = theme->ramp(2);
++            lightGrey400 = theme->ramp(3); lightGrey500 = theme->ramp(4); lightGrey600 = theme->ramp(5);
++            lightGrey700 = theme->ramp(6);
++            makeLightPalette();
++        }
+     }
+ 
+     // Keyboard focus is drawn in the accent, not plain white or black, so it is visible on every
+diff --git a/modules/gui/qt/style/systempalette.hpp b/modules/gui/qt/style/systempalette.hpp
+index 111eda24af..6e49d7a9c9 100644
+--- a/modules/gui/qt/style/systempalette.hpp
++++ b/modules/gui/qt/style/systempalette.hpp
+@@ -107,6 +107,8 @@ public:
+     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+     Q_PROPERTY(ColorSchemeModel::ColorScheme  source READ source WRITE setSource NOTIFY sourceChanged FINAL)
+     Q_PROPERTY(bool isDark MEMBER m_isDark NOTIFY paletteChanged FINAL)
++    /// Keep the palette dark even when the Omarchy theme is light (used over video).
++    Q_PROPERTY(bool forceDark READ forceDark WRITE setForceDark NOTIFY paletteChanged FINAL)
+     Q_PROPERTY(bool hasCSDImage READ hasCSDImage NOTIFY hasCSDImageChanged FINAL)
+     Q_PROPERTY(CSDMetrics* csdMetrics READ getCSDMetrics NOTIFY CSDMetricsChanged FINAL)
+ 
+@@ -143,6 +145,7 @@ public:
+     CSDMetrics* getCSDMetrics() const;
+ 
+     inline MainCtx* getCtx() const { return m_ctx; }
++    bool forceDark() const { return m_forceDark; }
+     bool hasCSDImage() const;
+ 
+     void setColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,
+@@ -155,6 +158,7 @@ public:
+ 
+ public slots:
+     void setSource(ColorSchemeModel::ColorScheme source);
++    void setForceDark(bool force);
+     void setCtx(MainCtx* ctx);
+ 
+ 
+@@ -187,6 +191,7 @@ private:
+     QMap<quint64, QColor> m_colorMap;
+ 
+     /// Theme foreground used by the stock palettes while the Omarchy scheme is active; invalid otherwise.
++    bool m_forceDark = false;
+     QColor m_fgOverride;
+     /// Theme colour for the stock palettes' outermost surfaces (pure black or white); invalid otherwise.
+     QColor m_bgEdgeOverride;
+diff --git a/modules/gui/qt/tests/test_qt_recent_media.cpp b/modules/gui/qt/tests/test_qt_recent_media.cpp
+new file mode 100644
+index 0000000000..5382f5532c
+--- /dev/null
++++ b/modules/gui/qt/tests/test_qt_recent_media.cpp
+@@ -0,0 +1,122 @@
++/*****************************************************************************
++ * test_qt_recent_media.cpp : the recently opened media history
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#include <QTest>
++#include <QSignalSpy>
++#include <QSettings>
++#include <QTemporaryDir>
++
++#include "util/recent_media.hpp"
++
++class TestRecentMedia : public QObject
++{
++    Q_OBJECT
++
++    QString iniPath() const { return m_dir.filePath("test.ini"); }
++
++private slots:
++    void init() { QVERIFY(m_dir.isValid()); QFile::remove(iniPath()); }
++
++    void startsEmpty()
++    {
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList list(&s);
++        QVERIFY(list.items().isEmpty());
++    }
++
++    void newestFirstAndDeduplicated()
++    {
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList list(&s);
++        list.add(QUrl("file:///a.mp4"), "A");
++        list.add(QUrl("file:///b.mp4"), "B");
++        list.add(QUrl("file:///a.mp4"), "A again");   // moves to the front, does not duplicate
++        const auto items = list.items();
++        QCOMPARE(items.size(), 2);
++        QCOMPARE(items[0].toMap()["url"].toString(), QString("file:///a.mp4"));
++        QCOMPARE(items[0].toMap()["title"].toString(), QString("A again"));
++        QCOMPARE(items[1].toMap()["url"].toString(), QString("file:///b.mp4"));
++    }
++
++    void keepsOnlyTheNewestTen()
++    {
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList list(&s);
++        for (int i = 0; i < 12; ++i)
++            list.add(QUrl(QString("file:///%1.mp4").arg(i)), QString::number(i));
++        const auto items = list.items();
++        QCOMPARE(items.size(), RecentMediaList::Limit);
++        QCOMPARE(items.first().toMap()["url"].toString(), QString("file:///11.mp4"));
++        QCOMPARE(items.last().toMap()["url"].toString(), QString("file:///2.mp4"));
++    }
++
++    void persistsAcrossInstances()
++    {
++        {
++            QSettings s(iniPath(), QSettings::IniFormat);
++            RecentMediaList list(&s);
++            list.add(QUrl("https://example.invalid/stream.m3u8"), "Stream");
++            list.add(QUrl("file:///a.mp4"), "A");
++        }
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList again(&s);
++        const auto items = again.items();
++        QCOMPARE(items.size(), 2);
++        QCOMPARE(items[0].toMap()["url"].toString(), QString("file:///a.mp4"));
++        QCOMPARE(items[1].toMap()["title"].toString(), QString("Stream"));
++    }
++
++    void ignoresEmptyUrls()
++    {
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList list(&s);
++        list.add(QUrl(), "nothing");
++        QVERIFY(list.items().isEmpty());
++    }
++
++    void titleCanBeFilledInLater()
++    {
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList list(&s);
++        list.add(QUrl("file:///a.mp4"), QString());          // the name is not known yet
++        list.setTitle(QUrl("file:///a.mp4"), "Real title");
++        list.setTitle(QUrl("file:///unknown.mp4"), "ignored");
++        QCOMPARE(list.items().size(), 1);
++        QCOMPARE(list.items()[0].toMap()["title"].toString(), QString("Real title"));
++    }
++
++    void emptyTitleFallsBackToTheFileName()
++    {
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList list(&s);
++        list.add(QUrl("file:///home/me/My%20Film.mkv"), QString());
++        QCOMPARE(list.items()[0].toMap()["display"].toString(), QString("My Film.mkv"));
++    }
++
++    void notifiesOnlyWhenSomethingChanged()
++    {
++        QSettings s(iniPath(), QSettings::IniFormat);
++        RecentMediaList list(&s);
++        QSignalSpy spy(&list, &RecentMediaList::changed);
++        list.add(QUrl("file:///a.mp4"), "A");
++        QCOMPARE(spy.count(), 1);
++        list.add(QUrl("file:///a.mp4"), "A");                // already first and identical
++        QCOMPARE(spy.count(), 1);
++        list.clear();
++        QCOMPARE(spy.count(), 2);
++        list.clear();                                        // already empty
++        QCOMPARE(spy.count(), 2);
++    }
++
++private:
++    QTemporaryDir m_dir;
++};
++
++QTEST_GUILESS_MAIN(TestRecentMedia)
++#include "test_qt_recent_media.moc"
+diff --git a/modules/gui/qt/util/recent_media.cpp b/modules/gui/qt/util/recent_media.cpp
+new file mode 100644
+index 0000000000..fb46a25a05
+--- /dev/null
++++ b/modules/gui/qt/util/recent_media.cpp
+@@ -0,0 +1,120 @@
++/*****************************************************************************
++ * recent_media.cpp : recently opened media, independent of the media library
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#include "recent_media.hpp"
++
++#include <QSettings>
++#include <QVariantMap>
++
++namespace {
++const QString group = QStringLiteral("RecentMedia");
++
++QString displayName(const QString &url, const QString &title)
++{
++    if (!title.isEmpty())
++        return title;
++    // Untitled: show the last path component, decoded, as a file manager would.
++    const QUrl u(url);
++    const QString name = u.fileName();
++    return name.isEmpty() ? url : name;
++}
++} // namespace
++
++RecentMediaList::RecentMediaList(QSettings *settings, QObject *parent)
++    : QObject(parent)
++    , m_settings(settings)
++{
++    load();
++}
++
++void RecentMediaList::load()
++{
++    m_entries.clear();
++    const int n = m_settings->beginReadArray(group);
++    for (int i = 0; i < n && i < Limit; ++i) {
++        m_settings->setArrayIndex(i);
++        const QString url = m_settings->value(QStringLiteral("url")).toString();
++        if (!url.isEmpty())
++            m_entries.append({url, m_settings->value(QStringLiteral("title")).toString()});
++    }
++    m_settings->endArray();
++}
++
++void RecentMediaList::save() const
++{
++    m_settings->beginWriteArray(group, m_entries.size());
++    for (int i = 0; i < m_entries.size(); ++i) {
++        m_settings->setArrayIndex(i);
++        m_settings->setValue(QStringLiteral("url"), m_entries[i].url);
++        m_settings->setValue(QStringLiteral("title"), m_entries[i].title);
++    }
++    m_settings->endArray();
++    m_settings->sync();
++}
++
++QVariantList RecentMediaList::items() const
++{
++    QVariantList out;
++    for (const Entry &e : m_entries)
++        out << QVariantMap{{"url", e.url}, {"title", e.title}, {"display", displayName(e.url, e.title)}};
++    return out;
++}
++
++void RecentMediaList::add(const QUrl &url, const QString &title)
++{
++    if (!url.isValid() || url.isEmpty())
++        return;
++    const QString u = url.toString(QUrl::FullyEncoded);
++
++    // Already first and identical: nothing to change, nothing to repaint.
++    if (!m_entries.isEmpty() && m_entries.first().url == u
++        && (title.isEmpty() || m_entries.first().title == title))
++        return;
++
++    // Keep a title we already know when the same media is opened before its name is available.
++    QString keptTitle = title;
++    for (int i = 0; i < m_entries.size(); ++i)
++        if (m_entries[i].url == u) {
++            if (keptTitle.isEmpty())
++                keptTitle = m_entries[i].title;
++            m_entries.removeAt(i);
++            break;
++        }
++
++    m_entries.prepend({u, keptTitle});
++    while (m_entries.size() > Limit)
++        m_entries.removeLast();
++    save();
++    emit changed();
++}
++
++void RecentMediaList::setTitle(const QUrl &url, const QString &title)
++{
++    if (title.isEmpty())
++        return;
++    const QString u = url.toString(QUrl::FullyEncoded);
++    for (Entry &e : m_entries)
++        if (e.url == u) {
++            if (e.title == title)
++                return;
++            e.title = title;
++            save();
++            emit changed();
++            return;
++        }
++}
++
++void RecentMediaList::clear()
++{
++    if (m_entries.isEmpty())
++        return;
++    m_entries.clear();
++    save();
++    emit changed();
++}
+diff --git a/modules/gui/qt/util/recent_media.hpp b/modules/gui/qt/util/recent_media.hpp
+new file mode 100644
+index 0000000000..3eab1b81d2
+--- /dev/null
++++ b/modules/gui/qt/util/recent_media.hpp
+@@ -0,0 +1,57 @@
++/*****************************************************************************
++ * recent_media.hpp : recently opened media, independent of the media library
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#ifndef RECENT_MEDIA_HPP
++#define RECENT_MEDIA_HPP
++
++#include <QObject>
++#include <QUrl>
++#include <QVariantList>
++
++class QSettings;
++
++/**
++ * The last few media the user played, newest first, stored in the interface settings.
++ *
++ * VLC 4's own "recent media" is backed by the media library, so without a library there is
++ * none. This list needs nothing but QSettings, so the empty home screen can offer it either way.
++ */
++class RecentMediaList : public QObject
++{
++    Q_OBJECT
++    /// Each entry: { url, title, display }. `display` is the title, or the file name when untitled.
++    Q_PROPERTY(QVariantList items READ items NOTIFY changed FINAL)
++
++public:
++    static constexpr int Limit = 10;
++
++    /// The settings object is not owned and must outlive this list.
++    explicit RecentMediaList(QSettings *settings, QObject *parent = nullptr);
++
++    QVariantList items() const;
++
++public slots:
++    void add(const QUrl &url, const QString &title);
++    /// Fills in the title once the player has learned it. Unknown urls are ignored.
++    void setTitle(const QUrl &url, const QString &title);
++    void clear();
++
++signals:
++    void changed();
++
++private:
++    struct Entry { QString url; QString title; };
++    void load();
++    void save() const;
++
++    QSettings *m_settings;
++    QList<Entry> m_entries;
++};
++
++#endif // RECENT_MEDIA_HPP
+diff --git a/src/libvlc-module.c b/src/libvlc-module.c
+index 788b86a53a..b7c77e9a16 100644
+--- a/src/libvlc-module.c
++++ b/src/libvlc-module.c
+@@ -1717,7 +1717,7 @@ vlc_module_begin ()
+         change_safe()
+         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
+     // autohide after 1 second
+-    add_integer( "mouse-hide-timeout", 1000, MOUSE_HIDE_TIMEOUT_TEXT,
++    add_integer( "mouse-hide-timeout", VLC_MOUSE_HIDE_TIMEOUT, MOUSE_HIDE_TIMEOUT_TEXT,
+                  MOUSE_HIDE_TIMEOUT_LONGTEXT )
+     set_section( N_("Snapshot") , NULL )
+     add_directory("snapshot-path", NULL, SNAP_PATH_TEXT, SNAP_PATH_LONGTEXT)

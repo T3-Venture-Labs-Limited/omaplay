@@ -1,0 +1,2217 @@
+category	entry	file	status
+menu	&3D Output	modules/gui/qt/menus/menus.cpp	identical
+menu	&Aspect Ratio	modules/gui/qt/menus/menus.cpp	identical
+menu	&Audio	modules/gui/qt/menus/menus.cpp	identical
+menu	&Audio Device	modules/gui/qt/menus/menus.cpp	identical
+menu	&Big Player View	modules/gui/qt/menus/menus.cpp	identical
+menu	&Chapter	modules/gui/qt/menus/menus.cpp	identical
+menu	&Color Scheme	modules/gui/qt/menus/menus.cpp	identical
+menu	&Crop	modules/gui/qt/menus/menus.cpp	identical
+menu	&Decrease Volume	modules/gui/qt/menus/menus.cpp	identical
+menu	&Deinterlace	modules/gui/qt/menus/menus.cpp	identical
+menu	&Deinterlace mode	modules/gui/qt/menus/menus.cpp	identical
+menu	&Effects and Filters	modules/gui/qt/menus/menus.cpp	identical
+menu	&Faster	modules/gui/qt/menus/menus.cpp	identical
+menu	&Fit	modules/gui/qt/menus/menus.cpp	identical
+menu	&Fullscreen	modules/gui/qt/menus/menus.cpp	identical
+menu	&Fullscreen Interface	modules/gui/qt/menus/menus.cpp	identical
+menu	&Help	modules/gui/qt/menus/menus.cpp	identical
+menu	&Increase Volume	modules/gui/qt/menus/menus.cpp	identical
+menu	&Jump Forward	modules/gui/qt/menus/menus.cpp	identical
+menu	&Minimal View	modules/gui/qt/menus/menus.cpp	identical
+menu	&Mix Mode	modules/gui/qt/menus/menus.cpp	identical
+menu	&Mute	modules/gui/qt/menus/menus.cpp	identical
+menu	&Open Multiple Files...	modules/gui/qt/menus/menus.cpp	identical
+menu	&Play	modules/gui/qt/menus/menus.cpp	identical
+menu	&Playback	modules/gui/qt/menus/menus.cpp	identical
+menu	&Preferences	modules/gui/qt/menus/menus.cpp	identical
+menu	&Program	modules/gui/qt/menus/menus.cpp	identical
+menu	&Quit	modules/gui/qt/menus/menus.cpp	identical
+menu	&Stereo Mode	modules/gui/qt/menus/menus.cpp	identical
+menu	&Stop	modules/gui/qt/menus/menus.cpp	identical
+menu	&Stream...	modules/gui/qt/menus/menus.cpp	identical
+menu	&Track Synchronization	modules/gui/qt/menus/menus.cpp	identical
+menu	&Video	modules/gui/qt/menus/menus.cpp	identical
+menu	&View Items as Grid	modules/gui/qt/menus/menus.cpp	identical
+menu	&Visualizations	modules/gui/qt/menus/menus.cpp	identical
+menu	&Zoom	modules/gui/qt/menus/menus.cpp	identical
+menu	Add &Subtitle File...	modules/gui/qt/menus/menus.cpp	identical
+menu	Always Fit &Window	modules/gui/qt/menus/menus.cpp	identical
+menu	Always on &top	modules/gui/qt/menus/menus.cpp	identical
+menu	Audio &Track	modules/gui/qt/menus/menus.cpp	identical
+menu	Check for &Updates...	modules/gui/qt/menus/menus.cpp	identical
+menu	Close to systray	modules/gui/qt/menus/menus.cpp	identical
+menu	Conve&rt / Save...	modules/gui/qt/menus/menus.cpp	identical
+menu	Customi&ze Interface...	modules/gui/qt/menus/menus.cpp	identical
+menu	Docked Play Queue	modules/gui/qt/menus/menus.cpp	identical
+menu	Faster (fine)	modules/gui/qt/menus/menus.cpp	identical
+menu	Help	modules/gui/qt/menus/menus.cpp	identical
+menu	Interface	modules/gui/qt/menus/menus.cpp	identical
+menu	Interfaces	modules/gui/qt/menus/menus.cpp	identical
+menu	Jump Bac&kward	modules/gui/qt/menus/menus.cpp	identical
+menu	N&ormal Speed	modules/gui/qt/menus/menus.cpp	identical
+menu	Ne&xt	modules/gui/qt/menus/menus.cpp	identical
+menu	Next Chapter	modules/gui/qt/menus/menus.cpp	identical
+menu	Next Title	modules/gui/qt/menus/menus.cpp	identical
+menu	Open &Capture Device...	modules/gui/qt/menus/menus.cpp	identical
+menu	Open &Disc...	modules/gui/qt/menus/menus.cpp	identical
+menu	Open &File...	modules/gui/qt/menus/menus.cpp	identical
+menu	Open &Location from clipboard	modules/gui/qt/menus/menus.cpp	identical
+menu	Open &Network Stream...	modules/gui/qt/menus/menus.cpp	identical
+menu	Open &Network...	modules/gui/qt/menus/menus.cpp	identical
+menu	Open &Recent Media	modules/gui/qt/menus/menus.cpp	identical
+menu	Open Media	modules/gui/qt/menus/menus.cpp	identical
+menu	Open skin...	modules/gui/qt/menus/menus.cpp	identical
+menu	Pause	modules/gui/qt/menus/menus.cpp	identical
+menu	Play &Queue	modules/gui/qt/menus/menus.cpp	identical
+menu	Plu&gins and extensions	modules/gui/qt/menus/menus.cpp	identical
+menu	Pre&vious	modules/gui/qt/menus/menus.cpp	identical
+menu	Previous Chapter	modules/gui/qt/menus/menus.cpp	identical
+menu	Previous Title	modules/gui/qt/menus/menus.cpp	identical
+menu	Program Guide	modules/gui/qt/menus/menus.cpp	identical
+menu	Quit	modules/gui/qt/menus/menus.cpp	identical
+menu	Quit at the end of play queue	modules/gui/qt/menus/menus.cpp	identical
+menu	Record	modules/gui/qt/menus/menus.cpp	identical
+menu	Set as Wall&paper	modules/gui/qt/menus/menus.cpp	identical
+menu	Slo&wer	modules/gui/qt/menus/menus.cpp	identical
+menu	Slower (fine)	modules/gui/qt/menus/menus.cpp	identical
+menu	Sp&eed	modules/gui/qt/menus/menus.cpp	identical
+menu	Sub &Track	modules/gui/qt/menus/menus.cpp	identical
+menu	Subti&tle	modules/gui/qt/menus/menus.cpp	identical
+menu	T&itle	modules/gui/qt/menus/menus.cpp	identical
+menu	Take &Snapshot	modules/gui/qt/menus/menus.cpp	identical
+menu	Tool&s	modules/gui/qt/menus/menus.cpp	identical
+menu	V&iew	modules/gui/qt/menus/menus.cpp	identical
+menu	Video &Track	modules/gui/qt/menus/menus.cpp	identical
+control	ArtworkInfoWidget	modules/gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml	identical
+control	AspectRatioWidget	modules/gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml	identical
+control	AtoBButton	modules/gui/qt/player/qml/controlbarcontrols/AtoBButton.qml	identical
+control	BackButton	modules/gui/qt/player/qml/controlbarcontrols/BackButton.qml	identical
+control	BookmarkButton	modules/gui/qt/player/qml/controlbarcontrols/BookmarkButton.qml	identical
+control	ChapterNextButton	modules/gui/qt/player/qml/controlbarcontrols/ChapterNextButton.qml	identical
+control	ChapterPreviousButton	modules/gui/qt/player/qml/controlbarcontrols/ChapterPreviousButton.qml	identical
+control	DvdMenuButton	modules/gui/qt/player/qml/controlbarcontrols/DvdMenuButton.qml	identical
+control	ExpandingSpacerWidget	modules/gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml	identical
+control	ExtendedSettingsButton	modules/gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml	identical
+control	Fallback	modules/gui/qt/player/qml/controlbarcontrols/Fallback.qml	identical
+control	FasterButton	modules/gui/qt/player/qml/controlbarcontrols/FasterButton.qml	identical
+control	FrameNextButton	modules/gui/qt/player/qml/controlbarcontrols/FrameNextButton.qml	identical
+control	FramePrevButton	modules/gui/qt/player/qml/controlbarcontrols/FramePrevButton.qml	identical
+control	FullscreenButton	modules/gui/qt/player/qml/controlbarcontrols/FullscreenButton.qml	identical
+control	HighResolutionTimeWidget	modules/gui/qt/player/qml/controlbarcontrols/HighResolutionTimeWidget.qml	identical
+control	InfoButton	modules/gui/qt/player/qml/controlbarcontrols/InfoButton.qml	identical
+control	LangButton	modules/gui/qt/player/qml/controlbarcontrols/LangButton.qml	identical
+control	LoopButton	modules/gui/qt/player/qml/controlbarcontrols/LoopButton.qml	identical
+control	MenuButton	modules/gui/qt/player/qml/controlbarcontrols/MenuButton.qml	identical
+control	NavigationBoxButton	modules/gui/qt/player/qml/controlbarcontrols/NavigationBoxButton.qml	identical
+control	NavigationWidget	modules/gui/qt/player/qml/controlbarcontrols/NavigationWidget.qml	identical
+control	NextButton	modules/gui/qt/player/qml/controlbarcontrols/NextButton.qml	identical
+control	OpenButton	modules/gui/qt/player/qml/controlbarcontrols/OpenButton.qml	identical
+control	PlayButton	modules/gui/qt/player/qml/controlbarcontrols/PlayButton.qml	changed
+control	PlaybackSpeedButton	modules/gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml	identical
+control	PlayerSwitchButton	modules/gui/qt/player/qml/controlbarcontrols/PlayerSwitchButton.qml	identical
+control	PlaylistButton	modules/gui/qt/player/qml/controlbarcontrols/PlaylistButton.qml	identical
+control	PreviousButton	modules/gui/qt/player/qml/controlbarcontrols/PreviousButton.qml	identical
+control	ProgramButton	modules/gui/qt/player/qml/controlbarcontrols/ProgramButton.qml	identical
+control	QuitButton	modules/gui/qt/player/qml/controlbarcontrols/QuitButton.qml	identical
+control	RandomButton	modules/gui/qt/player/qml/controlbarcontrols/RandomButton.qml	identical
+control	RecordButton	modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml	changed
+control	RendererButton	modules/gui/qt/player/qml/controlbarcontrols/RendererButton.qml	identical
+control	ReverseButton	modules/gui/qt/player/qml/controlbarcontrols/ReverseButton.qml	identical
+control	SkipBackButton	modules/gui/qt/player/qml/controlbarcontrols/SkipBackButton.qml	identical
+control	SkipForwardButton	modules/gui/qt/player/qml/controlbarcontrols/SkipForwardButton.qml	identical
+control	SlowerButton	modules/gui/qt/player/qml/controlbarcontrols/SlowerButton.qml	identical
+control	SnapshotButton	modules/gui/qt/player/qml/controlbarcontrols/SnapshotButton.qml	identical
+control	SpacerWidget	modules/gui/qt/player/qml/controlbarcontrols/SpacerWidget.qml	identical
+control	StopButton	modules/gui/qt/player/qml/controlbarcontrols/StopButton.qml	identical
+control	TeletextButton	modules/gui/qt/player/qml/controlbarcontrols/TeletextButton.qml	identical
+control	TeletextColorButton	modules/gui/qt/player/qml/controlbarcontrols/TeletextColorButton.qml	identical
+control	TeletextWidget	modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml	identical
+control	VolumeWidget	modules/gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml	identical
+dialog	PLAppendDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	aboutDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	aboutDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	bookmarkDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	bookmarksDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	egpDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	epgDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	extendedDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	extendedDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	firstRunDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	firstRunDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	gotoTimeDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	gotoTimeDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	helpDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	helpDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	mediaCodecDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	mediaInfoDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	mediaInfoDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	messagesDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	messagesDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openAndStreamingDialogs	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openAndTranscodingDialogs	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openCaptureDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openDiscDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openFileDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openFileGenericDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openNetDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	openUrlDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	playlistsDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	pluginDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	pluginDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	podcastConfigureDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	podcastDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	prefsDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	prefsDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	showToolbarEditorDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	simpleOpenDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	streamingDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	synchroDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	updateDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	updateDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	vlmDialog	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+dialog	vlmDialogVisibleChanged	modules/gui/qt/dialogs/dialogs_provider.hpp	identical
+qml	dialogs/dialogs/qml/CustomDialog.qml	modules/gui/qt/dialogs/dialogs/qml/CustomDialog.qml	identical
+qml	dialogs/dialogs/qml/Dialogs.qml	modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml	identical
+qml	dialogs/dialogs/qml/ModalDialog.qml	modules/gui/qt/dialogs/dialogs/qml/ModalDialog.qml	changed
+qml	dialogs/dialogs/qml/WindowDialog.qml	modules/gui/qt/dialogs/dialogs/qml/WindowDialog.qml	identical
+qml	dialogs/toolbar/qml/EditorDNDDelegate.qml	modules/gui/qt/dialogs/toolbar/qml/EditorDNDDelegate.qml	identical
+qml	dialogs/toolbar/qml/EditorDNDView.qml	modules/gui/qt/dialogs/toolbar/qml/EditorDNDView.qml	identical
+qml	dialogs/toolbar/qml/EditorDummyButton.qml	modules/gui/qt/dialogs/toolbar/qml/EditorDummyButton.qml	identical
+qml	dialogs/toolbar/qml/EditorTabButton.qml	modules/gui/qt/dialogs/toolbar/qml/EditorTabButton.qml	identical
+qml	dialogs/toolbar/qml/ToolbarEditor.qml	modules/gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml	identical
+qml	dialogs/toolbar/qml/ToolbarEditorButtonList.qml	modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorButtonList.qml	identical
+qml	dialogs/toolbar/qml/ToolbarEditorDialog.qml	modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml	identical
+qml	maininterface/qml/LocalTopbar.qml	modules/gui/qt/maininterface/qml/LocalTopbar.qml	identical
+qml	maininterface/qml/MainDisplay.qml	modules/gui/qt/maininterface/qml/MainDisplay.qml	changed
+qml	maininterface/qml/MainInterface.qml	modules/gui/qt/maininterface/qml/MainInterface.qml	changed
+qml	maininterface/qml/MainViewLoader.qml	modules/gui/qt/maininterface/qml/MainViewLoader.qml	identical
+qml	maininterface/qml/MenuTopbar.qml	modules/gui/qt/maininterface/qml/MenuTopbar.qml	identical
+qml	maininterface/qml/NoMedialibHome.qml	modules/gui/qt/maininterface/qml/NoMedialibHome.qml	changed
+qml	maininterface/qml/OpenFileSplitButton.qml	modules/gui/qt/maininterface/qml/OpenFileSplitButton.qml	identical
+qml	maininterface/qml/SideNavigationDelegate.qml	modules/gui/qt/maininterface/qml/SideNavigationDelegate.qml	identical
+qml	maininterface/qml/SideNavigationPane.qml	modules/gui/qt/maininterface/qml/SideNavigationPane.qml	changed
+qml	maininterface/qml/UpdatePane.qml	modules/gui/qt/maininterface/qml/UpdatePane.qml	changed
+qml	medialibrary/qml/ArtistTopBanner.qml	modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml	identical
+qml	medialibrary/qml/AudioGridItem.qml	modules/gui/qt/medialibrary/qml/AudioGridItem.qml	identical
+qml	medialibrary/qml/Bookmarks.qml	modules/gui/qt/medialibrary/qml/Bookmarks.qml	changed
+qml	medialibrary/qml/HomeDisplay.qml	modules/gui/qt/medialibrary/qml/HomeDisplay.qml	identical
+qml	medialibrary/qml/HomePage.qml	modules/gui/qt/medialibrary/qml/HomePage.qml	changed
+qml	medialibrary/qml/MLContextMenu.qml	modules/gui/qt/medialibrary/qml/MLContextMenu.qml	identical
+qml	medialibrary/qml/MLDragItem.qml	modules/gui/qt/medialibrary/qml/MLDragItem.qml	identical
+qml	medialibrary/qml/MLGlobalShortcuts.qml	modules/gui/qt/medialibrary/qml/MLGlobalShortcuts.qml	identical
+qml	medialibrary/qml/MLTableColumns.qml	modules/gui/qt/medialibrary/qml/MLTableColumns.qml	identical
+qml	medialibrary/qml/MediaView.qml	modules/gui/qt/medialibrary/qml/MediaView.qml	identical
+qml	medialibrary/qml/MusicAlbumSectionDelegate.qml	modules/gui/qt/medialibrary/qml/MusicAlbumSectionDelegate.qml	identical
+qml	medialibrary/qml/MusicAlbums.qml	modules/gui/qt/medialibrary/qml/MusicAlbums.qml	identical
+qml	medialibrary/qml/MusicAlbumsDisplay.qml	modules/gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml	identical
+qml	medialibrary/qml/MusicAlbumsGridExpandDelegate.qml	modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml	identical
+qml	medialibrary/qml/MusicAllArtists.qml	modules/gui/qt/medialibrary/qml/MusicAllArtists.qml	identical
+qml	medialibrary/qml/MusicArtist.qml	modules/gui/qt/medialibrary/qml/MusicArtist.qml	changed
+qml	medialibrary/qml/MusicArtistDelegate.qml	modules/gui/qt/medialibrary/qml/MusicArtistDelegate.qml	identical
+qml	medialibrary/qml/MusicArtistsAlbums.qml	modules/gui/qt/medialibrary/qml/MusicArtistsAlbums.qml	identical
+qml	medialibrary/qml/MusicArtistsDisplay.qml	modules/gui/qt/medialibrary/qml/MusicArtistsDisplay.qml	identical
+qml	medialibrary/qml/MusicDisplay.qml	modules/gui/qt/medialibrary/qml/MusicDisplay.qml	identical
+qml	medialibrary/qml/MusicGenres.qml	modules/gui/qt/medialibrary/qml/MusicGenres.qml	identical
+qml	medialibrary/qml/MusicGenresDisplay.qml	modules/gui/qt/medialibrary/qml/MusicGenresDisplay.qml	identical
+qml	medialibrary/qml/MusicPlaylistsDisplay.qml	modules/gui/qt/medialibrary/qml/MusicPlaylistsDisplay.qml	identical
+qml	medialibrary/qml/MusicTrackListDisplay.qml	modules/gui/qt/medialibrary/qml/MusicTrackListDisplay.qml	identical
+qml	medialibrary/qml/MusicTracksDisplay.qml	modules/gui/qt/medialibrary/qml/MusicTracksDisplay.qml	identical
+qml	medialibrary/qml/PlaylistMedia.qml	modules/gui/qt/medialibrary/qml/PlaylistMedia.qml	identical
+qml	medialibrary/qml/PlaylistMediaDisplay.qml	modules/gui/qt/medialibrary/qml/PlaylistMediaDisplay.qml	identical
+qml	medialibrary/qml/PlaylistMediaList.qml	modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml	identical
+qml	medialibrary/qml/ScanProgressBar.qml	modules/gui/qt/medialibrary/qml/ScanProgressBar.qml	identical
+qml	medialibrary/qml/UrlListDisplay.qml	modules/gui/qt/medialibrary/qml/UrlListDisplay.qml	identical
+qml	medialibrary/qml/VideoAll.qml	modules/gui/qt/medialibrary/qml/VideoAll.qml	identical
+qml	medialibrary/qml/VideoAllDisplay.qml	modules/gui/qt/medialibrary/qml/VideoAllDisplay.qml	identical
+qml	medialibrary/qml/VideoAllSubDisplay.qml	modules/gui/qt/medialibrary/qml/VideoAllSubDisplay.qml	identical
+qml	medialibrary/qml/VideoDisplay.qml	modules/gui/qt/medialibrary/qml/VideoDisplay.qml	identical
+qml	medialibrary/qml/VideoGridDisplay.qml	modules/gui/qt/medialibrary/qml/VideoGridDisplay.qml	identical
+qml	medialibrary/qml/VideoGridItem.qml	modules/gui/qt/medialibrary/qml/VideoGridItem.qml	identical
+qml	medialibrary/qml/VideoGroupDisplay.qml	modules/gui/qt/medialibrary/qml/VideoGroupDisplay.qml	identical
+qml	medialibrary/qml/VideoInfoExpandPanel.qml	modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml	identical
+qml	medialibrary/qml/VideoListDisplay.qml	modules/gui/qt/medialibrary/qml/VideoListDisplay.qml	identical
+qml	medialibrary/qml/VideoPlaylistsDisplay.qml	modules/gui/qt/medialibrary/qml/VideoPlaylistsDisplay.qml	identical
+qml	menus/qml/GlobalShortcuts.qml	modules/gui/qt/menus/qml/GlobalShortcuts.qml	identical
+qml	menus/qml/Menubar.qml	modules/gui/qt/menus/qml/Menubar.qml	identical
+qml	menus/qml/ShortcutExt.qml	modules/gui/qt/menus/qml/ShortcutExt.qml	identical
+qml	network/qml/AddressbarButton.qml	modules/gui/qt/network/qml/AddressbarButton.qml	identical
+qml	network/qml/BrowseDeviceView.qml	modules/gui/qt/network/qml/BrowseDeviceView.qml	identical
+qml	network/qml/BrowseDisplay.qml	modules/gui/qt/network/qml/BrowseDisplay.qml	identical
+qml	network/qml/BrowseHomeDisplay.qml	modules/gui/qt/network/qml/BrowseHomeDisplay.qml	changed
+qml	network/qml/BrowseTreeDisplay.qml	modules/gui/qt/network/qml/BrowseTreeDisplay.qml	identical
+qml	network/qml/BrowseTreeHeader.qml	modules/gui/qt/network/qml/BrowseTreeHeader.qml	identical
+qml	network/qml/DiscoverDisplay.qml	modules/gui/qt/network/qml/DiscoverDisplay.qml	identical
+qml	network/qml/DiscoverUrlDisplay.qml	modules/gui/qt/network/qml/DiscoverUrlDisplay.qml	identical
+qml	network/qml/NetworkAddressbar.qml	modules/gui/qt/network/qml/NetworkAddressbar.qml	identical
+qml	network/qml/NetworkGridItem.qml	modules/gui/qt/network/qml/NetworkGridItem.qml	identical
+qml	network/qml/NetworkThumbnailItem.qml	modules/gui/qt/network/qml/NetworkThumbnailItem.qml	identical
+qml	network/qml/ServicesHomeDisplay.qml	modules/gui/qt/network/qml/ServicesHomeDisplay.qml	identical
+qml	network/qml/ServicesManage.qml	modules/gui/qt/network/qml/ServicesManage.qml	identical
+qml	network/qml/ServicesSources.qml	modules/gui/qt/network/qml/ServicesSources.qml	identical
+qml	player/qml/ControlBar.qml	modules/gui/qt/player/qml/ControlBar.qml	identical
+qml	player/qml/ControlLayout.qml	modules/gui/qt/player/qml/ControlLayout.qml	identical
+qml	player/qml/ControlRepeater.qml	modules/gui/qt/player/qml/ControlRepeater.qml	identical
+qml	player/qml/LyricsFlickable.qml	modules/gui/qt/player/qml/LyricsFlickable.qml	identical
+qml	player/qml/MiniPlayer.qml	modules/gui/qt/player/qml/MiniPlayer.qml	changed
+qml	player/qml/MinimalView.qml	modules/gui/qt/player/qml/MinimalView.qml	identical
+qml	player/qml/NavigationBox.qml	modules/gui/qt/player/qml/NavigationBox.qml	identical
+qml	player/qml/PIPPlayer.qml	modules/gui/qt/player/qml/PIPPlayer.qml	identical
+qml	player/qml/PlaybackSpeed.qml	modules/gui/qt/player/qml/PlaybackSpeed.qml	identical
+qml	player/qml/PlayerControlLayout.qml	modules/gui/qt/player/qml/PlayerControlLayout.qml	identical
+qml	player/qml/PlayerControlbarControls.qml	modules/gui/qt/player/qml/PlayerControlbarControls.qml	identical
+qml	player/qml/PlayerPlaylistVisibilityFSM.qml	modules/gui/qt/player/qml/PlayerPlaylistVisibilityFSM.qml	identical
+qml	player/qml/PlayerToolbarVisibilityFSM.qml	modules/gui/qt/player/qml/PlayerToolbarVisibilityFSM.qml	identical
+qml	player/qml/PlayerView.qml	modules/gui/qt/player/qml/PlayerView.qml	changed
+qml	player/qml/ResumeDialog.qml	modules/gui/qt/player/qml/ResumeDialog.qml	identical
+qml	player/qml/SliderBar.qml	modules/gui/qt/player/qml/SliderBar.qml	changed
+qml	player/qml/TopBar.qml	modules/gui/qt/player/qml/TopBar.qml	identical
+qml	player/qml/TracksListPage.qml	modules/gui/qt/player/qml/TracksListPage.qml	identical
+qml	player/qml/TracksMenu.qml	modules/gui/qt/player/qml/TracksMenu.qml	changed
+qml	player/qml/TracksPage.qml	modules/gui/qt/player/qml/TracksPage.qml	identical
+qml	player/qml/TracksPageAudio.qml	modules/gui/qt/player/qml/TracksPageAudio.qml	identical
+qml	player/qml/TracksPageSpeed.qml	modules/gui/qt/player/qml/TracksPageSpeed.qml	identical
+qml	player/qml/TracksPageSubtitle.qml	modules/gui/qt/player/qml/TracksPageSubtitle.qml	identical
+qml	player/qml/controlbarcontrols/ArtworkInfoWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml	identical
+qml	player/qml/controlbarcontrols/AspectRatioWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml	identical
+qml	player/qml/controlbarcontrols/AtoBButton.qml	modules/gui/qt/player/qml/controlbarcontrols/AtoBButton.qml	identical
+qml	player/qml/controlbarcontrols/BackButton.qml	modules/gui/qt/player/qml/controlbarcontrols/BackButton.qml	identical
+qml	player/qml/controlbarcontrols/BookmarkButton.qml	modules/gui/qt/player/qml/controlbarcontrols/BookmarkButton.qml	identical
+qml	player/qml/controlbarcontrols/ChapterNextButton.qml	modules/gui/qt/player/qml/controlbarcontrols/ChapterNextButton.qml	identical
+qml	player/qml/controlbarcontrols/ChapterPreviousButton.qml	modules/gui/qt/player/qml/controlbarcontrols/ChapterPreviousButton.qml	identical
+qml	player/qml/controlbarcontrols/DvdMenuButton.qml	modules/gui/qt/player/qml/controlbarcontrols/DvdMenuButton.qml	identical
+qml	player/qml/controlbarcontrols/ExpandingSpacerWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml	identical
+qml	player/qml/controlbarcontrols/ExtendedSettingsButton.qml	modules/gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml	identical
+qml	player/qml/controlbarcontrols/Fallback.qml	modules/gui/qt/player/qml/controlbarcontrols/Fallback.qml	identical
+qml	player/qml/controlbarcontrols/FasterButton.qml	modules/gui/qt/player/qml/controlbarcontrols/FasterButton.qml	identical
+qml	player/qml/controlbarcontrols/FrameNextButton.qml	modules/gui/qt/player/qml/controlbarcontrols/FrameNextButton.qml	identical
+qml	player/qml/controlbarcontrols/FramePrevButton.qml	modules/gui/qt/player/qml/controlbarcontrols/FramePrevButton.qml	identical
+qml	player/qml/controlbarcontrols/FullscreenButton.qml	modules/gui/qt/player/qml/controlbarcontrols/FullscreenButton.qml	identical
+qml	player/qml/controlbarcontrols/HighResolutionTimeWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/HighResolutionTimeWidget.qml	identical
+qml	player/qml/controlbarcontrols/InfoButton.qml	modules/gui/qt/player/qml/controlbarcontrols/InfoButton.qml	identical
+qml	player/qml/controlbarcontrols/LangButton.qml	modules/gui/qt/player/qml/controlbarcontrols/LangButton.qml	identical
+qml	player/qml/controlbarcontrols/LoopButton.qml	modules/gui/qt/player/qml/controlbarcontrols/LoopButton.qml	identical
+qml	player/qml/controlbarcontrols/MenuButton.qml	modules/gui/qt/player/qml/controlbarcontrols/MenuButton.qml	identical
+qml	player/qml/controlbarcontrols/NavigationBoxButton.qml	modules/gui/qt/player/qml/controlbarcontrols/NavigationBoxButton.qml	identical
+qml	player/qml/controlbarcontrols/NavigationWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/NavigationWidget.qml	identical
+qml	player/qml/controlbarcontrols/NextButton.qml	modules/gui/qt/player/qml/controlbarcontrols/NextButton.qml	identical
+qml	player/qml/controlbarcontrols/OpenButton.qml	modules/gui/qt/player/qml/controlbarcontrols/OpenButton.qml	identical
+qml	player/qml/controlbarcontrols/PlayButton.qml	modules/gui/qt/player/qml/controlbarcontrols/PlayButton.qml	changed
+qml	player/qml/controlbarcontrols/PlaybackSpeedButton.qml	modules/gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml	identical
+qml	player/qml/controlbarcontrols/PlayerSwitchButton.qml	modules/gui/qt/player/qml/controlbarcontrols/PlayerSwitchButton.qml	identical
+qml	player/qml/controlbarcontrols/PlaylistButton.qml	modules/gui/qt/player/qml/controlbarcontrols/PlaylistButton.qml	identical
+qml	player/qml/controlbarcontrols/PreviousButton.qml	modules/gui/qt/player/qml/controlbarcontrols/PreviousButton.qml	identical
+qml	player/qml/controlbarcontrols/ProgramButton.qml	modules/gui/qt/player/qml/controlbarcontrols/ProgramButton.qml	identical
+qml	player/qml/controlbarcontrols/QuitButton.qml	modules/gui/qt/player/qml/controlbarcontrols/QuitButton.qml	identical
+qml	player/qml/controlbarcontrols/RandomButton.qml	modules/gui/qt/player/qml/controlbarcontrols/RandomButton.qml	identical
+qml	player/qml/controlbarcontrols/RecordButton.qml	modules/gui/qt/player/qml/controlbarcontrols/RecordButton.qml	changed
+qml	player/qml/controlbarcontrols/RendererButton.qml	modules/gui/qt/player/qml/controlbarcontrols/RendererButton.qml	identical
+qml	player/qml/controlbarcontrols/ReverseButton.qml	modules/gui/qt/player/qml/controlbarcontrols/ReverseButton.qml	identical
+qml	player/qml/controlbarcontrols/SkipBackButton.qml	modules/gui/qt/player/qml/controlbarcontrols/SkipBackButton.qml	identical
+qml	player/qml/controlbarcontrols/SkipForwardButton.qml	modules/gui/qt/player/qml/controlbarcontrols/SkipForwardButton.qml	identical
+qml	player/qml/controlbarcontrols/SlowerButton.qml	modules/gui/qt/player/qml/controlbarcontrols/SlowerButton.qml	identical
+qml	player/qml/controlbarcontrols/SnapshotButton.qml	modules/gui/qt/player/qml/controlbarcontrols/SnapshotButton.qml	identical
+qml	player/qml/controlbarcontrols/SpacerWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/SpacerWidget.qml	identical
+qml	player/qml/controlbarcontrols/StopButton.qml	modules/gui/qt/player/qml/controlbarcontrols/StopButton.qml	identical
+qml	player/qml/controlbarcontrols/TeletextButton.qml	modules/gui/qt/player/qml/controlbarcontrols/TeletextButton.qml	identical
+qml	player/qml/controlbarcontrols/TeletextColorButton.qml	modules/gui/qt/player/qml/controlbarcontrols/TeletextColorButton.qml	identical
+qml	player/qml/controlbarcontrols/TeletextWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml	identical
+qml	player/qml/controlbarcontrols/VolumeWidget.qml	modules/gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml	identical
+qml	playlist/qml/PlaylistDelegate.qml	modules/gui/qt/playlist/qml/PlaylistDelegate.qml	changed
+qml	playlist/qml/PlaylistDetachedWindow.qml	modules/gui/qt/playlist/qml/PlaylistDetachedWindow.qml	identical
+qml	playlist/qml/PlaylistPane.qml	modules/gui/qt/playlist/qml/PlaylistPane.qml	changed
+qml	style/AcrylicController.qml	modules/gui/qt/style/AcrylicController.qml	changed
+qml	style/VLCStyle.qml	modules/gui/qt/style/VLCStyle.qml	changed
+qml	util/qml/DefaultFlickableScrollHandler.qml	modules/gui/qt/util/qml/DefaultFlickableScrollHandler.qml	identical
+qml	util/qml/DelayedBehavior.qml	modules/gui/qt/util/qml/DelayedBehavior.qml	identical
+qml	util/qml/DelegateTouchTapHandler.qml	modules/gui/qt/util/qml/DelegateTouchTapHandler.qml	identical
+qml	util/qml/FSM.qml	modules/gui/qt/util/qml/FSM.qml	identical
+qml	util/qml/FSMState.qml	modules/gui/qt/util/qml/FSMState.qml	identical
+qml	util/qml/FadeControllerStateGroup.qml	modules/gui/qt/util/qml/FadeControllerStateGroup.qml	changed
+qml	util/qml/GridSizeHelper.qml	modules/gui/qt/util/qml/GridSizeHelper.qml	identical
+qml	util/qml/Helpers.qml	modules/gui/qt/util/qml/Helpers.qml	identical
+qml	util/qml/ModelSortSettingHandler.qml	modules/gui/qt/util/qml/ModelSortSettingHandler.qml	identical
+qml	util/qml/NativeMenu.qml	modules/gui/qt/util/qml/NativeMenu.qml	identical
+qml	util/qml/ViewDragAutoScrollHandler.qml	modules/gui/qt/util/qml/ViewDragAutoScrollHandler.qml	identical
+qml	widgets/qml/AcrylicBackground.qml	modules/gui/qt/widgets/qml/AcrylicBackground.qml	identical
+qml	widgets/qml/ActionButtonOverlay.qml	modules/gui/qt/widgets/qml/ActionButtonOverlay.qml	identical
+qml	widgets/qml/ActionButtonPrimary.qml	modules/gui/qt/widgets/qml/ActionButtonPrimary.qml	identical
+qml	widgets/qml/ActionOverlay.qml	modules/gui/qt/widgets/qml/ActionOverlay.qml	changed
+qml	widgets/qml/AnimatedBackground.qml	modules/gui/qt/widgets/qml/AnimatedBackground.qml	identical
+qml	widgets/qml/BannerCone.qml	modules/gui/qt/widgets/qml/BannerCone.qml	changed
+qml	widgets/qml/BannerTabButton.qml	modules/gui/qt/widgets/qml/BannerTabButton.qml	identical
+qml	widgets/qml/BusyIndicatorExt.qml	modules/gui/qt/widgets/qml/BusyIndicatorExt.qml	identical
+qml	widgets/qml/ButtonExt.qml	modules/gui/qt/widgets/qml/ButtonExt.qml	identical
+qml	widgets/qml/CSDMouseStealer.qml	modules/gui/qt/widgets/qml/CSDMouseStealer.qml	identical
+qml	widgets/qml/CSDThemeButton.qml	modules/gui/qt/widgets/qml/CSDThemeButton.qml	identical
+qml	widgets/qml/CSDThemeButtonSet.qml	modules/gui/qt/widgets/qml/CSDThemeButtonSet.qml	identical
+qml	widgets/qml/CSDTitlebarTapNDrapHandler.qml	modules/gui/qt/widgets/qml/CSDTitlebarTapNDrapHandler.qml	identical
+qml	widgets/qml/CSDWindowButton.qml	modules/gui/qt/widgets/qml/CSDWindowButton.qml	identical
+qml	widgets/qml/CSDWindowButtonSet.qml	modules/gui/qt/widgets/qml/CSDWindowButtonSet.qml	identical
+qml	widgets/qml/CaptionLabel.qml	modules/gui/qt/widgets/qml/CaptionLabel.qml	identical
+qml	widgets/qml/CheckBoxExt.qml	modules/gui/qt/widgets/qml/CheckBoxExt.qml	identical
+qml	widgets/qml/CheckButton.qml	modules/gui/qt/widgets/qml/CheckButton.qml	identical
+qml	widgets/qml/CheckedDelegate.qml	modules/gui/qt/widgets/qml/CheckedDelegate.qml	identical
+qml	widgets/qml/ComboBoxExt.qml	modules/gui/qt/widgets/qml/ComboBoxExt.qml	identical
+qml	widgets/qml/CurrentIndicator.qml	modules/gui/qt/widgets/qml/CurrentIndicator.qml	identical
+qml	widgets/qml/DefaultShadow.qml	modules/gui/qt/widgets/qml/DefaultShadow.qml	identical
+qml	widgets/qml/DoubleShadow.qml	modules/gui/qt/widgets/qml/DoubleShadow.qml	identical
+qml	widgets/qml/DragItem.qml	modules/gui/qt/widgets/qml/DragItem.qml	identical
+qml	widgets/qml/DrawerExt.qml	modules/gui/qt/widgets/qml/DrawerExt.qml	changed
+qml	widgets/qml/DropShadowImage.qml	modules/gui/qt/widgets/qml/DropShadowImage.qml	identical
+qml	widgets/qml/DualKawaseBlur.qml	modules/gui/qt/widgets/qml/DualKawaseBlur.qml	identical
+qml	widgets/qml/EmptyLabel.qml	modules/gui/qt/widgets/qml/EmptyLabel.qml	identical
+qml	widgets/qml/EmptyLabelButton.qml	modules/gui/qt/widgets/qml/EmptyLabelButton.qml	identical
+qml	widgets/qml/EmptyLabelHint.qml	modules/gui/qt/widgets/qml/EmptyLabelHint.qml	identical
+qml	widgets/qml/EnhancedImageExt.qml	modules/gui/qt/widgets/qml/EnhancedImageExt.qml	identical
+qml	widgets/qml/ExpandGridItemView.qml	modules/gui/qt/widgets/qml/ExpandGridItemView.qml	identical
+qml	widgets/qml/ExpandGridView.qml	modules/gui/qt/widgets/qml/ExpandGridView.qml	identical
+qml	widgets/qml/FadingEdge.qml	modules/gui/qt/widgets/qml/FadingEdge.qml	changed
+qml	widgets/qml/FadingEdgeForItemView.qml	modules/gui/qt/widgets/qml/FadingEdgeForItemView.qml	identical
+qml	widgets/qml/FastBlend.qml	modules/gui/qt/widgets/qml/FastBlend.qml	identical
+qml	widgets/qml/FloatingNotification.qml	modules/gui/qt/widgets/qml/FloatingNotification.qml	changed
+qml	widgets/qml/FrostedGlassEffect.qml	modules/gui/qt/widgets/qml/FrostedGlassEffect.qml	identical
+qml	widgets/qml/GridItem.qml	modules/gui/qt/widgets/qml/GridItem.qml	changed
+qml	widgets/qml/GridSortFilterControls.qml	modules/gui/qt/widgets/qml/GridSortFilterControls.qml	identical
+qml	widgets/qml/HorizontalResizeHandle.qml	modules/gui/qt/widgets/qml/HorizontalResizeHandle.qml	identical
+qml	widgets/qml/IconButton.qml	modules/gui/qt/widgets/qml/IconButton.qml	identical
+qml	widgets/qml/IconLabel.qml	modules/gui/qt/widgets/qml/IconLabel.qml	identical
+qml	widgets/qml/IconToolButton.qml	modules/gui/qt/widgets/qml/IconToolButton.qml	identical
+qml	widgets/qml/IconTrackButton.qml	modules/gui/qt/widgets/qml/IconTrackButton.qml	identical
+qml	widgets/qml/ImageExt.qml	modules/gui/qt/widgets/qml/ImageExt.qml	identical
+qml	widgets/qml/ImageToolButton.qml	modules/gui/qt/widgets/qml/ImageToolButton.qml	identical
+qml	widgets/qml/LabelExt.qml	modules/gui/qt/widgets/qml/LabelExt.qml	identical
+qml	widgets/qml/ListLabel.qml	modules/gui/qt/widgets/qml/ListLabel.qml	identical
+qml	widgets/qml/ListSubtitleLabel.qml	modules/gui/qt/widgets/qml/ListSubtitleLabel.qml	identical
+qml	widgets/qml/ListViewExt.qml	modules/gui/qt/widgets/qml/ListViewExt.qml	changed
+qml	widgets/qml/MediaCover.qml	modules/gui/qt/widgets/qml/MediaCover.qml	changed
+qml	widgets/qml/MenuCaption.qml	modules/gui/qt/widgets/qml/MenuCaption.qml	identical
+qml	widgets/qml/MenuLabel.qml	modules/gui/qt/widgets/qml/MenuLabel.qml	identical
+qml	widgets/qml/NavigableCol.qml	modules/gui/qt/widgets/qml/NavigableCol.qml	identical
+qml	widgets/qml/NavigableRow.qml	modules/gui/qt/widgets/qml/NavigableRow.qml	identical
+qml	widgets/qml/PageExt.qml	modules/gui/qt/widgets/qml/PageExt.qml	identical
+qml	widgets/qml/PageLoader.qml	modules/gui/qt/widgets/qml/PageLoader.qml	identical
+qml	widgets/qml/PartialEffect.qml	modules/gui/qt/widgets/qml/PartialEffect.qml	identical
+qml	widgets/qml/PlayCover.qml	modules/gui/qt/widgets/qml/PlayCover.qml	changed
+qml	widgets/qml/PointingTooltip.qml	modules/gui/qt/widgets/qml/PointingTooltip.qml	identical
+qml	widgets/qml/PopupIconToolButton.qml	modules/gui/qt/widgets/qml/PopupIconToolButton.qml	identical
+qml	widgets/qml/ProgressBarExt.qml	modules/gui/qt/widgets/qml/ProgressBarExt.qml	changed
+qml	widgets/qml/ProgressIndicator.qml	modules/gui/qt/widgets/qml/ProgressIndicator.qml	identical
+qml	widgets/qml/RadioButtonExt.qml	modules/gui/qt/widgets/qml/RadioButtonExt.qml	identical
+qml	widgets/qml/RoundButtonExt.qml	modules/gui/qt/widgets/qml/RoundButtonExt.qml	identical
+qml	widgets/qml/RoundedRectangleShadow.qml	modules/gui/qt/widgets/qml/RoundedRectangleShadow.qml	identical
+qml	widgets/qml/ScaledImage.qml	modules/gui/qt/widgets/qml/ScaledImage.qml	identical
+qml	widgets/qml/ScrollBarExt.qml	modules/gui/qt/widgets/qml/ScrollBarExt.qml	identical
+qml	widgets/qml/SearchBox.qml	modules/gui/qt/widgets/qml/SearchBox.qml	changed
+qml	widgets/qml/SliderExt.qml	modules/gui/qt/widgets/qml/SliderExt.qml	identical
+qml	widgets/qml/SortControl.qml	modules/gui/qt/widgets/qml/SortControl.qml	identical
+qml	widgets/qml/SpinBoxExt.qml	modules/gui/qt/widgets/qml/SpinBoxExt.qml	identical
+qml	widgets/qml/SplitButton.qml	modules/gui/qt/widgets/qml/SplitButton.qml	identical
+qml	widgets/qml/StackViewExt.qml	modules/gui/qt/widgets/qml/StackViewExt.qml	identical
+qml	widgets/qml/SubtitleLabel.qml	modules/gui/qt/widgets/qml/SubtitleLabel.qml	identical
+qml	widgets/qml/TableColumns.qml	modules/gui/qt/widgets/qml/TableColumns.qml	identical
+qml	widgets/qml/TableHeaderDelegate.qml	modules/gui/qt/widgets/qml/TableHeaderDelegate.qml	identical
+qml	widgets/qml/TableRowDelegate.qml	modules/gui/qt/widgets/qml/TableRowDelegate.qml	identical
+qml	widgets/qml/TableViewDelegateExt.qml	modules/gui/qt/widgets/qml/TableViewDelegateExt.qml	identical
+qml	widgets/qml/TableViewExt.qml	modules/gui/qt/widgets/qml/TableViewExt.qml	identical
+qml	widgets/qml/TextAutoScroller.qml	modules/gui/qt/widgets/qml/TextAutoScroller.qml	identical
+qml	widgets/qml/TextFieldExt.qml	modules/gui/qt/widgets/qml/TextFieldExt.qml	identical
+qml	widgets/qml/TextToolButton.qml	modules/gui/qt/widgets/qml/TextToolButton.qml	identical
+qml	widgets/qml/ToolTipExt.qml	modules/gui/qt/widgets/qml/ToolTipExt.qml	identical
+qml	widgets/qml/TrackDelayButton.qml	modules/gui/qt/widgets/qml/TrackDelayButton.qml	identical
+qml	widgets/qml/VideoProgressBar.qml	modules/gui/qt/widgets/qml/VideoProgressBar.qml	identical
+qml	widgets/qml/VideoQualityLabels.qml	modules/gui/qt/widgets/qml/VideoQualityLabels.qml	identical
+qml	widgets/qml/ViewHeader.qml	modules/gui/qt/widgets/qml/ViewHeader.qml	identical
+qml	widgets/qml/VoronoiSnow.qml	modules/gui/qt/widgets/qml/VoronoiSnow.qml	identical
+option	--adaptive-bw	src/libvlc-module.c + modules	present
+option	--adaptive-livedelay	src/libvlc-module.c + modules	present
+option	--adaptive-logic	src/libvlc-module.c + modules	present
+option	--adaptive-lowlatency	src/libvlc-module.c + modules	present
+option	--adaptive-maxbuffer	src/libvlc-module.c + modules	present
+option	--adaptive-maxheight	src/libvlc-module.c + modules	present
+option	--adaptive-maxwidth	src/libvlc-module.c + modules	present
+option	--adaptive-use-access	src/libvlc-module.c + modules	present
+option	--album-art-filename	src/libvlc-module.c + modules	present
+option	--align	src/libvlc-module.c + modules	present
+option	--alphamask-mask	src/libvlc-module.c + modules	present
+option	--alsa-audio-channels	src/libvlc-module.c + modules	present
+option	--alsa-audio-device	src/libvlc-module.c + modules	present
+option	--alsa-gain	src/libvlc-module.c + modules	present
+option	--alsa-passthrough	src/libvlc-module.c + modules	present
+option	--alsa-samplerate	src/libvlc-module.c + modules	present
+option	--alsa-stereo	src/libvlc-module.c + modules	present
+option	--amem-channels	src/libvlc-module.c + modules	present
+option	--amem-format	src/libvlc-module.c + modules	present
+option	--amem-rate	src/libvlc-module.c + modules	present
+option	--amt-native-timeout	src/libvlc-module.c + modules	present
+option	--amt-relay	src/libvlc-module.c + modules	present
+option	--anaglyph-scheme	src/libvlc-module.c + modules	present
+option	--antiflicker-softening-size	src/libvlc-module.c + modules	present
+option	--antiflicker-window-size	src/libvlc-module.c + modules	present
+option	--aout	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-center	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-left	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-lfe	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-middleleft	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-middleright	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-rearcenter	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-rearleft	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-rearright	src/libvlc-module.c + modules	present
+option	--aout-remap-channel-right	src/libvlc-module.c + modules	present
+option	--aout-remap-normalize	src/libvlc-module.c + modules	present
+option	--aribsub-ignore-ruby	src/libvlc-module.c + modules	present
+option	--aribsub-use-coretext	src/libvlc-module.c + modules	present
+option	--aspect-ratio	src/libvlc-module.c + modules	present
+option	--audio	src/libvlc-module.c + modules	present
+option	--audio-bitexact	src/libvlc-module.c + modules	present
+option	--audio-desync	src/libvlc-module.c + modules	present
+option	--audio-filter	src/libvlc-module.c + modules	present
+option	--audio-language	src/libvlc-module.c + modules	present
+option	--audio-replay-gain-default	src/libvlc-module.c + modules	present
+option	--audio-replay-gain-mode	src/libvlc-module.c + modules	present
+option	--audio-replay-gain-peak-protection	src/libvlc-module.c + modules	present
+option	--audio-replay-gain-preamp	src/libvlc-module.c + modules	present
+option	--audio-resampler	src/libvlc-module.c + modules	present
+option	--audio-time-stretch	src/libvlc-module.c + modules	present
+option	--audio-track	src/libvlc-module.c + modules	present
+option	--audio-track-id	src/libvlc-module.c + modules	present
+option	--audio-visual	src/libvlc-module.c + modules	present
+option	--audiobargraph	src/libvlc-module.c + modules	present
+option	--audiofile-channels	src/libvlc-module.c + modules	present
+option	--audiofile-file	src/libvlc-module.c + modules	present
+option	--audiofile-format	src/libvlc-module.c + modules	present
+option	--audiofile-wav	src/libvlc-module.c + modules	present
+option	--auto-preparse	src/libvlc-module.c + modules	present
+option	--autoscale	src/libvlc-module.c + modules	present
+option	--avcodec-codec	src/libvlc-module.c + modules	present
+option	--avcodec-corrupted	src/libvlc-module.c + modules	present
+option	--avcodec-debug	src/libvlc-module.c + modules	present
+option	--avcodec-dr	src/libvlc-module.c + modules	present
+option	--avcodec-hurry-up	src/libvlc-module.c + modules	present
+option	--avcodec-options	src/libvlc-module.c + modules	present
+option	--avcodec-skip-frame	src/libvlc-module.c + modules	present
+option	--avcodec-skip-idct	src/libvlc-module.c + modules	present
+option	--avcodec-skiploopfilter	src/libvlc-module.c + modules	present
+option	--avcodec-threads	src/libvlc-module.c + modules	present
+option	--avformat-format	src/libvlc-module.c + modules	present
+option	--avformat-options	src/libvlc-module.c + modules	present
+option	--avi-index	src/libvlc-module.c + modules	present
+option	--avi-interleaved	src/libvlc-module.c + modules	present
+option	--avio-options	src/libvlc-module.c + modules	present
+option	--ball-color	src/libvlc-module.c + modules	present
+option	--ball-edge-visible	src/libvlc-module.c + modules	present
+option	--ball-gradient-threshold	src/libvlc-module.c + modules	present
+option	--ball-size	src/libvlc-module.c + modules	present
+option	--ball-speed	src/libvlc-module.c + modules	present
+option	--bandwidth-overhead-limit	src/libvlc-module.c + modules	present
+option	--blendbench-alpha	src/libvlc-module.c + modules	present
+option	--blendbench-base-chroma	src/libvlc-module.c + modules	present
+option	--blendbench-base-image	src/libvlc-module.c + modules	present
+option	--blendbench-blend-chroma	src/libvlc-module.c + modules	present
+option	--blendbench-blend-image	src/libvlc-module.c + modules	present
+option	--blendbench-loops	src/libvlc-module.c + modules	present
+option	--bluescreen-u	src/libvlc-module.c + modules	present
+option	--bluescreen-ut	src/libvlc-module.c + modules	present
+option	--bluescreen-v	src/libvlc-module.c + modules	present
+option	--bluescreen-vt	src/libvlc-module.c + modules	present
+option	--blur-factor	src/libvlc-module.c + modules	present
+option	--bluray-java-home	src/libvlc-module.c + modules	present
+option	--bluray-menu	src/libvlc-module.c + modules	present
+option	--bluray-persistent-storage	src/libvlc-module.c + modules	present
+option	--bluray-region	src/libvlc-module.c + modules	present
+option	--bookmark1	src/libvlc-module.c + modules	present
+option	--bookmark10	src/libvlc-module.c + modules	present
+option	--bookmark2	src/libvlc-module.c + modules	present
+option	--bookmark3	src/libvlc-module.c + modules	present
+option	--bookmark4	src/libvlc-module.c + modules	present
+option	--bookmark5	src/libvlc-module.c + modules	present
+option	--bookmark6	src/libvlc-module.c + modules	present
+option	--bookmark7	src/libvlc-module.c + modules	present
+option	--bookmark8	src/libvlc-module.c + modules	present
+option	--bookmark9	src/libvlc-module.c + modules	present
+option	--bookmarks	src/libvlc-module.c + modules	present
+option	--brightness	src/libvlc-module.c + modules	present
+option	--browse-dir	src/libvlc-module.c + modules	present
+option	--canvas-aspect	src/libvlc-module.c + modules	present
+option	--canvas-height	src/libvlc-module.c + modules	present
+option	--canvas-padd	src/libvlc-module.c + modules	present
+option	--canvas-width	src/libvlc-module.c + modules	present
+option	--captions	src/libvlc-module.c + modules	present
+option	--cc-opaque	src/libvlc-module.c + modules	present
+option	--cd-audio	src/libvlc-module.c + modules	present
+option	--cdda-first-sector	src/libvlc-module.c + modules	present
+option	--cdda-last-sector	src/libvlc-module.c + modules	present
+option	--cdda-track	src/libvlc-module.c + modules	present
+option	--clock-jitter	src/libvlc-module.c + modules	present
+option	--clock-master	src/libvlc-module.c + modules	present
+option	--clock-synchro	src/libvlc-module.c + modules	present
+option	--clone-count	src/libvlc-module.c + modules	present
+option	--clone-vout-list	src/libvlc-module.c + modules	present
+option	--codec	src/libvlc-module.c + modules	present
+option	--color	src/libvlc-module.c + modules	present
+option	--colorthres-color	src/libvlc-module.c + modules	present
+option	--colorthres-saturationthres	src/libvlc-module.c + modules	present
+option	--colorthres-similaritythres	src/libvlc-module.c + modules	present
+option	--compressor-attack	src/libvlc-module.c + modules	present
+option	--compressor-knee	src/libvlc-module.c + modules	present
+option	--compressor-makeup-gain	src/libvlc-module.c + modules	present
+option	--compressor-ratio	src/libvlc-module.c + modules	present
+option	--compressor-release	src/libvlc-module.c + modules	present
+option	--compressor-rms-peak	src/libvlc-module.c + modules	present
+option	--compressor-threshold	src/libvlc-module.c + modules	present
+option	--concat-list	src/libvlc-module.c + modules	present
+option	--config	src/libvlc-module.c + modules	present
+option	--contrast	src/libvlc-module.c + modules	present
+option	--control	src/libvlc-module.c + modules	present
+option	--cr-average	src/libvlc-module.c + modules	present
+option	--crop	src/libvlc-module.c + modules	present
+option	--croppadd-cropbottom	src/libvlc-module.c + modules	present
+option	--croppadd-cropleft	src/libvlc-module.c + modules	present
+option	--croppadd-cropright	src/libvlc-module.c + modules	present
+option	--croppadd-croptop	src/libvlc-module.c + modules	present
+option	--croppadd-paddbottom	src/libvlc-module.c + modules	present
+option	--croppadd-paddleft	src/libvlc-module.c + modules	present
+option	--croppadd-paddright	src/libvlc-module.c + modules	present
+option	--croppadd-paddtop	src/libvlc-module.c + modules	present
+option	--custom-aspect-ratios	src/libvlc-module.c + modules	present
+option	--custom-crop-ratios	src/libvlc-module.c + modules	present
+option	--dav1d-all-layers	src/libvlc-module.c + modules	present
+option	--dav1d-thread-frames	src/libvlc-module.c + modules	present
+option	--dec-dev	src/libvlc-module.c + modules	present
+option	--deinterlace	src/libvlc-module.c + modules	present
+option	--deinterlace-filter	src/libvlc-module.c + modules	present
+option	--deinterlace-mode	src/libvlc-module.c + modules	present
+option	--delay-time	src/libvlc-module.c + modules	present
+option	--demux	src/libvlc-module.c + modules	present
+option	--demux-filter	src/libvlc-module.c + modules	present
+option	--demuxdump-access	src/libvlc-module.c + modules	present
+option	--demuxdump-append	src/libvlc-module.c + modules	present
+option	--demuxdump-file	src/libvlc-module.c + modules	present
+option	--denoise-sigma	src/libvlc-module.c + modules	present
+option	--disable-screensaver	src/libvlc-module.c + modules	present
+option	--disc-caching	src/libvlc-module.c + modules	present
+option	--dither-algo	src/libvlc-module.c + modules	present
+option	--dither-depth	src/libvlc-module.c + modules	present
+option	--dither-mode	src/libvlc-module.c + modules	present
+option	--draw-vflip	src/libvlc-module.c + modules	present
+option	--drawable-xid	src/libvlc-module.c + modules	present
+option	--drop-late-frames	src/libvlc-module.c + modules	present
+option	--dry-mix	src/libvlc-module.c + modules	present
+option	--dscp	src/libvlc-module.c + modules	present
+option	--dummy-chroma	src/libvlc-module.c + modules	present
+option	--dummy-save-es	src/libvlc-module.c + modules	present
+option	--duration	src/libvlc-module.c + modules	present
+option	--dvb-a-count	src/libvlc-module.c + modules	present
+option	--dvb-a-fec	src/libvlc-module.c + modules	present
+option	--dvb-a-interleaving	src/libvlc-module.c + modules	present
+option	--dvb-a-modulation	src/libvlc-module.c + modules	present
+option	--dvb-adapter	src/libvlc-module.c + modules	present
+option	--dvb-b-count	src/libvlc-module.c + modules	present
+option	--dvb-b-fec	src/libvlc-module.c + modules	present
+option	--dvb-b-interleaving	src/libvlc-module.c + modules	present
+option	--dvb-b-modulation	src/libvlc-module.c + modules	present
+option	--dvb-bandwidth	src/libvlc-module.c + modules	present
+option	--dvb-budget-mode	src/libvlc-module.c + modules	present
+option	--dvb-c-count	src/libvlc-module.c + modules	present
+option	--dvb-c-fec	src/libvlc-module.c + modules	present
+option	--dvb-c-interleaving	src/libvlc-module.c + modules	present
+option	--dvb-c-modulation	src/libvlc-module.c + modules	present
+option	--dvb-code-rate-hp	src/libvlc-module.c + modules	present
+option	--dvb-code-rate-lp	src/libvlc-module.c + modules	present
+option	--dvb-device	src/libvlc-module.c + modules	present
+option	--dvb-fec	src/libvlc-module.c + modules	present
+option	--dvb-frequency	src/libvlc-module.c + modules	present
+option	--dvb-guard	src/libvlc-module.c + modules	present
+option	--dvb-hierarchy	src/libvlc-module.c + modules	present
+option	--dvb-high-voltage	src/libvlc-module.c + modules	present
+option	--dvb-inversion	src/libvlc-module.c + modules	present
+option	--dvb-lnb-high	src/libvlc-module.c + modules	present
+option	--dvb-lnb-low	src/libvlc-module.c + modules	present
+option	--dvb-lnb-switch	src/libvlc-module.c + modules	present
+option	--dvb-modulation	src/libvlc-module.c + modules	present
+option	--dvb-pilot	src/libvlc-module.c + modules	present
+option	--dvb-plp-id	src/libvlc-module.c + modules	present
+option	--dvb-polarization	src/libvlc-module.c + modules	present
+option	--dvb-rolloff	src/libvlc-module.c + modules	present
+option	--dvb-satno	src/libvlc-module.c + modules	present
+option	--dvb-srate	src/libvlc-module.c + modules	present
+option	--dvb-stream	src/libvlc-module.c + modules	present
+option	--dvb-tone	src/libvlc-module.c + modules	present
+option	--dvb-transmission	src/libvlc-module.c + modules	present
+option	--dvb-ts-id	src/libvlc-module.c + modules	present
+option	--dvb-uncommitted	src/libvlc-module.c + modules	present
+option	--dvbsub-position	src/libvlc-module.c + modules	present
+option	--dvbsub-x	src/libvlc-module.c + modules	present
+option	--dvbsub-y	src/libvlc-module.c + modules	present
+option	--dvd	src/libvlc-module.c + modules	present
+option	--dvdnav-angle	src/libvlc-module.c + modules	present
+option	--dvdnav-menu	src/libvlc-module.c + modules	present
+option	--dvdread-angle	src/libvlc-module.c + modules	present
+option	--dvdsub-transparency	src/libvlc-module.c + modules	present
+option	--ebur128-mode	src/libvlc-module.c + modules	present
+option	--effect-fft-window	src/libvlc-module.c + modules	present
+option	--effect-height	src/libvlc-module.c + modules	present
+option	--effect-kaiser-param	src/libvlc-module.c + modules	present
+option	--effect-list	src/libvlc-module.c + modules	present
+option	--effect-width	src/libvlc-module.c + modules	present
+option	--embedded-video	src/libvlc-module.c + modules	present
+option	--equalizer-2pass	src/libvlc-module.c + modules	present
+option	--equalizer-bands	src/libvlc-module.c + modules	present
+option	--equalizer-preamp	src/libvlc-module.c + modules	present
+option	--equalizer-preset	src/libvlc-module.c + modules	present
+option	--equalizer-vlcfreqs	src/libvlc-module.c + modules	present
+option	--erase-mask	src/libvlc-module.c + modules	present
+option	--erase-x	src/libvlc-module.c + modules	present
+option	--erase-y	src/libvlc-module.c + modules	present
+option	--es-fps	src/libvlc-module.c + modules	present
+option	--expander-attack	src/libvlc-module.c + modules	present
+option	--expander-knee	src/libvlc-module.c + modules	present
+option	--expander-makeup-gain	src/libvlc-module.c + modules	present
+option	--expander-ratio	src/libvlc-module.c + modules	present
+option	--expander-release	src/libvlc-module.c + modules	present
+option	--expander-rms-peak	src/libvlc-module.c + modules	present
+option	--expander-threshold	src/libvlc-module.c + modules	present
+option	--extract-component	src/libvlc-module.c + modules	present
+option	--extractor-flatten	src/libvlc-module.c + modules	present
+option	--extraintf	src/libvlc-module.c + modules	present
+option	--extrashort-jump-size	src/libvlc-module.c + modules	present
+option	--feedback-gain	src/libvlc-module.c + modules	present
+option	--fetch-art-threads	src/libvlc-module.c + modules	present
+option	--file-caching	src/libvlc-module.c + modules	present
+option	--file-logging	src/libvlc-module.c + modules	present
+option	--fit	src/libvlc-module.c + modules	present
+option	--flaschen-display	src/libvlc-module.c + modules	present
+option	--flaschen-height	src/libvlc-module.c + modules	present
+option	--flaschen-offset-x	src/libvlc-module.c + modules	present
+option	--flaschen-offset-y	src/libvlc-module.c + modules	present
+option	--flaschen-offset-z	src/libvlc-module.c + modules	present
+option	--flaschen-width	src/libvlc-module.c + modules	present
+option	--force-dolby-surround	src/libvlc-module.c + modules	present
+option	--formatcrop-bottom	src/libvlc-module.c + modules	present
+option	--formatcrop-left	src/libvlc-module.c + modules	present
+option	--formatcrop-right	src/libvlc-module.c + modules	present
+option	--formatcrop-top	src/libvlc-module.c + modules	present
+option	--fps-fps	src/libvlc-module.c + modules	present
+option	--freetype-background-color	src/libvlc-module.c + modules	present
+option	--freetype-background-opacity	src/libvlc-module.c + modules	present
+option	--freetype-blending-mode	src/libvlc-module.c + modules	present
+option	--freetype-bold	src/libvlc-module.c + modules	present
+option	--freetype-cache-size	src/libvlc-module.c + modules	present
+option	--freetype-color	src/libvlc-module.c + modules	present
+option	--freetype-font	src/libvlc-module.c + modules	present
+option	--freetype-monofont	src/libvlc-module.c + modules	present
+option	--freetype-opacity	src/libvlc-module.c + modules	present
+option	--freetype-outline-color	src/libvlc-module.c + modules	present
+option	--freetype-outline-opacity	src/libvlc-module.c + modules	present
+option	--freetype-outline-thickness	src/libvlc-module.c + modules	present
+option	--freetype-shadow-angle	src/libvlc-module.c + modules	present
+option	--freetype-shadow-color	src/libvlc-module.c + modules	present
+option	--freetype-shadow-distance	src/libvlc-module.c + modules	present
+option	--freetype-shadow-opacity	src/libvlc-module.c + modules	present
+option	--freetype-text-direction	src/libvlc-module.c + modules	present
+option	--freetype-yuvp	src/libvlc-module.c + modules	present
+option	--ftp-account	src/libvlc-module.c + modules	present
+option	--ftp-pwd	src/libvlc-module.c + modules	present
+option	--ftp-user	src/libvlc-module.c + modules	present
+option	--full-help	src/libvlc-module.c + modules	present
+option	--fullscreen	src/libvlc-module.c + modules	present
+option	--gain	src/libvlc-module.c + modules	present
+option	--gain-value	src/libvlc-module.c + modules	present
+option	--gamma	src/libvlc-module.c + modules	present
+option	--gate-attack	src/libvlc-module.c + modules	present
+option	--gate-release	src/libvlc-module.c + modules	present
+option	--gate-threshold	src/libvlc-module.c + modules	present
+option	--gaussianblur-sigma	src/libvlc-module.c + modules	present
+option	--gestures-button	src/libvlc-module.c + modules	present
+option	--gestures-threshold	src/libvlc-module.c + modules	present
+option	--gl	src/libvlc-module.c + modules	present
+option	--gl-allow-sw	src/libvlc-module.c + modules	present
+option	--gl-downscaler	src/libvlc-module.c + modules	present
+option	--gl-gamut-mapping	src/libvlc-module.c + modules	present
+option	--gl-inverse-tone-mapping	src/libvlc-module.c + modules	present
+option	--gl-lut-file	src/libvlc-module.c + modules	present
+option	--gl-sampler	src/libvlc-module.c + modules	present
+option	--gl-swap-depth	src/libvlc-module.c + modules	present
+option	--gl-tone-mapping-function	src/libvlc-module.c + modules	present
+option	--gl-tone-mapping-param	src/libvlc-module.c + modules	present
+option	--gl-upscaler	src/libvlc-module.c + modules	present
+option	--glinterop	src/libvlc-module.c + modules	present
+option	--global-key-aspect-ratio	src/libvlc-module.c + modules	present
+option	--global-key-audio-track	src/libvlc-module.c + modules	present
+option	--global-key-audiodelay-down	src/libvlc-module.c + modules	present
+option	--global-key-audiodelay-up	src/libvlc-module.c + modules	present
+option	--global-key-audiodevice-cycle	src/libvlc-module.c + modules	present
+option	--global-key-chapter-next	src/libvlc-module.c + modules	present
+option	--global-key-chapter-prev	src/libvlc-module.c + modules	present
+option	--global-key-clear-playlist	src/libvlc-module.c + modules	present
+option	--global-key-crop	src/libvlc-module.c + modules	present
+option	--global-key-crop-bottom	src/libvlc-module.c + modules	present
+option	--global-key-crop-left	src/libvlc-module.c + modules	present
+option	--global-key-crop-right	src/libvlc-module.c + modules	present
+option	--global-key-crop-top	src/libvlc-module.c + modules	present
+option	--global-key-decr-scalefactor	src/libvlc-module.c + modules	present
+option	--global-key-deinterlace	src/libvlc-module.c + modules	present
+option	--global-key-deinterlace-mode	src/libvlc-module.c + modules	present
+option	--global-key-disc-menu	src/libvlc-module.c + modules	present
+option	--global-key-faster	src/libvlc-module.c + modules	present
+option	--global-key-frame-next	src/libvlc-module.c + modules	present
+option	--global-key-frame-previous	src/libvlc-module.c + modules	present
+option	--global-key-incr-scalefactor	src/libvlc-module.c + modules	present
+option	--global-key-intf-boss	src/libvlc-module.c + modules	present
+option	--global-key-intf-popup-menu	src/libvlc-module.c + modules	present
+option	--global-key-intf-show	src/libvlc-module.c + modules	present
+option	--global-key-jump	src/libvlc-module.c + modules	present
+option	--global-key-jump-extrashort	src/libvlc-module.c + modules	present
+option	--global-key-jump-long	src/libvlc-module.c + modules	present
+option	--global-key-jump-medium	src/libvlc-module.c + modules	present
+option	--global-key-jump-short	src/libvlc-module.c + modules	present
+option	--global-key-leave-fullscreen	src/libvlc-module.c + modules	present
+option	--global-key-loop	src/libvlc-module.c + modules	present
+option	--global-key-nav-activate	src/libvlc-module.c + modules	present
+option	--global-key-nav-down	src/libvlc-module.c + modules	present
+option	--global-key-nav-left	src/libvlc-module.c + modules	present
+option	--global-key-nav-right	src/libvlc-module.c + modules	present
+option	--global-key-nav-up	src/libvlc-module.c + modules	present
+option	--global-key-next	src/libvlc-module.c + modules	present
+option	--global-key-pause	src/libvlc-module.c + modules	present
+option	--global-key-play	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark1	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark10	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark2	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark3	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark4	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark5	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark6	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark7	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark8	src/libvlc-module.c + modules	present
+option	--global-key-play-bookmark9	src/libvlc-module.c + modules	present
+option	--global-key-play-pause	src/libvlc-module.c + modules	present
+option	--global-key-position	src/libvlc-module.c + modules	present
+option	--global-key-prev	src/libvlc-module.c + modules	present
+option	--global-key-program-sid-next	src/libvlc-module.c + modules	present
+option	--global-key-program-sid-prev	src/libvlc-module.c + modules	present
+option	--global-key-projection-toggle	src/libvlc-module.c + modules	present
+option	--global-key-quit	src/libvlc-module.c + modules	present
+option	--global-key-random	src/libvlc-module.c + modules	present
+option	--global-key-rate-faster-fine	src/libvlc-module.c + modules	present
+option	--global-key-rate-normal	src/libvlc-module.c + modules	present
+option	--global-key-rate-slower-fine	src/libvlc-module.c + modules	present
+option	--global-key-record	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark1	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark10	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark2	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark3	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark4	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark5	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark6	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark7	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark8	src/libvlc-module.c + modules	present
+option	--global-key-set-bookmark9	src/libvlc-module.c + modules	present
+option	--global-key-slower	src/libvlc-module.c + modules	present
+option	--global-key-snapshot	src/libvlc-module.c + modules	present
+option	--global-key-stop	src/libvlc-module.c + modules	present
+option	--global-key-subdelay-down	src/libvlc-module.c + modules	present
+option	--global-key-subdelay-up	src/libvlc-module.c + modules	present
+option	--global-key-subpos-down	src/libvlc-module.c + modules	present
+option	--global-key-subpos-up	src/libvlc-module.c + modules	present
+option	--global-key-subsync-apply	src/libvlc-module.c + modules	present
+option	--global-key-subsync-markaudio	src/libvlc-module.c + modules	present
+option	--global-key-subsync-marksub	src/libvlc-module.c + modules	present
+option	--global-key-subsync-reset	src/libvlc-module.c + modules	present
+option	--global-key-subtitle-control-secondary	src/libvlc-module.c + modules	present
+option	--global-key-subtitle-revtrack	src/libvlc-module.c + modules	present
+option	--global-key-subtitle-text-scale-down	src/libvlc-module.c + modules	present
+option	--global-key-subtitle-text-scale-normal	src/libvlc-module.c + modules	present
+option	--global-key-subtitle-text-scale-up	src/libvlc-module.c + modules	present
+option	--global-key-subtitle-toggle	src/libvlc-module.c + modules	present
+option	--global-key-subtitle-track	src/libvlc-module.c + modules	present
+option	--global-key-title-next	src/libvlc-module.c + modules	present
+option	--global-key-title-prev	src/libvlc-module.c + modules	present
+option	--global-key-toggle-autoscale	src/libvlc-module.c + modules	present
+option	--global-key-toggle-fullscreen	src/libvlc-module.c + modules	present
+option	--global-key-uncrop-bottom	src/libvlc-module.c + modules	present
+option	--global-key-uncrop-left	src/libvlc-module.c + modules	present
+option	--global-key-uncrop-right	src/libvlc-module.c + modules	present
+option	--global-key-uncrop-top	src/libvlc-module.c + modules	present
+option	--global-key-unzoom	src/libvlc-module.c + modules	present
+option	--global-key-viewpoint-fov-in	src/libvlc-module.c + modules	present
+option	--global-key-viewpoint-fov-out	src/libvlc-module.c + modules	present
+option	--global-key-viewpoint-roll-anticlock	src/libvlc-module.c + modules	present
+option	--global-key-viewpoint-roll-clock	src/libvlc-module.c + modules	present
+option	--global-key-vol-down	src/libvlc-module.c + modules	present
+option	--global-key-vol-mute	src/libvlc-module.c + modules	present
+option	--global-key-vol-up	src/libvlc-module.c + modules	present
+option	--global-key-wallpaper	src/libvlc-module.c + modules	present
+option	--global-key-zoom	src/libvlc-module.c + modules	present
+option	--global-key-zoom-double	src/libvlc-module.c + modules	present
+option	--global-key-zoom-half	src/libvlc-module.c + modules	present
+option	--global-key-zoom-original	src/libvlc-module.c + modules	present
+option	--global-key-zoom-quarter	src/libvlc-module.c + modules	present
+option	--glspectrum-height	src/libvlc-module.c + modules	present
+option	--glspectrum-width	src/libvlc-module.c + modules	present
+option	--gme-playback-limit	src/libvlc-module.c + modules	present
+option	--gnutls-dir-trust	src/libvlc-module.c + modules	present
+option	--gnutls-priorities	src/libvlc-module.c + modules	present
+option	--gnutls-system-trust	src/libvlc-module.c + modules	present
+option	--goom-height	src/libvlc-module.c + modules	present
+option	--goom-speed	src/libvlc-module.c + modules	present
+option	--goom-width	src/libvlc-module.c + modules	present
+option	--gradfun-radius	src/libvlc-module.c + modules	present
+option	--gradfun-strength	src/libvlc-module.c + modules	present
+option	--gradient-cartoon	src/libvlc-module.c + modules	present
+option	--gradient-color	src/libvlc-module.c + modules	present
+option	--gradient-mode	src/libvlc-module.c + modules	present
+option	--grain-period-max	src/libvlc-module.c + modules	present
+option	--grain-period-min	src/libvlc-module.c + modules	present
+option	--grain-variance	src/libvlc-module.c + modules	present
+option	--grayscale	src/libvlc-module.c + modules	present
+option	--h264-fps	src/libvlc-module.c + modules	present
+option	--hdtv-fix	src/libvlc-module.c + modules	present
+option	--headphone-compensate	src/libvlc-module.c + modules	present
+option	--headphone-dim	src/libvlc-module.c + modules	present
+option	--headphone-dolby	src/libvlc-module.c + modules	present
+option	--heif-image-duration	src/libvlc-module.c + modules	present
+option	--height	src/libvlc-module.c + modules	present
+option	--help	src/libvlc-module.c + modules	present
+option	--help-verbose	src/libvlc-module.c + modules	present
+option	--hevc-fps	src/libvlc-module.c + modules	present
+option	--hotkeys-x-wheel-mode	src/libvlc-module.c + modules	present
+option	--hotkeys-y-wheel-mode	src/libvlc-module.c + modules	present
+option	--hqdn3d-chroma-spat	src/libvlc-module.c + modules	present
+option	--hqdn3d-chroma-temp	src/libvlc-module.c + modules	present
+option	--hqdn3d-luma-spat	src/libvlc-module.c + modules	present
+option	--hqdn3d-luma-temp	src/libvlc-module.c + modules	present
+option	--http-cert	src/libvlc-module.c + modules	present
+option	--http-continuous	src/libvlc-module.c + modules	present
+option	--http-forward-cookies	src/libvlc-module.c + modules	present
+option	--http-host	src/libvlc-module.c + modules	present
+option	--http-index	src/libvlc-module.c + modules	present
+option	--http-key	src/libvlc-module.c + modules	present
+option	--http-password	src/libvlc-module.c + modules	present
+option	--http-port	src/libvlc-module.c + modules	present
+option	--http-reconnect	src/libvlc-module.c + modules	present
+option	--http-referrer	src/libvlc-module.c + modules	present
+option	--http-src	src/libvlc-module.c + modules	present
+option	--http-user-agent	src/libvlc-module.c + modules	present
+option	--https-port	src/libvlc-module.c + modules	present
+option	--hue	src/libvlc-module.c + modules	present
+option	--hw-dec	src/libvlc-module.c + modules	present
+option	--hxxx-helper-testdec-xvc	src/libvlc-module.c + modules	present
+option	--ignore-config	src/libvlc-module.c + modules	present
+option	--ignore-filetypes	src/libvlc-module.c + modules	present
+option	--image-chroma	src/libvlc-module.c + modules	present
+option	--image-decode	src/libvlc-module.c + modules	present
+option	--image-duration	src/libvlc-module.c + modules	present
+option	--image-fps	src/libvlc-module.c + modules	present
+option	--image-group	src/libvlc-module.c + modules	present
+option	--image-id	src/libvlc-module.c + modules	present
+option	--image-realtime	src/libvlc-module.c + modules	present
+option	--imem-cat	src/libvlc-module.c + modules	present
+option	--imem-channels	src/libvlc-module.c + modules	present
+option	--imem-codec	src/libvlc-module.c + modules	present
+option	--imem-cookie	src/libvlc-module.c + modules	present
+option	--imem-dar	src/libvlc-module.c + modules	present
+option	--imem-data	src/libvlc-module.c + modules	present
+option	--imem-fps	src/libvlc-module.c + modules	present
+option	--imem-get	src/libvlc-module.c + modules	present
+option	--imem-group	src/libvlc-module.c + modules	present
+option	--imem-height	src/libvlc-module.c + modules	present
+option	--imem-id	src/libvlc-module.c + modules	present
+option	--imem-language	src/libvlc-module.c + modules	present
+option	--imem-release	src/libvlc-module.c + modules	present
+option	--imem-samplerate	src/libvlc-module.c + modules	present
+option	--imem-size	src/libvlc-module.c + modules	present
+option	--imem-width	src/libvlc-module.c + modules	present
+option	--input-fast-seek	src/libvlc-module.c + modules	present
+option	--input-list	src/libvlc-module.c + modules	present
+option	--input-record-native	src/libvlc-module.c + modules	present
+option	--input-record-path	src/libvlc-module.c + modules	present
+option	--input-repeat	src/libvlc-module.c + modules	present
+option	--input-slave	src/libvlc-module.c + modules	present
+option	--input-timeshift-granularity	src/libvlc-module.c + modules	present
+option	--input-timeshift-path	src/libvlc-module.c + modules	present
+option	--input-title-format	src/libvlc-module.c + modules	present
+option	--interact	src/libvlc-module.c + modules	present
+option	--intf	src/libvlc-module.c + modules	present
+option	--ipv4-timeout	src/libvlc-module.c + modules	present
+option	--jack-auto-connect	src/libvlc-module.c + modules	present
+option	--jack-connect-regex	src/libvlc-module.c + modules	present
+option	--jack-gain	src/libvlc-module.c + modules	present
+option	--jack-input-auto-connect	src/libvlc-module.c + modules	present
+option	--jack-input-channels	src/libvlc-module.c + modules	present
+option	--jack-input-ports	src/libvlc-module.c + modules	present
+option	--jack-input-use-vlc-pace	src/libvlc-module.c + modules	present
+option	--jack-name	src/libvlc-module.c + modules	present
+option	--json-tracer-file	src/libvlc-module.c + modules	present
+option	--kate-formatted	src/libvlc-module.c + modules	present
+option	--kate-tiger-default-background-alpha	src/libvlc-module.c + modules	present
+option	--kate-tiger-default-background-color	src/libvlc-module.c + modules	present
+option	--kate-tiger-default-font-alpha	src/libvlc-module.c + modules	present
+option	--kate-tiger-default-font-color	src/libvlc-module.c + modules	present
+option	--kate-tiger-default-font-desc	src/libvlc-module.c + modules	present
+option	--kate-tiger-default-font-effect	src/libvlc-module.c + modules	present
+option	--kate-tiger-default-font-effect-strength	src/libvlc-module.c + modules	present
+option	--kate-tiger-quality	src/libvlc-module.c + modules	present
+option	--kate-use-tiger	src/libvlc-module.c + modules	present
+hotkey	--key-aspect-ratio	src/libvlc-module.c	present
+hotkey	--key-audio-track	src/libvlc-module.c	present
+hotkey	--key-audiodelay-down	src/libvlc-module.c	present
+hotkey	--key-audiodelay-up	src/libvlc-module.c	present
+hotkey	--key-audiodevice-cycle	src/libvlc-module.c	present
+hotkey	--key-chapter-next	src/libvlc-module.c	present
+hotkey	--key-chapter-prev	src/libvlc-module.c	present
+hotkey	--key-clear-playlist	src/libvlc-module.c	present
+hotkey	--key-crop	src/libvlc-module.c	present
+hotkey	--key-crop-bottom	src/libvlc-module.c	present
+hotkey	--key-crop-left	src/libvlc-module.c	present
+hotkey	--key-crop-right	src/libvlc-module.c	present
+hotkey	--key-crop-top	src/libvlc-module.c	present
+hotkey	--key-decr-scalefactor	src/libvlc-module.c	present
+hotkey	--key-deinterlace	src/libvlc-module.c	present
+hotkey	--key-deinterlace-mode	src/libvlc-module.c	present
+hotkey	--key-disc-menu	src/libvlc-module.c	present
+hotkey	--key-faster	src/libvlc-module.c	present
+hotkey	--key-frame-next	src/libvlc-module.c	present
+hotkey	--key-frame-previous	src/libvlc-module.c	present
+hotkey	--key-incr-scalefactor	src/libvlc-module.c	present
+hotkey	--key-intf-boss	src/libvlc-module.c	present
+hotkey	--key-intf-popup-menu	src/libvlc-module.c	present
+hotkey	--key-intf-show	src/libvlc-module.c	present
+hotkey	--key-jump	src/libvlc-module.c	present
+hotkey	--key-jump-extrashort	src/libvlc-module.c	present
+hotkey	--key-jump-long	src/libvlc-module.c	present
+hotkey	--key-jump-medium	src/libvlc-module.c	present
+hotkey	--key-jump-short	src/libvlc-module.c	present
+hotkey	--key-leave-fullscreen	src/libvlc-module.c	present
+hotkey	--key-length	src/libvlc-module.c	present
+hotkey	--key-loop	src/libvlc-module.c	present
+hotkey	--key-nav-activate	src/libvlc-module.c	present
+hotkey	--key-nav-down	src/libvlc-module.c	present
+hotkey	--key-nav-left	src/libvlc-module.c	present
+hotkey	--key-nav-right	src/libvlc-module.c	present
+hotkey	--key-nav-up	src/libvlc-module.c	present
+hotkey	--key-next	src/libvlc-module.c	present
+hotkey	--key-pause	src/libvlc-module.c	present
+hotkey	--key-play	src/libvlc-module.c	present
+hotkey	--key-play-bookmark1	src/libvlc-module.c	present
+hotkey	--key-play-bookmark10	src/libvlc-module.c	present
+hotkey	--key-play-bookmark2	src/libvlc-module.c	present
+hotkey	--key-play-bookmark3	src/libvlc-module.c	present
+hotkey	--key-play-bookmark4	src/libvlc-module.c	present
+hotkey	--key-play-bookmark5	src/libvlc-module.c	present
+hotkey	--key-play-bookmark6	src/libvlc-module.c	present
+hotkey	--key-play-bookmark7	src/libvlc-module.c	present
+hotkey	--key-play-bookmark8	src/libvlc-module.c	present
+hotkey	--key-play-bookmark9	src/libvlc-module.c	present
+hotkey	--key-play-pause	src/libvlc-module.c	present
+hotkey	--key-position	src/libvlc-module.c	present
+hotkey	--key-prev	src/libvlc-module.c	present
+hotkey	--key-program-sid-next	src/libvlc-module.c	present
+hotkey	--key-program-sid-prev	src/libvlc-module.c	present
+hotkey	--key-projection-toggle	src/libvlc-module.c	present
+hotkey	--key-quit	src/libvlc-module.c	present
+hotkey	--key-random	src/libvlc-module.c	present
+hotkey	--key-rate-faster-fine	src/libvlc-module.c	present
+hotkey	--key-rate-normal	src/libvlc-module.c	present
+hotkey	--key-rate-slower-fine	src/libvlc-module.c	present
+hotkey	--key-record	src/libvlc-module.c	present
+hotkey	--key-set-bookmark1	src/libvlc-module.c	present
+hotkey	--key-set-bookmark10	src/libvlc-module.c	present
+hotkey	--key-set-bookmark2	src/libvlc-module.c	present
+hotkey	--key-set-bookmark3	src/libvlc-module.c	present
+hotkey	--key-set-bookmark4	src/libvlc-module.c	present
+hotkey	--key-set-bookmark5	src/libvlc-module.c	present
+hotkey	--key-set-bookmark6	src/libvlc-module.c	present
+hotkey	--key-set-bookmark7	src/libvlc-module.c	present
+hotkey	--key-set-bookmark8	src/libvlc-module.c	present
+hotkey	--key-set-bookmark9	src/libvlc-module.c	present
+hotkey	--key-slower	src/libvlc-module.c	present
+hotkey	--key-snapshot	src/libvlc-module.c	present
+hotkey	--key-stop	src/libvlc-module.c	present
+hotkey	--key-subdelay-down	src/libvlc-module.c	present
+hotkey	--key-subdelay-up	src/libvlc-module.c	present
+hotkey	--key-subpos-down	src/libvlc-module.c	present
+hotkey	--key-subpos-up	src/libvlc-module.c	present
+hotkey	--key-subsync-apply	src/libvlc-module.c	present
+hotkey	--key-subsync-markaudio	src/libvlc-module.c	present
+hotkey	--key-subsync-marksub	src/libvlc-module.c	present
+hotkey	--key-subsync-reset	src/libvlc-module.c	present
+hotkey	--key-subtitle-control-secondary	src/libvlc-module.c	present
+hotkey	--key-subtitle-revtrack	src/libvlc-module.c	present
+hotkey	--key-subtitle-text-scale-down	src/libvlc-module.c	present
+hotkey	--key-subtitle-text-scale-normal	src/libvlc-module.c	present
+hotkey	--key-subtitle-text-scale-up	src/libvlc-module.c	present
+hotkey	--key-subtitle-toggle	src/libvlc-module.c	present
+hotkey	--key-subtitle-track	src/libvlc-module.c	present
+hotkey	--key-title-next	src/libvlc-module.c	present
+hotkey	--key-title-prev	src/libvlc-module.c	present
+hotkey	--key-toggle-autoscale	src/libvlc-module.c	present
+hotkey	--key-toggle-fullscreen	src/libvlc-module.c	present
+hotkey	--key-uncrop-bottom	src/libvlc-module.c	present
+hotkey	--key-uncrop-left	src/libvlc-module.c	present
+hotkey	--key-uncrop-right	src/libvlc-module.c	present
+hotkey	--key-uncrop-top	src/libvlc-module.c	present
+hotkey	--key-unzoom	src/libvlc-module.c	present
+hotkey	--key-viewpoint-fov-in	src/libvlc-module.c	present
+hotkey	--key-viewpoint-fov-out	src/libvlc-module.c	present
+hotkey	--key-viewpoint-roll-anticlock	src/libvlc-module.c	present
+hotkey	--key-viewpoint-roll-clock	src/libvlc-module.c	present
+hotkey	--key-vol-down	src/libvlc-module.c	present
+hotkey	--key-vol-mute	src/libvlc-module.c	present
+hotkey	--key-vol-up	src/libvlc-module.c	present
+hotkey	--key-wallpaper	src/libvlc-module.c	present
+hotkey	--key-zoom	src/libvlc-module.c	present
+hotkey	--key-zoom-double	src/libvlc-module.c	present
+hotkey	--key-zoom-half	src/libvlc-module.c	present
+hotkey	--key-zoom-original	src/libvlc-module.c	present
+hotkey	--key-zoom-quarter	src/libvlc-module.c	present
+option	--keyboard-events	src/libvlc-module.c + modules	present
+option	--keystore	src/libvlc-module.c + modules	present
+option	--keystore-file	src/libvlc-module.c + modules	present
+option	--kms-connector	src/libvlc-module.c + modules	present
+option	--kms-device	src/libvlc-module.c + modules	present
+option	--lastfm-password	src/libvlc-module.c + modules	present
+option	--lastfm-username	src/libvlc-module.c + modules	present
+option	--latency	src/libvlc-module.c + modules	present
+option	--limiter-attack	src/libvlc-module.c + modules	present
+option	--limiter-knee	src/libvlc-module.c + modules	present
+option	--limiter-makeup-gain	src/libvlc-module.c + modules	present
+option	--limiter-ratio	src/libvlc-module.c + modules	present
+option	--limiter-release	src/libvlc-module.c + modules	present
+option	--limiter-rms-peak	src/libvlc-module.c + modules	present
+option	--limiter-threshold	src/libvlc-module.c + modules	present
+option	--linsys-hdsdi-aspect-ratio	src/libvlc-module.c + modules	present
+option	--linsys-hdsdi-audio	src/libvlc-module.c + modules	present
+option	--linsys-hdsdi-id-video	src/libvlc-module.c + modules	present
+option	--linsys-hdsdi-link	src/libvlc-module.c + modules	present
+option	--linsys-sdi-aspect-ratio	src/libvlc-module.c + modules	present
+option	--linsys-sdi-audio	src/libvlc-module.c + modules	present
+option	--linsys-sdi-id-video	src/libvlc-module.c + modules	present
+option	--linsys-sdi-link	src/libvlc-module.c + modules	present
+option	--linsys-sdi-telx	src/libvlc-module.c + modules	present
+option	--linsys-sdi-telx-lang	src/libvlc-module.c + modules	present
+option	--list	src/libvlc-module.c + modules	present
+option	--list-special-files	src/libvlc-module.c + modules	present
+option	--list-verbose	src/libvlc-module.c + modules	present
+option	--live-caching	src/libvlc-module.c + modules	present
+option	--log-verbose	src/libvlc-module.c + modules	present
+option	--logfile	src/libvlc-module.c + modules	present
+option	--logmode	src/libvlc-module.c + modules	present
+option	--logo-delay	src/libvlc-module.c + modules	present
+option	--logo-file	src/libvlc-module.c + modules	present
+option	--logo-opacity	src/libvlc-module.c + modules	present
+option	--logo-position	src/libvlc-module.c + modules	present
+option	--logo-repeat	src/libvlc-module.c + modules	present
+option	--logo-x	src/libvlc-module.c + modules	present
+option	--logo-y	src/libvlc-module.c + modules	present
+option	--long-jump-size	src/libvlc-module.c + modules	present
+option	--longhelp	src/libvlc-module.c + modules	present
+option	--loop	src/libvlc-module.c + modules	present
+option	--low-delay	src/libvlc-module.c + modules	present
+option	--lua	src/libvlc-module.c + modules	present
+option	--lua-config	src/libvlc-module.c + modules	present
+option	--lua-intf	src/libvlc-module.c + modules	present
+option	--lua-sd	src/libvlc-module.c + modules	present
+option	--marq-color	src/libvlc-module.c + modules	present
+option	--marq-file	src/libvlc-module.c + modules	present
+option	--marq-marquee	src/libvlc-module.c + modules	present
+option	--marq-opacity	src/libvlc-module.c + modules	present
+option	--marq-position	src/libvlc-module.c + modules	present
+option	--marq-refresh	src/libvlc-module.c + modules	present
+option	--marq-size	src/libvlc-module.c + modules	present
+option	--marq-timeout	src/libvlc-module.c + modules	present
+option	--marq-x	src/libvlc-module.c + modules	present
+option	--marq-y	src/libvlc-module.c + modules	present
+option	--media-library	src/libvlc-module.c + modules	present
+option	--medium-jump-size	src/libvlc-module.c + modules	present
+option	--menu-language	src/libvlc-module.c + modules	present
+option	--meta-artist	src/libvlc-module.c + modules	present
+option	--meta-author	src/libvlc-module.c + modules	present
+option	--meta-copyright	src/libvlc-module.c + modules	present
+option	--meta-date	src/libvlc-module.c + modules	present
+option	--meta-description	src/libvlc-module.c + modules	present
+option	--meta-genre	src/libvlc-module.c + modules	present
+option	--meta-title	src/libvlc-module.c + modules	present
+option	--meta-url	src/libvlc-module.c + modules	present
+option	--metadata-network-access	src/libvlc-module.c + modules	present
+option	--miface	src/libvlc-module.c + modules	present
+option	--mirror-direction	src/libvlc-module.c + modules	present
+option	--mirror-split	src/libvlc-module.c + modules	present
+option	--mix-mode	src/libvlc-module.c + modules	present
+option	--mjpeg-fps	src/libvlc-module.c + modules	present
+option	--mkv-preload-clusters	src/libvlc-module.c + modules	present
+option	--mkv-preload-local-dir	src/libvlc-module.c + modules	present
+option	--mkv-use-chapter-codec	src/libvlc-module.c + modules	present
+option	--mkv-use-dummy	src/libvlc-module.c + modules	present
+option	--mkv-use-ordered-chapters	src/libvlc-module.c + modules	present
+option	--mms-all	src/libvlc-module.c + modules	present
+option	--mms-maxbitrate	src/libvlc-module.c + modules	present
+option	--mms-timeout	src/libvlc-module.c + modules	present
+option	--mock-angle	src/libvlc-module.c + modules	present
+option	--mock-attachment	src/libvlc-module.c + modules	present
+option	--mock-audio	src/libvlc-module.c + modules	present
+option	--mock-can	src/libvlc-module.c + modules	present
+option	--mock-chapter	src/libvlc-module.c + modules	present
+option	--mock-config	src/libvlc-module.c + modules	present
+option	--mock-discontinuities	src/libvlc-module.c + modules	present
+option	--mock-error	src/libvlc-module.c + modules	present
+option	--mock-input	src/libvlc-module.c + modules	present
+option	--mock-length	src/libvlc-module.c + modules	present
+option	--mock-mask	src/libvlc-module.c + modules	present
+option	--mock-msaa	src/libvlc-module.c + modules	present
+option	--mock-node	src/libvlc-module.c + modules	present
+option	--mock-null	src/libvlc-module.c + modules	present
+option	--mock-plane	src/libvlc-module.c + modules	present
+option	--mock-program	src/libvlc-module.c + modules	present
+option	--mock-pts	src/libvlc-module.c + modules	present
+option	--mock-report	src/libvlc-module.c + modules	present
+option	--mock-speed	src/libvlc-module.c + modules	present
+option	--mock-sub	src/libvlc-module.c + modules	present
+option	--mock-time	src/libvlc-module.c + modules	present
+option	--mock-title	src/libvlc-module.c + modules	present
+option	--mock-video	src/libvlc-module.c + modules	present
+option	--mod-megabass	src/libvlc-module.c + modules	present
+option	--mod-megabass-level	src/libvlc-module.c + modules	present
+option	--mod-megabass-range	src/libvlc-module.c + modules	present
+option	--mod-noisereduction	src/libvlc-module.c + modules	present
+option	--mod-reverb	src/libvlc-module.c + modules	present
+option	--mod-reverb-delay	src/libvlc-module.c + modules	present
+option	--mod-reverb-level	src/libvlc-module.c + modules	present
+option	--mod-surround	src/libvlc-module.c + modules	present
+option	--mod-surround-delay	src/libvlc-module.c + modules	present
+option	--mod-surround-level	src/libvlc-module.c + modules	present
+option	--mode	src/libvlc-module.c + modules	present
+option	--module	src/libvlc-module.c + modules	present
+option	--monitor-par	src/libvlc-module.c + modules	present
+option	--mosaic-align	src/libvlc-module.c + modules	present
+option	--mosaic-alpha	src/libvlc-module.c + modules	present
+option	--mosaic-borderh	src/libvlc-module.c + modules	present
+option	--mosaic-borderw	src/libvlc-module.c + modules	present
+option	--mosaic-cols	src/libvlc-module.c + modules	present
+option	--mosaic-delay	src/libvlc-module.c + modules	present
+option	--mosaic-height	src/libvlc-module.c + modules	present
+option	--mosaic-keep-aspect-ratio	src/libvlc-module.c + modules	present
+option	--mosaic-keep-picture	src/libvlc-module.c + modules	present
+option	--mosaic-offsets	src/libvlc-module.c + modules	present
+option	--mosaic-order	src/libvlc-module.c + modules	present
+option	--mosaic-position	src/libvlc-module.c + modules	present
+option	--mosaic-rows	src/libvlc-module.c + modules	present
+option	--mosaic-width	src/libvlc-module.c + modules	present
+option	--mosaic-xoffset	src/libvlc-module.c + modules	present
+option	--mosaic-yoffset	src/libvlc-module.c + modules	present
+option	--mouse-events	src/libvlc-module.c + modules	present
+option	--mouse-hide-timeout	src/libvlc-module.c + modules	present
+option	--mouse-pause-policy	src/libvlc-module.c + modules	present
+option	--mp4-editlist	src/libvlc-module.c + modules	present
+option	--mp4-m4a-audioonly	src/libvlc-module.c + modules	present
+option	--mtu	src/libvlc-module.c + modules	present
+option	--musicbrainz-server	src/libvlc-module.c + modules	present
+option	--ncurses-colors	src/libvlc-module.c + modules	present
+option	--ncurses-theme	src/libvlc-module.c + modules	present
+option	--network-caching	src/libvlc-module.c + modules	present
+option	--nfs-auto-guid	src/libvlc-module.c + modules	present
+option	--norm-buff-size	src/libvlc-module.c + modules	present
+option	--norm-max-level	src/libvlc-module.c + modules	present
+option	--nvdec-deint	src/libvlc-module.c + modules	present
+option	--open	src/libvlc-module.c + modules	present
+option	--opengl-filter	src/libvlc-module.c + modules	present
+option	--opengl-gl	src/libvlc-module.c + modules	present
+option	--opengl-gles	src/libvlc-module.c + modules	present
+option	--option	src/libvlc-module.c + modules	present
+option	--osd	src/libvlc-module.c + modules	present
+option	--overlay-input	src/libvlc-module.c + modules	present
+option	--overlay-output	src/libvlc-module.c + modules	present
+option	--packetizer	src/libvlc-module.c + modules	present
+option	--packetizer-mpegvideo-sync-iframe	src/libvlc-module.c + modules	present
+option	--palette	src/libvlc-module.c + modules	present
+option	--pan-control	src/libvlc-module.c + modules	present
+option	--panoramix-active	src/libvlc-module.c + modules	present
+option	--panoramix-attenuate	src/libvlc-module.c + modules	present
+option	--panoramix-bz-begin	src/libvlc-module.c + modules	present
+option	--panoramix-bz-blackcrush-blue	src/libvlc-module.c + modules	present
+option	--panoramix-bz-blackcrush-green	src/libvlc-module.c + modules	present
+option	--panoramix-bz-blackcrush-red	src/libvlc-module.c + modules	present
+option	--panoramix-bz-blacklevel-blue	src/libvlc-module.c + modules	present
+option	--panoramix-bz-blacklevel-green	src/libvlc-module.c + modules	present
+option	--panoramix-bz-blacklevel-red	src/libvlc-module.c + modules	present
+option	--panoramix-bz-end	src/libvlc-module.c + modules	present
+option	--panoramix-bz-gamma-blue	src/libvlc-module.c + modules	present
+option	--panoramix-bz-gamma-green	src/libvlc-module.c + modules	present
+option	--panoramix-bz-gamma-red	src/libvlc-module.c + modules	present
+option	--panoramix-bz-height	src/libvlc-module.c + modules	present
+option	--panoramix-bz-length	src/libvlc-module.c + modules	present
+option	--panoramix-bz-middle	src/libvlc-module.c + modules	present
+option	--panoramix-bz-middle-pos	src/libvlc-module.c + modules	present
+option	--panoramix-bz-whitecrush-blue	src/libvlc-module.c + modules	present
+option	--panoramix-bz-whitecrush-green	src/libvlc-module.c + modules	present
+option	--panoramix-bz-whitecrush-red	src/libvlc-module.c + modules	present
+option	--panoramix-bz-whitelevel-blue	src/libvlc-module.c + modules	present
+option	--panoramix-bz-whitelevel-green	src/libvlc-module.c + modules	present
+option	--panoramix-bz-whitelevel-red	src/libvlc-module.c + modules	present
+option	--panoramix-cols	src/libvlc-module.c + modules	present
+option	--panoramix-rows	src/libvlc-module.c + modules	present
+option	--param-eq-f1	src/libvlc-module.c + modules	present
+option	--param-eq-f2	src/libvlc-module.c + modules	present
+option	--param-eq-f3	src/libvlc-module.c + modules	present
+option	--param-eq-gain1	src/libvlc-module.c + modules	present
+option	--param-eq-gain2	src/libvlc-module.c + modules	present
+option	--param-eq-gain3	src/libvlc-module.c + modules	present
+option	--param-eq-highf	src/libvlc-module.c + modules	present
+option	--param-eq-highgain	src/libvlc-module.c + modules	present
+option	--param-eq-lowf	src/libvlc-module.c + modules	present
+option	--param-eq-lowgain	src/libvlc-module.c + modules	present
+option	--param-eq-q1	src/libvlc-module.c + modules	present
+option	--param-eq-q2	src/libvlc-module.c + modules	present
+option	--param-eq-q3	src/libvlc-module.c + modules	present
+option	--passphrase	src/libvlc-module.c + modules	present
+option	--payload-size	src/libvlc-module.c + modules	present
+option	--pitch-shift	src/libvlc-module.c + modules	present
+option	--pl-antiringing	src/libvlc-module.c + modules	present
+option	--pl-contrast-recovery	src/libvlc-module.c + modules	present
+option	--pl-contrast-smoothness	src/libvlc-module.c + modules	present
+option	--pl-debanding	src/libvlc-module.c + modules	present
+option	--pl-delayed-peak	src/libvlc-module.c + modules	present
+option	--pl-disable-linear	src/libvlc-module.c + modules	present
+option	--pl-dither	src/libvlc-module.c + modules	present
+option	--pl-dither-depth	src/libvlc-module.c + modules	present
+option	--pl-dither-size	src/libvlc-module.c + modules	present
+option	--pl-downscaler-blur	src/libvlc-module.c + modules	present
+option	--pl-downscaler-clamp	src/libvlc-module.c + modules	present
+option	--pl-downscaler-kernel	src/libvlc-module.c + modules	present
+option	--pl-downscaler-polar	src/libvlc-module.c + modules	present
+option	--pl-downscaler-preset	src/libvlc-module.c + modules	present
+option	--pl-downscaler-taper	src/libvlc-module.c + modules	present
+option	--pl-downscaler-window	src/libvlc-module.c + modules	present
+option	--pl-force-general	src/libvlc-module.c + modules	present
+option	--pl-gamut-mapping	src/libvlc-module.c + modules	present
+option	--pl-gl	src/libvlc-module.c + modules	present
+option	--pl-gpu	src/libvlc-module.c + modules	present
+option	--pl-grain	src/libvlc-module.c + modules	present
+option	--pl-inverse-tone-mapping	src/libvlc-module.c + modules	present
+option	--pl-iterations	src/libvlc-module.c + modules	present
+option	--pl-lut-entries	src/libvlc-module.c + modules	present
+option	--pl-lut-file	src/libvlc-module.c + modules	present
+option	--pl-lut-mode	src/libvlc-module.c + modules	present
+option	--pl-output-hint	src/libvlc-module.c + modules	present
+option	--pl-overlay-direct	src/libvlc-module.c + modules	present
+option	--pl-peak-period	src/libvlc-module.c + modules	present
+option	--pl-polar-cutoff	src/libvlc-module.c + modules	present
+option	--pl-radius	src/libvlc-module.c + modules	present
+option	--pl-scene-threshold-high	src/libvlc-module.c + modules	present
+option	--pl-scene-threshold-low	src/libvlc-module.c + modules	present
+option	--pl-sigmoid	src/libvlc-module.c + modules	present
+option	--pl-sigmoid-center	src/libvlc-module.c + modules	present
+option	--pl-sigmoid-slope	src/libvlc-module.c + modules	present
+option	--pl-skip-aa	src/libvlc-module.c + modules	present
+option	--pl-target-prim	src/libvlc-module.c + modules	present
+option	--pl-target-trc	src/libvlc-module.c + modules	present
+option	--pl-temporal-dither	src/libvlc-module.c + modules	present
+option	--pl-threshold	src/libvlc-module.c + modules	present
+option	--pl-tone-mapping-function	src/libvlc-module.c + modules	present
+option	--pl-tone-mapping-param	src/libvlc-module.c + modules	present
+option	--pl-upscaler-blur	src/libvlc-module.c + modules	present
+option	--pl-upscaler-clamp	src/libvlc-module.c + modules	present
+option	--pl-upscaler-kernel	src/libvlc-module.c + modules	present
+option	--pl-upscaler-polar	src/libvlc-module.c + modules	present
+option	--pl-upscaler-preset	src/libvlc-module.c + modules	present
+option	--pl-upscaler-taper	src/libvlc-module.c + modules	present
+option	--pl-upscaler-window	src/libvlc-module.c + modules	present
+option	--pl-user-shader	src/libvlc-module.c + modules	present
+option	--play-and-exit	src/libvlc-module.c + modules	present
+option	--play-and-pause	src/libvlc-module.c + modules	present
+option	--play-and-stop	src/libvlc-module.c + modules	present
+option	--playlist-autostart	src/libvlc-module.c + modules	present
+option	--playlist-cork	src/libvlc-module.c + modules	present
+option	--playlist-skip-ads	src/libvlc-module.c + modules	present
+option	--playlist-tree	src/libvlc-module.c + modules	present
+option	--plscale-downscaler	src/libvlc-module.c + modules	present
+option	--plscale-upscaler	src/libvlc-module.c + modules	present
+option	--plugins-cache	src/libvlc-module.c + modules	present
+option	--plugins-scan	src/libvlc-module.c + modules	present
+option	--podcast-urls	src/libvlc-module.c + modules	present
+option	--poll-timeout	src/libvlc-module.c + modules	present
+option	--posterize-level	src/libvlc-module.c + modules	present
+option	--preferred-resolution	src/libvlc-module.c + modules	present
+option	--prefetch-buffer-size	src/libvlc-module.c + modules	present
+option	--prefetch-seek-threshold	src/libvlc-module.c + modules	present
+option	--preparse-threads	src/libvlc-module.c + modules	present
+option	--preparse-timeout	src/libvlc-module.c + modules	present
+option	--program	src/libvlc-module.c + modules	present
+option	--programs	src/libvlc-module.c + modules	present
+option	--projection-mode	src/libvlc-module.c + modules	present
+option	--projectm-height	src/libvlc-module.c + modules	present
+option	--projectm-menu-font	src/libvlc-module.c + modules	present
+option	--projectm-meshx	src/libvlc-module.c + modules	present
+option	--projectm-meshy	src/libvlc-module.c + modules	present
+option	--projectm-preset-path	src/libvlc-module.c + modules	present
+option	--projectm-texture-size	src/libvlc-module.c + modules	present
+option	--projectm-title-font	src/libvlc-module.c + modules	present
+option	--projectm-width	src/libvlc-module.c + modules	present
+option	--ps-trust-timestamps	src/libvlc-module.c + modules	present
+option	--puzzle-auto-shuffle	src/libvlc-module.c + modules	present
+option	--puzzle-auto-solve	src/libvlc-module.c + modules	present
+option	--puzzle-border	src/libvlc-module.c + modules	present
+option	--puzzle-cols	src/libvlc-module.c + modules	present
+option	--puzzle-mode	src/libvlc-module.c + modules	present
+option	--puzzle-preview	src/libvlc-module.c + modules	present
+option	--puzzle-preview-size	src/libvlc-module.c + modules	present
+option	--puzzle-rotation	src/libvlc-module.c + modules	present
+option	--puzzle-rows	src/libvlc-module.c + modules	present
+option	--puzzle-shape-size	src/libvlc-module.c + modules	present
+option	--qt-accent-color	src/libvlc-module.c + modules	present
+option	--qt-auto-raise	src/libvlc-module.c + modules	present
+option	--qt-autoload-extensions	src/libvlc-module.c + modules	present
+option	--qt-backdrop-blur	src/libvlc-module.c + modules	present
+option	--qt-bgcone	src/libvlc-module.c + modules	present
+option	--qt-bgcone-expands	src/libvlc-module.c + modules	present
+option	--qt-close-to-system-tray	src/libvlc-module.c + modules	present
+option	--qt-compositor	src/libvlc-module.c + modules	present
+option	--qt-embedded-open	src/libvlc-module.c + modules	present
+option	--qt-error-dialogs	src/libvlc-module.c + modules	present
+option	--qt-fs-controller	src/libvlc-module.c + modules	present
+option	--qt-fs-opacity	src/libvlc-module.c + modules	present
+option	--qt-fs-sensitivity	src/libvlc-module.c + modules	present
+option	--qt-fullscreen-screennumber	src/libvlc-module.c + modules	present
+option	--qt-icon-change	src/libvlc-module.c + modules	present
+option	--qt-initial-prefs-view	src/libvlc-module.c + modules	present
+option	--qt-interface-scale	src/libvlc-module.c + modules	present
+option	--qt-max-volume	src/libvlc-module.c + modules	present
+option	--qt-menubar	src/libvlc-module.c + modules	present
+option	--qt-minimal-view	src/libvlc-module.c + modules	present
+option	--qt-name-in-title	src/libvlc-module.c + modules	present
+option	--qt-notification	src/libvlc-module.c + modules	present
+option	--qt-opacity	src/libvlc-module.c + modules	present
+option	--qt-pause-minimized	src/libvlc-module.c + modules	present
+option	--qt-pin-controls	src/libvlc-module.c + modules	present
+option	--qt-pip-mode	src/libvlc-module.c + modules	present
+option	--qt-privacy-ask	src/libvlc-module.c + modules	present
+option	--qt-safe-area	src/libvlc-module.c + modules	present
+option	--qt-smooth-scrolling	src/libvlc-module.c + modules	present
+option	--qt-start-minimized	src/libvlc-module.c + modules	present
+option	--qt-system-tray	src/libvlc-module.c + modules	present
+option	--qt-titlebar	src/libvlc-module.c + modules	present
+option	--qt-use-scroll-handler	src/libvlc-module.c + modules	present
+option	--qt-verbose	src/libvlc-module.c + modules	present
+option	--qt-video-autoresize	src/libvlc-module.c + modules	present
+option	--quiet	src/libvlc-module.c + modules	present
+option	--radio-browser-baseurl	src/libvlc-module.c + modules	present
+option	--random	src/libvlc-module.c + modules	present
+option	--rate	src/libvlc-module.c + modules	present
+option	--rawaud-channels	src/libvlc-module.c + modules	present
+option	--rawaud-fourcc	src/libvlc-module.c + modules	present
+option	--rawaud-lang	src/libvlc-module.c + modules	present
+option	--rawaud-samplerate	src/libvlc-module.c + modules	present
+option	--rawdv-hurry-up	src/libvlc-module.c + modules	present
+option	--rawvid-aspect-ratio	src/libvlc-module.c + modules	present
+option	--rawvid-chroma	src/libvlc-module.c + modules	present
+option	--rawvid-fps	src/libvlc-module.c + modules	present
+option	--rawvid-height	src/libvlc-module.c + modules	present
+option	--rawvid-width	src/libvlc-module.c + modules	present
+option	--rc-fake-tty	src/libvlc-module.c + modules	present
+option	--rc-host	src/libvlc-module.c + modules	present
+option	--rc-show-pos	src/libvlc-module.c + modules	present
+option	--rc-unix	src/libvlc-module.c + modules	present
+option	--recursive	src/libvlc-module.c + modules	present
+option	--repeat	src/libvlc-module.c + modules	present
+option	--reset-config	src/libvlc-module.c + modules	present
+option	--reset-plugins-cache	src/libvlc-module.c + modules	present
+option	--restore-playback-pos	src/libvlc-module.c + modules	present
+option	--restore-playback-states	src/libvlc-module.c + modules	present
+option	--rist-aes-type	src/libvlc-module.c + modules	present
+option	--rist-bandwidth	src/libvlc-module.c + modules	present
+option	--rist-cname	src/libvlc-module.c + modules	present
+option	--rist-latency	src/libvlc-module.c + modules	present
+option	--rist-max-retries	src/libvlc-module.c + modules	present
+option	--rist-maximum-jitter	src/libvlc-module.c + modules	present
+option	--rist-nack-type	src/libvlc-module.c + modules	present
+option	--rist-packet-size	src/libvlc-module.c + modules	present
+option	--rist-password	src/libvlc-module.c + modules	present
+option	--rist-peer-url2	src/libvlc-module.c + modules	present
+option	--rist-peer-url3	src/libvlc-module.c + modules	present
+option	--rist-peer-url4	src/libvlc-module.c + modules	present
+option	--rist-profile	src/libvlc-module.c + modules	present
+option	--rist-reorder-buffer	src/libvlc-module.c + modules	present
+option	--rist-retry-interval	src/libvlc-module.c + modules	present
+option	--rist-secret	src/libvlc-module.c + modules	present
+option	--rist-timing-mode	src/libvlc-module.c + modules	present
+option	--rist-username	src/libvlc-module.c + modules	present
+option	--rist-verbose-level	src/libvlc-module.c + modules	present
+option	--rist-virt-dst-port	src/libvlc-module.c + modules	present
+option	--role	src/libvlc-module.c + modules	present
+option	--rotate-angle	src/libvlc-module.c + modules	present
+option	--rotate-use-motion	src/libvlc-module.c + modules	present
+option	--rss-color	src/libvlc-module.c + modules	present
+option	--rss-images	src/libvlc-module.c + modules	present
+option	--rss-length	src/libvlc-module.c + modules	present
+option	--rss-opacity	src/libvlc-module.c + modules	present
+option	--rss-position	src/libvlc-module.c + modules	present
+option	--rss-size	src/libvlc-module.c + modules	present
+option	--rss-speed	src/libvlc-module.c + modules	present
+option	--rss-title	src/libvlc-module.c + modules	present
+option	--rss-ttl	src/libvlc-module.c + modules	present
+option	--rss-urls	src/libvlc-module.c + modules	present
+option	--rss-x	src/libvlc-module.c + modules	present
+option	--rss-y	src/libvlc-module.c + modules	present
+option	--rtcp-port	src/libvlc-module.c + modules	present
+option	--rtp-max-dropout	src/libvlc-module.c + modules	present
+option	--rtp-max-misorder	src/libvlc-module.c + modules	present
+option	--rtp-max-src	src/libvlc-module.c + modules	present
+option	--rtp-timeout	src/libvlc-module.c + modules	present
+option	--rtsp-host	src/libvlc-module.c + modules	present
+option	--rtsp-port	src/libvlc-module.c + modules	present
+option	--rtsp-timeout	src/libvlc-module.c + modules	present
+option	--run-time	src/libvlc-module.c + modules	present
+option	--sap-addr	src/libvlc-module.c + modules	present
+option	--sap-interval	src/libvlc-module.c + modules	present
+option	--sap-timeout	src/libvlc-module.c + modules	present
+option	--satip-channellist-url	src/libvlc-module.c + modules	present
+option	--satip-host	src/libvlc-module.c + modules	present
+option	--satip-multicast	src/libvlc-module.c + modules	present
+option	--saturation	src/libvlc-module.c + modules	present
+option	--save-recentplay	src/libvlc-module.c + modules	present
+option	--scaletempo-overlap	src/libvlc-module.c + modules	present
+option	--scaletempo-search	src/libvlc-module.c + modules	present
+option	--scaletempo-stride	src/libvlc-module.c + modules	present
+option	--scene-format	src/libvlc-module.c + modules	present
+option	--scene-height	src/libvlc-module.c + modules	present
+option	--scene-path	src/libvlc-module.c + modules	present
+option	--scene-prefix	src/libvlc-module.c + modules	present
+option	--scene-ratio	src/libvlc-module.c + modules	present
+option	--scene-replace	src/libvlc-module.c + modules	present
+option	--scene-width	src/libvlc-module.c + modules	present
+option	--screen-follow-mouse	src/libvlc-module.c + modules	present
+option	--screen-fps	src/libvlc-module.c + modules	present
+option	--screen-height	src/libvlc-module.c + modules	present
+option	--screen-left	src/libvlc-module.c + modules	present
+option	--screen-top	src/libvlc-module.c + modules	present
+option	--screen-width	src/libvlc-module.c + modules	present
+option	--scrobbler-url	src/libvlc-module.c + modules	present
+option	--secondary-sub-alignment	src/libvlc-module.c + modules	present
+option	--secondary-sub-margin	src/libvlc-module.c + modules	present
+option	--sepia-intensity	src/libvlc-module.c + modules	present
+option	--services-discovery	src/libvlc-module.c + modules	present
+option	--sftp-port	src/libvlc-module.c + modules	present
+option	--sftp-privatekey	src/libvlc-module.c + modules	present
+option	--sftp-pwd	src/libvlc-module.c + modules	present
+option	--sftp-user	src/libvlc-module.c + modules	present
+option	--sharpen-sigma	src/libvlc-module.c + modules	present
+option	--shm-depth	src/libvlc-module.c + modules	present
+option	--shm-file	src/libvlc-module.c + modules	present
+option	--shm-fps	src/libvlc-module.c + modules	present
+option	--shm-height	src/libvlc-module.c + modules	present
+option	--shm-id	src/libvlc-module.c + modules	present
+option	--shm-width	src/libvlc-module.c + modules	present
+option	--short-jump-size	src/libvlc-module.c + modules	present
+option	--show-hiddenfiles	src/libvlc-module.c + modules	present
+option	--skinned-playlist	src/libvlc-module.c + modules	present
+option	--skinned-video	src/libvlc-module.c + modules	present
+option	--skins2-config	src/libvlc-module.c + modules	present
+option	--skins2-last	src/libvlc-module.c + modules	present
+option	--skins2-transparency	src/libvlc-module.c + modules	present
+option	--smb-domain	src/libvlc-module.c + modules	present
+option	--smb-pwd	src/libvlc-module.c + modules	present
+option	--smb-user	src/libvlc-module.c + modules	present
+option	--smoothing-time	src/libvlc-module.c + modules	present
+option	--snapshot-format	src/libvlc-module.c + modules	present
+option	--snapshot-height	src/libvlc-module.c + modules	present
+option	--snapshot-path	src/libvlc-module.c + modules	present
+option	--snapshot-prefix	src/libvlc-module.c + modules	present
+option	--snapshot-preview	src/libvlc-module.c + modules	present
+option	--snapshot-sequential	src/libvlc-module.c + modules	present
+option	--snapshot-width	src/libvlc-module.c + modules	present
+option	--socks	src/libvlc-module.c + modules	present
+option	--socks-pwd	src/libvlc-module.c + modules	present
+option	--socks-user	src/libvlc-module.c + modules	present
+option	--soundfont	src/libvlc-module.c + modules	present
+option	--sout	src/libvlc-module.c + modules	present
+option	--sout-all	src/libvlc-module.c + modules	present
+option	--sout-aom-bitdepth	src/libvlc-module.c + modules	present
+option	--sout-aom-cpu-used	src/libvlc-module.c + modules	present
+option	--sout-aom-lag-in-frames	src/libvlc-module.c + modules	present
+option	--sout-aom-profile	src/libvlc-module.c + modules	present
+option	--sout-aom-rate-control	src/libvlc-module.c + modules	present
+option	--sout-aom-row-mt	src/libvlc-module.c + modules	present
+option	--sout-aom-tile-columns	src/libvlc-module.c + modules	present
+option	--sout-aom-tile-rows	src/libvlc-module.c + modules	present
+option	--sout-aom-usage	src/libvlc-module.c + modules	present
+option	--sout-asf-author	src/libvlc-module.c + modules	present
+option	--sout-asf-bitrate-override	src/libvlc-module.c + modules	present
+option	--sout-asf-comment	src/libvlc-module.c + modules	present
+option	--sout-asf-copyright	src/libvlc-module.c + modules	present
+option	--sout-asf-packet-size	src/libvlc-module.c + modules	present
+option	--sout-asf-rating	src/libvlc-module.c + modules	present
+option	--sout-asf-title	src/libvlc-module.c + modules	present
+option	--sout-audio	src/libvlc-module.c + modules	present
+option	--sout-autodel-drop-delay	src/libvlc-module.c + modules	present
+option	--sout-avcodec-aac-profile	src/libvlc-module.c + modules	present
+option	--sout-avcodec-bframes	src/libvlc-module.c + modules	present
+option	--sout-avcodec-border-masking	src/libvlc-module.c + modules	present
+option	--sout-avcodec-chroma-elim-threshold	src/libvlc-module.c + modules	present
+option	--sout-avcodec-codec	src/libvlc-module.c + modules	present
+option	--sout-avcodec-dark-masking	src/libvlc-module.c + modules	present
+option	--sout-avcodec-hq	src/libvlc-module.c + modules	present
+option	--sout-avcodec-hurry-up	src/libvlc-module.c + modules	present
+option	--sout-avcodec-i-quant-factor	src/libvlc-module.c + modules	present
+option	--sout-avcodec-interlace	src/libvlc-module.c + modules	present
+option	--sout-avcodec-interlace-me	src/libvlc-module.c + modules	present
+option	--sout-avcodec-keyint	src/libvlc-module.c + modules	present
+option	--sout-avcodec-luma-elim-threshold	src/libvlc-module.c + modules	present
+option	--sout-avcodec-lumi-masking	src/libvlc-module.c + modules	present
+option	--sout-avcodec-mpeg4-matrix	src/libvlc-module.c + modules	present
+option	--sout-avcodec-noise-reduction	src/libvlc-module.c + modules	present
+option	--sout-avcodec-options	src/libvlc-module.c + modules	present
+option	--sout-avcodec-p-masking	src/libvlc-module.c + modules	present
+option	--sout-avcodec-pre-me	src/libvlc-module.c + modules	present
+option	--sout-avcodec-qmax	src/libvlc-module.c + modules	present
+option	--sout-avcodec-qmin	src/libvlc-module.c + modules	present
+option	--sout-avcodec-qscale	src/libvlc-module.c + modules	present
+option	--sout-avcodec-rc-buffer-aggressivity	src/libvlc-module.c + modules	present
+option	--sout-avcodec-rc-buffer-size	src/libvlc-module.c + modules	present
+option	--sout-avcodec-strict	src/libvlc-module.c + modules	present
+option	--sout-avcodec-trellis	src/libvlc-module.c + modules	present
+option	--sout-avcodec-vt	src/libvlc-module.c + modules	present
+option	--sout-avformat-mux	src/libvlc-module.c + modules	present
+option	--sout-avformat-options	src/libvlc-module.c + modules	present
+option	--sout-avformat-reset-ts	src/libvlc-module.c + modules	present
+option	--sout-avi-artist	src/libvlc-module.c + modules	present
+option	--sout-avi-comment	src/libvlc-module.c + modules	present
+option	--sout-avi-copyright	src/libvlc-module.c + modules	present
+option	--sout-avi-date	src/libvlc-module.c + modules	present
+option	--sout-avi-encoder	src/libvlc-module.c + modules	present
+option	--sout-avi-genre	src/libvlc-module.c + modules	present
+option	--sout-avi-keywords	src/libvlc-module.c + modules	present
+option	--sout-avi-name	src/libvlc-module.c + modules	present
+option	--sout-avi-subject	src/libvlc-module.c + modules	present
+option	--sout-avio-options	src/libvlc-module.c + modules	present
+option	--sout-bridge-in-delay	src/libvlc-module.c + modules	present
+option	--sout-bridge-in-id-offset	src/libvlc-module.c + modules	present
+option	--sout-bridge-in-name	src/libvlc-module.c + modules	present
+option	--sout-bridge-in-placeholder	src/libvlc-module.c + modules	present
+option	--sout-bridge-in-placeholder-delay	src/libvlc-module.c + modules	present
+option	--sout-bridge-in-placeholder-switch-on-iframe	src/libvlc-module.c + modules	present
+option	--sout-bridge-out-id	src/libvlc-module.c + modules	present
+option	--sout-bridge-out-in-name	src/libvlc-module.c + modules	present
+option	--sout-chromecast-audio-passthrough	src/libvlc-module.c + modules	present
+option	--sout-chromecast-conversion-quality	src/libvlc-module.c + modules	present
+option	--sout-chromecast-device-name	src/libvlc-module.c + modules	present
+option	--sout-chromecast-http-port	src/libvlc-module.c + modules	present
+option	--sout-chromecast-ip	src/libvlc-module.c + modules	present
+option	--sout-chromecast-port	src/libvlc-module.c + modules	present
+option	--sout-chromecast-video	src/libvlc-module.c + modules	present
+option	--sout-deinterlace-mode	src/libvlc-module.c + modules	present
+option	--sout-deinterlace-phosphor-chroma	src/libvlc-module.c + modules	present
+option	--sout-deinterlace-phosphor-dimmer	src/libvlc-module.c + modules	present
+option	--sout-delay-delay	src/libvlc-module.c + modules	present
+option	--sout-delay-id	src/libvlc-module.c + modules	present
+option	--sout-display	src/libvlc-module.c + modules	present
+option	--sout-display-audio	src/libvlc-module.c + modules	present
+option	--sout-display-delay	src/libvlc-module.c + modules	present
+option	--sout-display-video	src/libvlc-module.c + modules	present
+option	--sout-dlna-audio-passthrough	src/libvlc-module.c + modules	present
+option	--sout-dlna-base	src/libvlc-module.c + modules	present
+option	--sout-dlna-conversion-quality	src/libvlc-module.c + modules	present
+option	--sout-dlna-http-port	src/libvlc-module.c + modules	present
+option	--sout-dlna-ip	src/libvlc-module.c + modules	present
+option	--sout-dlna-port	src/libvlc-module.c + modules	present
+option	--sout-dlna-url	src/libvlc-module.c + modules	present
+option	--sout-dlna-video	src/libvlc-module.c + modules	present
+option	--sout-dvbsub-x	src/libvlc-module.c + modules	present
+option	--sout-dvbsub-y	src/libvlc-module.c + modules	present
+option	--sout-es-access	src/libvlc-module.c + modules	present
+option	--sout-es-access-audio	src/libvlc-module.c + modules	present
+option	--sout-es-access-video	src/libvlc-module.c + modules	present
+option	--sout-es-dst	src/libvlc-module.c + modules	present
+option	--sout-es-dst-audio	src/libvlc-module.c + modules	present
+option	--sout-es-dst-video	src/libvlc-module.c + modules	present
+option	--sout-es-mux	src/libvlc-module.c + modules	present
+option	--sout-es-mux-audio	src/libvlc-module.c + modules	present
+option	--sout-es-mux-video	src/libvlc-module.c + modules	present
+option	--sout-fdkaac-afterburner	src/libvlc-module.c + modules	present
+option	--sout-fdkaac-profile	src/libvlc-module.c + modules	present
+option	--sout-fdkaac-sbr	src/libvlc-module.c + modules	present
+option	--sout-fdkaac-signaling	src/libvlc-module.c + modules	present
+option	--sout-fdkaac-vbr	src/libvlc-module.c + modules	present
+option	--sout-file-append	src/libvlc-module.c + modules	present
+option	--sout-file-format	src/libvlc-module.c + modules	present
+option	--sout-file-overwrite	src/libvlc-module.c + modules	present
+option	--sout-file-sync	src/libvlc-module.c + modules	present
+option	--sout-hls-base-url	src/libvlc-module.c + modules	present
+option	--sout-hls-host-http	src/libvlc-module.c + modules	present
+option	--sout-hls-legacy-codecs	src/libvlc-module.c + modules	present
+option	--sout-hls-max-memory	src/libvlc-module.c + modules	present
+option	--sout-hls-max-seg-len	src/libvlc-module.c + modules	present
+option	--sout-hls-num-seg	src/libvlc-module.c + modules	present
+option	--sout-hls-out-dir	src/libvlc-module.c + modules	present
+option	--sout-hls-pace	src/libvlc-module.c + modules	present
+option	--sout-hls-seg-len	src/libvlc-module.c + modules	present
+option	--sout-hls-seg-type	src/libvlc-module.c + modules	present
+option	--sout-hls-variants	src/libvlc-module.c + modules	present
+option	--sout-http-metacube	src/libvlc-module.c + modules	present
+option	--sout-http-mime	src/libvlc-module.c + modules	present
+option	--sout-http-put-pwd	src/libvlc-module.c + modules	present
+option	--sout-http-put-user	src/libvlc-module.c + modules	present
+option	--sout-http-pwd	src/libvlc-module.c + modules	present
+option	--sout-http-user	src/libvlc-module.c + modules	present
+option	--sout-jpeg-quality	src/libvlc-module.c + modules	present
+option	--sout-keep	src/libvlc-module.c + modules	present
+option	--sout-livehttp-caching	src/libvlc-module.c + modules	present
+option	--sout-livehttp-delsegs	src/libvlc-module.c + modules	present
+option	--sout-livehttp-generate-iv	src/libvlc-module.c + modules	present
+option	--sout-livehttp-index	src/libvlc-module.c + modules	present
+option	--sout-livehttp-index-url	src/libvlc-module.c + modules	present
+option	--sout-livehttp-initial-segment-number	src/libvlc-module.c + modules	present
+option	--sout-livehttp-key-file	src/libvlc-module.c + modules	present
+option	--sout-livehttp-key-loadfile	src/libvlc-module.c + modules	present
+option	--sout-livehttp-key-uri	src/libvlc-module.c + modules	present
+option	--sout-livehttp-numsegs	src/libvlc-module.c + modules	present
+option	--sout-livehttp-ratecontrol	src/libvlc-module.c + modules	present
+option	--sout-livehttp-seglen	src/libvlc-module.c + modules	present
+option	--sout-livehttp-splitanywhere	src/libvlc-module.c + modules	present
+option	--sout-mono-channel	src/libvlc-module.c + modules	present
+option	--sout-mono-downmix	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-alpha	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-chroma	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-height	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-id	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-sar	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-vfilter	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-width	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-x	src/libvlc-module.c + modules	present
+option	--sout-mosaic-bridge-y	src/libvlc-module.c + modules	present
+option	--sout-mp4-faststart	src/libvlc-module.c + modules	present
+option	--sout-mux-caching	src/libvlc-module.c + modules	present
+option	--sout-ogg-indexintvl	src/libvlc-module.c + modules	present
+option	--sout-ogg-indexratio	src/libvlc-module.c + modules	present
+option	--sout-ps-dts-delay	src/libvlc-module.c + modules	present
+option	--sout-ps-pes-max-size	src/libvlc-module.c + modules	present
+option	--sout-qsv-accuracy	src/libvlc-module.c + modules	present
+option	--sout-qsv-async-depth	src/libvlc-module.c + modules	present
+option	--sout-qsv-bitrate-max	src/libvlc-module.c + modules	present
+option	--sout-qsv-convergence	src/libvlc-module.c + modules	present
+option	--sout-qsv-gop-refdist	src/libvlc-module.c + modules	present
+option	--sout-qsv-gop-size	src/libvlc-module.c + modules	present
+option	--sout-qsv-h264-level	src/libvlc-module.c + modules	present
+option	--sout-qsv-h264-profile	src/libvlc-module.c + modules	present
+option	--sout-qsv-idr-interval	src/libvlc-module.c + modules	present
+option	--sout-qsv-mpeg2-level	src/libvlc-module.c + modules	present
+option	--sout-qsv-mpeg2-profile	src/libvlc-module.c + modules	present
+option	--sout-qsv-num-ref-frame	src/libvlc-module.c + modules	present
+option	--sout-qsv-num-slice	src/libvlc-module.c + modules	present
+option	--sout-qsv-qp	src/libvlc-module.c + modules	present
+option	--sout-qsv-qpb	src/libvlc-module.c + modules	present
+option	--sout-qsv-qpi	src/libvlc-module.c + modules	present
+option	--sout-qsv-qpp	src/libvlc-module.c + modules	present
+option	--sout-qsv-rc-method	src/libvlc-module.c + modules	present
+option	--sout-qsv-software	src/libvlc-module.c + modules	present
+option	--sout-qsv-target-usage	src/libvlc-module.c + modules	present
+option	--sout-rav1e-bitdepth	src/libvlc-module.c + modules	present
+option	--sout-rav1e-profile	src/libvlc-module.c + modules	present
+option	--sout-rav1e-tile-columns	src/libvlc-module.c + modules	present
+option	--sout-rav1e-tile-rows	src/libvlc-module.c + modules	present
+option	--sout-record-dst-prefix	src/libvlc-module.c + modules	present
+option	--sout-renderer-show-perf-warning	src/libvlc-module.c + modules	present
+option	--sout-rist-aes-type	src/libvlc-module.c + modules	present
+option	--sout-rist-bandwidth	src/libvlc-module.c + modules	present
+option	--sout-rist-cname	src/libvlc-module.c + modules	present
+option	--sout-rist-latency	src/libvlc-module.c + modules	present
+option	--sout-rist-max-retries	src/libvlc-module.c + modules	present
+option	--sout-rist-multipeer-mode	src/libvlc-module.c + modules	present
+option	--sout-rist-packet-size	src/libvlc-module.c + modules	present
+option	--sout-rist-password	src/libvlc-module.c + modules	present
+option	--sout-rist-peer-url2	src/libvlc-module.c + modules	present
+option	--sout-rist-peer-url3	src/libvlc-module.c + modules	present
+option	--sout-rist-peer-url4	src/libvlc-module.c + modules	present
+option	--sout-rist-profile	src/libvlc-module.c + modules	present
+option	--sout-rist-reorder-buffer	src/libvlc-module.c + modules	present
+option	--sout-rist-retry-interval	src/libvlc-module.c + modules	present
+option	--sout-rist-secret	src/libvlc-module.c + modules	present
+option	--sout-rist-username	src/libvlc-module.c + modules	present
+option	--sout-rist-verbose-level	src/libvlc-module.c + modules	present
+option	--sout-rist-virt-dst-port	src/libvlc-module.c + modules	present
+option	--sout-rist-virt-src-port	src/libvlc-module.c + modules	present
+option	--sout-rtp-caching	src/libvlc-module.c + modules	present
+option	--sout-rtp-cat	src/libvlc-module.c + modules	present
+option	--sout-rtp-description	src/libvlc-module.c + modules	present
+option	--sout-rtp-dst	src/libvlc-module.c + modules	present
+option	--sout-rtp-key	src/libvlc-module.c + modules	present
+option	--sout-rtp-mp4a-latm	src/libvlc-module.c + modules	present
+option	--sout-rtp-mux	src/libvlc-module.c + modules	present
+option	--sout-rtp-name	src/libvlc-module.c + modules	present
+option	--sout-rtp-port	src/libvlc-module.c + modules	present
+option	--sout-rtp-port-audio	src/libvlc-module.c + modules	present
+option	--sout-rtp-port-video	src/libvlc-module.c + modules	present
+option	--sout-rtp-proto	src/libvlc-module.c + modules	present
+option	--sout-rtp-rtcp-mux	src/libvlc-module.c + modules	present
+option	--sout-rtp-salt	src/libvlc-module.c + modules	present
+option	--sout-rtp-sap	src/libvlc-module.c + modules	present
+option	--sout-rtp-sdp	src/libvlc-module.c + modules	present
+option	--sout-rtp-ttl	src/libvlc-module.c + modules	present
+option	--sout-rtsp-pwd	src/libvlc-module.c + modules	present
+option	--sout-rtsp-user	src/libvlc-module.c + modules	present
+option	--sout-setid-id	src/libvlc-module.c + modules	present
+option	--sout-setid-new-id	src/libvlc-module.c + modules	present
+option	--sout-setlang-id	src/libvlc-module.c + modules	present
+option	--sout-setlang-lang	src/libvlc-module.c + modules	present
+option	--sout-shout-bitrate	src/libvlc-module.c + modules	present
+option	--sout-shout-channels	src/libvlc-module.c + modules	present
+option	--sout-shout-description	src/libvlc-module.c + modules	present
+option	--sout-shout-genre	src/libvlc-module.c + modules	present
+option	--sout-shout-mp3	src/libvlc-module.c + modules	present
+option	--sout-shout-name	src/libvlc-module.c + modules	present
+option	--sout-shout-public	src/libvlc-module.c + modules	present
+option	--sout-shout-quality	src/libvlc-module.c + modules	present
+option	--sout-shout-samplerate	src/libvlc-module.c + modules	present
+option	--sout-shout-url	src/libvlc-module.c + modules	present
+option	--sout-smem-audio-data	src/libvlc-module.c + modules	present
+option	--sout-smem-audio-postrender-callback	src/libvlc-module.c + modules	present
+option	--sout-smem-audio-prerender-callback	src/libvlc-module.c + modules	present
+option	--sout-smem-time-sync	src/libvlc-module.c + modules	present
+option	--sout-smem-video-data	src/libvlc-module.c + modules	present
+option	--sout-smem-video-postrender-callback	src/libvlc-module.c + modules	present
+option	--sout-smem-video-prerender-callback	src/libvlc-module.c + modules	present
+option	--sout-speex-cbr	src/libvlc-module.c + modules	present
+option	--sout-speex-complexity	src/libvlc-module.c + modules	present
+option	--sout-speex-dtx	src/libvlc-module.c + modules	present
+option	--sout-speex-max-bitrate	src/libvlc-module.c + modules	present
+option	--sout-speex-mode	src/libvlc-module.c + modules	present
+option	--sout-speex-quality	src/libvlc-module.c + modules	present
+option	--sout-speex-vad	src/libvlc-module.c + modules	present
+option	--sout-spu	src/libvlc-module.c + modules	present
+option	--sout-standard-access	src/libvlc-module.c + modules	present
+option	--sout-standard-bind	src/libvlc-module.c + modules	present
+option	--sout-standard-dst	src/libvlc-module.c + modules	present
+option	--sout-standard-mux	src/libvlc-module.c + modules	present
+option	--sout-standard-path	src/libvlc-module.c + modules	present
+option	--sout-stats-output	src/libvlc-module.c + modules	present
+option	--sout-stats-prefix	src/libvlc-module.c + modules	present
+option	--sout-theora-quality	src/libvlc-module.c + modules	present
+option	--sout-trace-name	src/libvlc-module.c + modules	present
+option	--sout-transcode-ab	src/libvlc-module.c + modules	present
+option	--sout-transcode-acodec	src/libvlc-module.c + modules	present
+option	--sout-transcode-aenc	src/libvlc-module.c + modules	present
+option	--sout-transcode-afilter	src/libvlc-module.c + modules	present
+option	--sout-transcode-alang	src/libvlc-module.c + modules	present
+option	--sout-transcode-channels	src/libvlc-module.c + modules	present
+option	--sout-transcode-deinterlace	src/libvlc-module.c + modules	present
+option	--sout-transcode-deinterlace-module	src/libvlc-module.c + modules	present
+option	--sout-transcode-forward-pcr	src/libvlc-module.c + modules	present
+option	--sout-transcode-fps	src/libvlc-module.c + modules	present
+option	--sout-transcode-height	src/libvlc-module.c + modules	present
+option	--sout-transcode-maxheight	src/libvlc-module.c + modules	present
+option	--sout-transcode-maxwidth	src/libvlc-module.c + modules	present
+option	--sout-transcode-pool-size	src/libvlc-module.c + modules	present
+option	--sout-transcode-samplerate	src/libvlc-module.c + modules	present
+option	--sout-transcode-scale	src/libvlc-module.c + modules	present
+option	--sout-transcode-scodec	src/libvlc-module.c + modules	present
+option	--sout-transcode-senc	src/libvlc-module.c + modules	present
+option	--sout-transcode-sfilter	src/libvlc-module.c + modules	present
+option	--sout-transcode-soverlay	src/libvlc-module.c + modules	present
+option	--sout-transcode-threads	src/libvlc-module.c + modules	present
+option	--sout-transcode-vb	src/libvlc-module.c + modules	present
+option	--sout-transcode-vcodec	src/libvlc-module.c + modules	present
+option	--sout-transcode-venc	src/libvlc-module.c + modules	present
+option	--sout-transcode-vfilter	src/libvlc-module.c + modules	present
+option	--sout-transcode-width	src/libvlc-module.c + modules	present
+option	--sout-ts-alignment	src/libvlc-module.c + modules	present
+option	--sout-ts-crypt-audio	src/libvlc-module.c + modules	present
+option	--sout-ts-crypt-video	src/libvlc-module.c + modules	present
+option	--sout-ts-csa-ck	src/libvlc-module.c + modules	present
+option	--sout-ts-csa-pkt	src/libvlc-module.c + modules	present
+option	--sout-ts-csa-use	src/libvlc-module.c + modules	present
+option	--sout-ts-csa2-ck	src/libvlc-module.c + modules	present
+option	--sout-ts-dts-delay	src/libvlc-module.c + modules	present
+option	--sout-ts-es-id-pid	src/libvlc-module.c + modules	present
+option	--sout-ts-muxpmt	src/libvlc-module.c + modules	present
+option	--sout-ts-netid	src/libvlc-module.c + modules	present
+option	--sout-ts-pcr	src/libvlc-module.c + modules	present
+option	--sout-ts-pid-audio	src/libvlc-module.c + modules	present
+option	--sout-ts-pid-pmt	src/libvlc-module.c + modules	present
+option	--sout-ts-pid-spu	src/libvlc-module.c + modules	present
+option	--sout-ts-pid-video	src/libvlc-module.c + modules	present
+option	--sout-ts-program-pmt	src/libvlc-module.c + modules	present
+option	--sout-ts-sdtdesc	src/libvlc-module.c + modules	present
+option	--sout-ts-shaping	src/libvlc-module.c + modules	present
+option	--sout-ts-standard	src/libvlc-module.c + modules	present
+option	--sout-ts-tsid	src/libvlc-module.c + modules	present
+option	--sout-ts-use-key-frames	src/libvlc-module.c + modules	present
+option	--sout-twolame-mode	src/libvlc-module.c + modules	present
+option	--sout-twolame-psy	src/libvlc-module.c + modules	present
+option	--sout-twolame-quality	src/libvlc-module.c + modules	present
+option	--sout-twolame-vbr	src/libvlc-module.c + modules	present
+option	--sout-udp-avformat	src/libvlc-module.c + modules	present
+option	--sout-udp-description	src/libvlc-module.c + modules	present
+option	--sout-udp-dst	src/libvlc-module.c + modules	present
+option	--sout-udp-name	src/libvlc-module.c + modules	present
+option	--sout-udp-sap	src/libvlc-module.c + modules	present
+option	--sout-video	src/libvlc-module.c + modules	present
+option	--sout-vorbis-cbr	src/libvlc-module.c + modules	present
+option	--sout-vorbis-max-bitrate	src/libvlc-module.c + modules	present
+option	--sout-vorbis-min-bitrate	src/libvlc-module.c + modules	present
+option	--sout-vorbis-quality	src/libvlc-module.c + modules	present
+option	--sout-vpx-quality-mode	src/libvlc-module.c + modules	present
+option	--sout-x264-8x8dct	src/libvlc-module.c + modules	present
+option	--sout-x264-aq-mode	src/libvlc-module.c + modules	present
+option	--sout-x264-aq-strength	src/libvlc-module.c + modules	present
+option	--sout-x264-asm	src/libvlc-module.c + modules	present
+option	--sout-x264-aud	src/libvlc-module.c + modules	present
+option	--sout-x264-b-adapt	src/libvlc-module.c + modules	present
+option	--sout-x264-b-bias	src/libvlc-module.c + modules	present
+option	--sout-x264-bframes	src/libvlc-module.c + modules	present
+option	--sout-x264-bluray-compat	src/libvlc-module.c + modules	present
+option	--sout-x264-bpyramid	src/libvlc-module.c + modules	present
+option	--sout-x264-cabac	src/libvlc-module.c + modules	present
+option	--sout-x264-chroma-me	src/libvlc-module.c + modules	present
+option	--sout-x264-chroma-qp-offset	src/libvlc-module.c + modules	present
+option	--sout-x264-cplxblur	src/libvlc-module.c + modules	present
+option	--sout-x264-crf	src/libvlc-module.c + modules	present
+option	--sout-x264-dct-decimate	src/libvlc-module.c + modules	present
+option	--sout-x264-deadzone-inter	src/libvlc-module.c + modules	present
+option	--sout-x264-deadzone-intra	src/libvlc-module.c + modules	present
+option	--sout-x264-deblock	src/libvlc-module.c + modules	present
+option	--sout-x264-direct	src/libvlc-module.c + modules	present
+option	--sout-x264-direct-8x8	src/libvlc-module.c + modules	present
+option	--sout-x264-fast-pskip	src/libvlc-module.c + modules	present
+option	--sout-x264-frame-packing	src/libvlc-module.c + modules	present
+option	--sout-x264-fullrange	src/libvlc-module.c + modules	present
+option	--sout-x264-hrd	src/libvlc-module.c + modules	present
+option	--sout-x264-interlaced	src/libvlc-module.c + modules	present
+option	--sout-x264-intra-refresh	src/libvlc-module.c + modules	present
+option	--sout-x264-ipratio	src/libvlc-module.c + modules	present
+option	--sout-x264-keyint	src/libvlc-module.c + modules	present
+option	--sout-x264-level	src/libvlc-module.c + modules	present
+option	--sout-x264-lookahead	src/libvlc-module.c + modules	present
+option	--sout-x264-mbtree	src/libvlc-module.c + modules	present
+option	--sout-x264-me	src/libvlc-module.c + modules	present
+option	--sout-x264-merange	src/libvlc-module.c + modules	present
+option	--sout-x264-min-keyint	src/libvlc-module.c + modules	present
+option	--sout-x264-mixed-refs	src/libvlc-module.c + modules	present
+option	--sout-x264-mvrange	src/libvlc-module.c + modules	present
+option	--sout-x264-mvrange-thread	src/libvlc-module.c + modules	present
+option	--sout-x264-nf	src/libvlc-module.c + modules	present
+option	--sout-x264-non-deterministic	src/libvlc-module.c + modules	present
+option	--sout-x264-nr	src/libvlc-module.c + modules	present
+option	--sout-x264-opengop	src/libvlc-module.c + modules	present
+option	--sout-x264-options	src/libvlc-module.c + modules	present
+option	--sout-x264-partitions	src/libvlc-module.c + modules	present
+option	--sout-x264-pass	src/libvlc-module.c + modules	present
+option	--sout-x264-pbratio	src/libvlc-module.c + modules	present
+option	--sout-x264-preset	src/libvlc-module.c + modules	present
+option	--sout-x264-profile	src/libvlc-module.c + modules	present
+option	--sout-x264-psnr	src/libvlc-module.c + modules	present
+option	--sout-x264-psy	src/libvlc-module.c + modules	present
+option	--sout-x264-psy-rd	src/libvlc-module.c + modules	present
+option	--sout-x264-qblur	src/libvlc-module.c + modules	present
+option	--sout-x264-qcomp	src/libvlc-module.c + modules	present
+option	--sout-x264-qp	src/libvlc-module.c + modules	present
+option	--sout-x264-qpmax	src/libvlc-module.c + modules	present
+option	--sout-x264-qpmin	src/libvlc-module.c + modules	present
+option	--sout-x264-qpstep	src/libvlc-module.c + modules	present
+option	--sout-x264-quiet	src/libvlc-module.c + modules	present
+option	--sout-x264-ratetol	src/libvlc-module.c + modules	present
+option	--sout-x264-ref	src/libvlc-module.c + modules	present
+option	--sout-x264-scenecut	src/libvlc-module.c + modules	present
+option	--sout-x264-slice-max-mbs	src/libvlc-module.c + modules	present
+option	--sout-x264-slice-max-size	src/libvlc-module.c + modules	present
+option	--sout-x264-slices	src/libvlc-module.c + modules	present
+option	--sout-x264-sps-id	src/libvlc-module.c + modules	present
+option	--sout-x264-ssim	src/libvlc-module.c + modules	present
+option	--sout-x264-stats	src/libvlc-module.c + modules	present
+option	--sout-x264-subme	src/libvlc-module.c + modules	present
+option	--sout-x264-trellis	src/libvlc-module.c + modules	present
+option	--sout-x264-tune	src/libvlc-module.c + modules	present
+option	--sout-x264-vbv-bufsize	src/libvlc-module.c + modules	present
+option	--sout-x264-vbv-init	src/libvlc-module.c + modules	present
+option	--sout-x264-vbv-maxrate	src/libvlc-module.c + modules	present
+option	--sout-x264-verbose	src/libvlc-module.c + modules	present
+option	--sout-x264-weightb	src/libvlc-module.c + modules	present
+option	--sout-x264-weightp	src/libvlc-module.c + modules	present
+option	--sout-x26410b-8x8dct	src/libvlc-module.c + modules	present
+option	--sout-x26410b-aq-mode	src/libvlc-module.c + modules	present
+option	--sout-x26410b-aq-strength	src/libvlc-module.c + modules	present
+option	--sout-x26410b-asm	src/libvlc-module.c + modules	present
+option	--sout-x26410b-aud	src/libvlc-module.c + modules	present
+option	--sout-x26410b-b-adapt	src/libvlc-module.c + modules	present
+option	--sout-x26410b-b-bias	src/libvlc-module.c + modules	present
+option	--sout-x26410b-bframes	src/libvlc-module.c + modules	present
+option	--sout-x26410b-bluray-compat	src/libvlc-module.c + modules	present
+option	--sout-x26410b-bpyramid	src/libvlc-module.c + modules	present
+option	--sout-x26410b-cabac	src/libvlc-module.c + modules	present
+option	--sout-x26410b-chroma-me	src/libvlc-module.c + modules	present
+option	--sout-x26410b-chroma-qp-offset	src/libvlc-module.c + modules	present
+option	--sout-x26410b-cplxblur	src/libvlc-module.c + modules	present
+option	--sout-x26410b-crf	src/libvlc-module.c + modules	present
+option	--sout-x26410b-dct-decimate	src/libvlc-module.c + modules	present
+option	--sout-x26410b-deadzone-inter	src/libvlc-module.c + modules	present
+option	--sout-x26410b-deadzone-intra	src/libvlc-module.c + modules	present
+option	--sout-x26410b-deblock	src/libvlc-module.c + modules	present
+option	--sout-x26410b-direct	src/libvlc-module.c + modules	present
+option	--sout-x26410b-direct-8x8	src/libvlc-module.c + modules	present
+option	--sout-x26410b-fast-pskip	src/libvlc-module.c + modules	present
+option	--sout-x26410b-frame-packing	src/libvlc-module.c + modules	present
+option	--sout-x26410b-fullrange	src/libvlc-module.c + modules	present
+option	--sout-x26410b-hrd	src/libvlc-module.c + modules	present
+option	--sout-x26410b-interlaced	src/libvlc-module.c + modules	present
+option	--sout-x26410b-intra-refresh	src/libvlc-module.c + modules	present
+option	--sout-x26410b-ipratio	src/libvlc-module.c + modules	present
+option	--sout-x26410b-keyint	src/libvlc-module.c + modules	present
+option	--sout-x26410b-level	src/libvlc-module.c + modules	present
+option	--sout-x26410b-lookahead	src/libvlc-module.c + modules	present
+option	--sout-x26410b-mbtree	src/libvlc-module.c + modules	present
+option	--sout-x26410b-me	src/libvlc-module.c + modules	present
+option	--sout-x26410b-merange	src/libvlc-module.c + modules	present
+option	--sout-x26410b-min-keyint	src/libvlc-module.c + modules	present
+option	--sout-x26410b-mixed-refs	src/libvlc-module.c + modules	present
+option	--sout-x26410b-mvrange	src/libvlc-module.c + modules	present
+option	--sout-x26410b-mvrange-thread	src/libvlc-module.c + modules	present
+option	--sout-x26410b-nf	src/libvlc-module.c + modules	present
+option	--sout-x26410b-non-deterministic	src/libvlc-module.c + modules	present
+option	--sout-x26410b-nr	src/libvlc-module.c + modules	present
+option	--sout-x26410b-opengop	src/libvlc-module.c + modules	present
+option	--sout-x26410b-options	src/libvlc-module.c + modules	present
+option	--sout-x26410b-partitions	src/libvlc-module.c + modules	present
+option	--sout-x26410b-pass	src/libvlc-module.c + modules	present
+option	--sout-x26410b-pbratio	src/libvlc-module.c + modules	present
+option	--sout-x26410b-preset	src/libvlc-module.c + modules	present
+option	--sout-x26410b-profile	src/libvlc-module.c + modules	present
+option	--sout-x26410b-psnr	src/libvlc-module.c + modules	present
+option	--sout-x26410b-psy	src/libvlc-module.c + modules	present
+option	--sout-x26410b-psy-rd	src/libvlc-module.c + modules	present
+option	--sout-x26410b-qblur	src/libvlc-module.c + modules	present
+option	--sout-x26410b-qcomp	src/libvlc-module.c + modules	present
+option	--sout-x26410b-qp	src/libvlc-module.c + modules	present
+option	--sout-x26410b-qpmax	src/libvlc-module.c + modules	present
+option	--sout-x26410b-qpmin	src/libvlc-module.c + modules	present
+option	--sout-x26410b-qpstep	src/libvlc-module.c + modules	present
+option	--sout-x26410b-quiet	src/libvlc-module.c + modules	present
+option	--sout-x26410b-ratetol	src/libvlc-module.c + modules	present
+option	--sout-x26410b-ref	src/libvlc-module.c + modules	present
+option	--sout-x26410b-scenecut	src/libvlc-module.c + modules	present
+option	--sout-x26410b-slice-max-mbs	src/libvlc-module.c + modules	present
+option	--sout-x26410b-slice-max-size	src/libvlc-module.c + modules	present
+option	--sout-x26410b-slices	src/libvlc-module.c + modules	present
+option	--sout-x26410b-sps-id	src/libvlc-module.c + modules	present
+option	--sout-x26410b-ssim	src/libvlc-module.c + modules	present
+option	--sout-x26410b-stats	src/libvlc-module.c + modules	present
+option	--sout-x26410b-subme	src/libvlc-module.c + modules	present
+option	--sout-x26410b-trellis	src/libvlc-module.c + modules	present
+option	--sout-x26410b-tune	src/libvlc-module.c + modules	present
+option	--sout-x26410b-vbv-bufsize	src/libvlc-module.c + modules	present
+option	--sout-x26410b-vbv-init	src/libvlc-module.c + modules	present
+option	--sout-x26410b-vbv-maxrate	src/libvlc-module.c + modules	present
+option	--sout-x26410b-verbose	src/libvlc-module.c + modules	present
+option	--sout-x26410b-weightb	src/libvlc-module.c + modules	present
+option	--sout-x26410b-weightp	src/libvlc-module.c + modules	present
+option	--soxr-resampler-quality	src/libvlc-module.c + modules	present
+option	--spatializer-damp	src/libvlc-module.c + modules	present
+option	--spatializer-dry	src/libvlc-module.c + modules	present
+option	--spatializer-roomsize	src/libvlc-module.c + modules	present
+option	--spatializer-wet	src/libvlc-module.c + modules	present
+option	--spatializer-width	src/libvlc-module.c + modules	present
+option	--spect-80-bands	src/libvlc-module.c + modules	present
+option	--spect-amp	src/libvlc-module.c + modules	present
+option	--spect-color	src/libvlc-module.c + modules	present
+option	--spect-peak-height	src/libvlc-module.c + modules	present
+option	--spect-peak-width	src/libvlc-module.c + modules	present
+option	--spect-radius	src/libvlc-module.c + modules	present
+option	--spect-sections	src/libvlc-module.c + modules	present
+option	--spect-separ	src/libvlc-module.c + modules	present
+option	--spect-show-bands	src/libvlc-module.c + modules	present
+option	--spect-show-base	src/libvlc-module.c + modules	present
+option	--spect-show-original	src/libvlc-module.c + modules	present
+option	--spect-show-peaks	src/libvlc-module.c + modules	present
+option	--speex-resampler-quality	src/libvlc-module.c + modules	present
+option	--spu	src/libvlc-module.c + modules	present
+option	--spu-fill	src/libvlc-module.c + modules	present
+option	--src-converter-type	src/libvlc-module.c + modules	present
+option	--srtp-key	src/libvlc-module.c + modules	present
+option	--srtp-salt	src/libvlc-module.c + modules	present
+option	--ssa-fontsdir	src/libvlc-module.c + modules	present
+option	--start-paused	src/libvlc-module.c + modules	present
+option	--start-time	src/libvlc-module.c + modules	present
+option	--stats	src/libvlc-module.c + modules	present
+option	--stats-min-report-interval	src/libvlc-module.c + modules	present
+option	--stereo-mode	src/libvlc-module.c + modules	present
+option	--stereowiden-crossfeed	src/libvlc-module.c + modules	present
+option	--stereowiden-delay	src/libvlc-module.c + modules	present
+option	--stereowiden-dry-mix	src/libvlc-module.c + modules	present
+option	--stereowiden-feedback	src/libvlc-module.c + modules	present
+option	--stop-time	src/libvlc-module.c + modules	present
+option	--stream-filter	src/libvlc-module.c + modules	present
+option	--streamid	src/libvlc-module.c + modules	present
+option	--sub-autodetect-file	src/libvlc-module.c + modules	present
+option	--sub-autodetect-fuzzy	src/libvlc-module.c + modules	present
+option	--sub-autodetect-path	src/libvlc-module.c + modules	present
+option	--sub-delay	src/libvlc-module.c + modules	present
+option	--sub-description	src/libvlc-module.c + modules	present
+option	--sub-file	src/libvlc-module.c + modules	present
+option	--sub-filter	src/libvlc-module.c + modules	present
+option	--sub-fps	src/libvlc-module.c + modules	present
+option	--sub-language	src/libvlc-module.c + modules	present
+option	--sub-margin	src/libvlc-module.c + modules	present
+option	--sub-source	src/libvlc-module.c + modules	present
+option	--sub-text-scale	src/libvlc-module.c + modules	present
+option	--sub-track	src/libvlc-module.c + modules	present
+option	--sub-track-id	src/libvlc-module.c + modules	present
+option	--sub-type	src/libvlc-module.c + modules	present
+option	--subsdec-align	src/libvlc-module.c + modules	present
+option	--subsdec-autodetect-utf8	src/libvlc-module.c + modules	present
+option	--subsdec-encoding	src/libvlc-module.c + modules	present
+option	--subsdec-formatted	src/libvlc-module.c + modules	present
+option	--subsdelay-factor	src/libvlc-module.c + modules	present
+option	--subsdelay-min-alpha	src/libvlc-module.c + modules	present
+option	--subsdelay-min-start-stop	src/libvlc-module.c + modules	present
+option	--subsdelay-min-stop-start	src/libvlc-module.c + modules	present
+option	--subsdelay-min-stops	src/libvlc-module.c + modules	present
+option	--subsdelay-mode	src/libvlc-module.c + modules	present
+option	--subsdelay-overlap	src/libvlc-module.c + modules	present
+option	--svg-height	src/libvlc-module.c + modules	present
+option	--svg-scale	src/libvlc-module.c + modules	present
+option	--svg-template-file	src/libvlc-module.c + modules	present
+option	--svg-width	src/libvlc-module.c + modules	present
+option	--sweep-depth	src/libvlc-module.c + modules	present
+option	--sweep-rate	src/libvlc-module.c + modules	present
+option	--swscale-mode	src/libvlc-module.c + modules	present
+option	--synth-chorus	src/libvlc-module.c + modules	present
+option	--synth-gain	src/libvlc-module.c + modules	present
+option	--synth-polyphony	src/libvlc-module.c + modules	present
+option	--synth-reverb	src/libvlc-module.c + modules	present
+option	--synth-sample-rate	src/libvlc-module.c + modules	present
+option	--syslog	src/libvlc-module.c + modules	present
+option	--syslog-debug	src/libvlc-module.c + modules	present
+option	--syslog-facility	src/libvlc-module.c + modules	present
+option	--syslog-ident	src/libvlc-module.c + modules	present
+option	--target-prim	src/libvlc-module.c + modules	present
+option	--target-trc	src/libvlc-module.c + modules	present
+option	--telnet-host	src/libvlc-module.c + modules	present
+option	--telnet-password	src/libvlc-module.c + modules	present
+option	--telnet-port	src/libvlc-module.c + modules	present
+option	--text-renderer	src/libvlc-module.c + modules	present
+option	--theora-postproc	src/libvlc-module.c + modules	present
+option	--timecode-fps	src/libvlc-module.c + modules	present
+option	--tracer	src/libvlc-module.c + modules	present
+option	--transform-type	src/libvlc-module.c + modules	present
+option	--ts-cc-check	src/libvlc-module.c + modules	present
+option	--ts-csa-ck	src/libvlc-module.c + modules	present
+option	--ts-csa-pkt	src/libvlc-module.c + modules	present
+option	--ts-csa2-ck	src/libvlc-module.c + modules	present
+option	--ts-es-id-pid	src/libvlc-module.c + modules	present
+option	--ts-extra-pmt	src/libvlc-module.c + modules	present
+option	--ts-generated-pcr-offset	src/libvlc-module.c + modules	present
+option	--ts-patfix	src/libvlc-module.c + modules	present
+option	--ts-pcr-offsetfix	src/libvlc-module.c + modules	present
+option	--ts-pmtfix-waitdata	src/libvlc-module.c + modules	present
+option	--ts-seek-percent	src/libvlc-module.c + modules	present
+option	--ts-split-es	src/libvlc-module.c + modules	present
+option	--ts-standard	src/libvlc-module.c + modules	present
+option	--ts-trust-pcr	src/libvlc-module.c + modules	present
+option	--ttl	src/libvlc-module.c + modules	present
+option	--ttml-align	src/libvlc-module.c + modules	present
+option	--udp-timeout	src/libvlc-module.c + modules	present
+option	--v4l2-aspect-ratio	src/libvlc-module.c + modules	present
+option	--v4l2-audio-balance	src/libvlc-module.c + modules	present
+option	--v4l2-audio-bass	src/libvlc-module.c + modules	present
+option	--v4l2-audio-input	src/libvlc-module.c + modules	present
+option	--v4l2-audio-loudness	src/libvlc-module.c + modules	present
+option	--v4l2-audio-mute	src/libvlc-module.c + modules	present
+option	--v4l2-audio-treble	src/libvlc-module.c + modules	present
+option	--v4l2-audio-volume	src/libvlc-module.c + modules	present
+option	--v4l2-auto-white-balance	src/libvlc-module.c + modules	present
+option	--v4l2-autogain	src/libvlc-module.c + modules	present
+option	--v4l2-backlight-compensation	src/libvlc-module.c + modules	present
+option	--v4l2-band-stop-filter	src/libvlc-module.c + modules	present
+option	--v4l2-blue-balance	src/libvlc-module.c + modules	present
+option	--v4l2-brightness	src/libvlc-module.c + modules	present
+option	--v4l2-brightness-auto	src/libvlc-module.c + modules	present
+option	--v4l2-chroma	src/libvlc-module.c + modules	present
+option	--v4l2-chroma-gain	src/libvlc-module.c + modules	present
+option	--v4l2-chroma-gain-auto	src/libvlc-module.c + modules	present
+option	--v4l2-color-effect	src/libvlc-module.c + modules	present
+option	--v4l2-color-killer	src/libvlc-module.c + modules	present
+option	--v4l2-contrast	src/libvlc-module.c + modules	present
+option	--v4l2-controls-reset	src/libvlc-module.c + modules	present
+option	--v4l2-dev	src/libvlc-module.c + modules	present
+option	--v4l2-fps	src/libvlc-module.c + modules	present
+option	--v4l2-gain	src/libvlc-module.c + modules	present
+option	--v4l2-gamma	src/libvlc-module.c + modules	present
+option	--v4l2-height	src/libvlc-module.c + modules	present
+option	--v4l2-hflip	src/libvlc-module.c + modules	present
+option	--v4l2-hue	src/libvlc-module.c + modules	present
+option	--v4l2-hue-auto	src/libvlc-module.c + modules	present
+option	--v4l2-input	src/libvlc-module.c + modules	present
+option	--v4l2-power-line-frequency	src/libvlc-module.c + modules	present
+option	--v4l2-radio-dev	src/libvlc-module.c + modules	present
+option	--v4l2-red-balance	src/libvlc-module.c + modules	present
+option	--v4l2-rotate	src/libvlc-module.c + modules	present
+option	--v4l2-saturation	src/libvlc-module.c + modules	present
+option	--v4l2-set-ctrls	src/libvlc-module.c + modules	present
+option	--v4l2-sharpness	src/libvlc-module.c + modules	present
+option	--v4l2-standard	src/libvlc-module.c + modules	present
+option	--v4l2-tuner-audio-mode	src/libvlc-module.c + modules	present
+option	--v4l2-tuner-frequency	src/libvlc-module.c + modules	present
+option	--v4l2-vbidev	src/libvlc-module.c + modules	present
+option	--v4l2-vflip	src/libvlc-module.c + modules	present
+option	--v4l2-white-balance-temperature	src/libvlc-module.c + modules	present
+option	--v4l2-width	src/libvlc-module.c + modules	present
+option	--vbi-level	src/libvlc-module.c + modules	present
+option	--vbi-opaque	src/libvlc-module.c + modules	present
+option	--vbi-page	src/libvlc-module.c + modules	present
+option	--vbi-position	src/libvlc-module.c + modules	present
+option	--vbi-text	src/libvlc-module.c + modules	present
+option	--vc1-fps	src/libvlc-module.c + modules	present
+option	--vcd	src/libvlc-module.c + modules	present
+option	--vdr-chapter-offset	src/libvlc-module.c + modules	present
+option	--vdr-fps	src/libvlc-module.c + modules	present
+option	--verbose	src/libvlc-module.c + modules	present
+option	--version	src/libvlc-module.c + modules	present
+option	--video	src/libvlc-module.c + modules	present
+option	--video-deco	src/libvlc-module.c + modules	present
+option	--video-filter	src/libvlc-module.c + modules	present
+option	--video-filter-opengl	src/libvlc-module.c + modules	present
+option	--video-on-top	src/libvlc-module.c + modules	present
+option	--video-splitter	src/libvlc-module.c + modules	present
+option	--video-stereo-mode	src/libvlc-module.c + modules	present
+option	--video-title	src/libvlc-module.c + modules	present
+option	--video-title-position	src/libvlc-module.c + modules	present
+option	--video-title-show	src/libvlc-module.c + modules	present
+option	--video-title-timeout	src/libvlc-module.c + modules	present
+option	--video-track	src/libvlc-module.c + modules	present
+option	--video-track-id	src/libvlc-module.c + modules	present
+option	--video-wallpaper	src/libvlc-module.c + modules	present
+option	--visual-80-bands	src/libvlc-module.c + modules	present
+option	--visual-peaks	src/libvlc-module.c + modules	present
+option	--vk-allow-sw	src/libvlc-module.c + modules	present
+option	--vk-async-comp	src/libvlc-module.c + modules	present
+option	--vk-async-xfer	src/libvlc-module.c + modules	present
+option	--vk-debug	src/libvlc-module.c + modules	present
+option	--vk-device	src/libvlc-module.c + modules	present
+option	--vk-platform	src/libvlc-module.c + modules	present
+option	--vk-present-mode	src/libvlc-module.c + modules	present
+option	--vk-queue-count	src/libvlc-module.c + modules	present
+option	--vk-queue-depth	src/libvlc-module.c + modules	present
+option	--vlm-conf	src/libvlc-module.c + modules	present
+option	--vmem-chroma	src/libvlc-module.c + modules	present
+option	--vmem-height	src/libvlc-module.c + modules	present
+option	--vmem-pitch	src/libvlc-module.c + modules	present
+option	--vmem-width	src/libvlc-module.c + modules	present
+option	--volume-save	src/libvlc-module.c + modules	present
+option	--volume-step	src/libvlc-module.c + modules	present
+option	--vout	src/libvlc-module.c + modules	present
+option	--vpx-threads	src/libvlc-module.c + modules	present
+option	--wall-active	src/libvlc-module.c + modules	present
+option	--wall-cols	src/libvlc-module.c + modules	present
+option	--wall-rows	src/libvlc-module.c + modules	present
+option	--wet-mix	src/libvlc-module.c + modules	present
+option	--width	src/libvlc-module.c + modules	present
+option	--wl-display	src/libvlc-module.c + modules	present
+option	--wl-output	src/libvlc-module.c + modules	present
+option	--x11-display	src/libvlc-module.c + modules	present
+option	--x11-render-filter	src/libvlc-module.c + modules	present
+option	--xlib	src/libvlc-module.c + modules	present
+option	--ytdl	src/libvlc-module.c + modules	present
+option	--ytdl-path	src/libvlc-module.c + modules	present
+option	--yuv-chroma	src/libvlc-module.c + modules	present
+option	--yuv-file	src/libvlc-module.c + modules	present
+option	--yuv-yuv4mpeg2	src/libvlc-module.c + modules	present
+option	--zoom	src/libvlc-module.c + modules	present

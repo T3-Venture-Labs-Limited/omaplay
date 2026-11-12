@@ -1,0 +1,6 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- omaplay application icon: a light play mark on a dark rounded tile, readable on light and dark panels. -->
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="#16181d"/>
+  <circle cx="128" cy="128" r="76" fill="none" stroke="#e6e9ef" stroke-width="14"/>
+  <path d="M110 92 L170 128 L110 164 Z" fill="#e6e9ef"/>
+</svg>

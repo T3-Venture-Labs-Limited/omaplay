@@ -1,0 +1,17 @@
+post_install() {
+  # The plugin cache is generated for this installation; the files are not part of the package.
+  /opt/omaplay/libexec/vlc/vlc-cache-gen /opt/omaplay/lib/vlc/plugins >/dev/null 2>&1 || true
+  gtk-update-icon-cache -q -t -f usr/share/icons/hicolor 2>/dev/null || true
+  update-desktop-database -q 2>/dev/null || true
+}
+
+post_upgrade() {
+  post_install
+}
+
+post_remove() {
+  # Only the generated cache is left behind; the directory is ours alone.
+  rm -rf /opt/omaplay
+  gtk-update-icon-cache -q -t -f usr/share/icons/hicolor 2>/dev/null || true
+  update-desktop-database -q 2>/dev/null || true
+}

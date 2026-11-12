@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# The meson options that make this build omaplay, one per line. Shared by bin/build and the PKGBUILD so
+# the two cannot drift. `--rpath` is needed because meson strips build-tree RPATHs on install.
+cat <<'FLAGS'
+--prefix=/opt/omaplay
+--libdir=lib
+--buildtype=release
+-Db_lto=false
+-Dc_args=-fno-omit-frame-pointer
+-Dc_link_args=-Wl,-rpath,/opt/omaplay/lib:/opt/omaplay/lib/vlc
+-Dcpp_link_args=-Wl,-rpath,/opt/omaplay/lib:/opt/omaplay/lib/vlc
+-Duser_dir_name=omaplay
+-Ddesktop_id=omaplay
+-Dmpris_name=omaplay
+-Dapp_identity=omaplay
+-Dhw_dec_default=false
+-Dcsd_wizard=false
+-Domarchy_default=true
+-Dmouse_hide_timeout=3000
+-Dproduct_name=omaplay
+FLAGS

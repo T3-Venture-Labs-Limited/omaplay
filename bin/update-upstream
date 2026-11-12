@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Move the pinned upstream VLC commit forward. Nothing changes in UPSTREAM or patches/ unless every step passes.
+#   bin/update-upstream <commit|origin/master>
+# Steps: rebase the omaplay commits onto the new commit, rebuild from scratch, run the Qt tests, regenerate the
+# parity inventory (fails if a stock option disappeared), then record the new pin and re-export the patches.
+# On any failure the rebased branch is left in vlc/ for inspection; roll back with the command it prints.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+target=${1:?usage: bin/update-upstream <commit|origin/master>}
+read -r old _ < <(grep -v '^#' UPSTREAM | head -n1)
+
+[[ -d vlc/.git ]] || { echo "vlc/ missing; run bin/setup first" >&2; exit 1; }
+[[ -z $(git -C vlc status --porcelain) ]] || { echo "vlc/ has uncommitted changes; commit or discard them first" >&2; exit 1; }
+[[ $(git -C vlc rev-parse --abbrev-ref HEAD) == omaplay ]] || { echo "vlc/ is not on branch omaplay" >&2; exit 1; }
+
+step() { printf '\n== %s\n' "$*"; }
+fail() { echo "FAILED: $1" >&2; echo "UPSTREAM and patches/ are unchanged. Roll back with:" >&2
+         echo "  git -C vlc reset --hard $backup && bin/setup" >&2; exit "${2:-1}"; }
+
+step "fetching"
+git -C vlc fetch -q origin
+new=$(git -C vlc rev-parse "$target^{commit}")
+[[ $new != "$old" ]] || { echo "already at ${old:0:12}"; exit 0; }
+echo "old ${old:0:12} -> new ${new:0:12} ($(git -C vlc rev-list --count "$old..$new") upstream commits)"
+
+backup=omaplay-before-${old:0:8}
+git -C vlc branch -f "$backup" omaplay
+
+step "rebasing the omaplay commits"
+if ! git -C vlc -c user.name=omaplay -c user.email=omaplay@localhost rebase --onto "$new" "$old" omaplay >/tmp/omaplay-rebase.log 2>&1; then
+  echo "conflicting files:"; git -C vlc diff --name-only --diff-filter=U | sed 's/^/  /'
+  git -C vlc rebase --abort || true
+  echo "rebase aborted; the branch is back where it was. Resolve by rebasing by hand:" >&2
+  echo "  git -C vlc rebase --onto $new $old omaplay" >&2
+  exit 2
+fi
+
+step "rebuilding from scratch"
+rm -rf build
+bin/build >/tmp/omaplay-update-build.log 2>&1 || fail "build (see /tmp/omaplay-update-build.log)"
+
+step "Qt tests"
+QT_QPA_PLATFORM=offscreen meson test -C build --suite qt --suite qt+test >/tmp/omaplay-update-tests.log 2>&1 \
+  || fail "tests (see /tmp/omaplay-update-tests.log)"
+grep -E '^(Ok|Fail):' /tmp/omaplay-update-tests.log
+
+step "parity"
+bin/parity || fail "a stock option or hotkey is missing from the new build (see docs/PARITY.md)"
+
+step "recording the new pin"
+printf '# Pinned upstream VLC commit (single source of truth). Format: <sha> <date>\n%s %s\n' "$new" "$(git -C vlc show -s --format=%cs "$new")" > UPSTREAM
+bin/export-patches
+echo
+echo "Updated to ${new:0:12}. Next: run bin/harness scenarios (docs/ACCEPTANCE.md), update _vlc_commit and pkgver in packaging/PKGBUILD and run"
+echo "updpkgsums there, then commit UPSTREAM, patches/ and docs/PARITY.md."

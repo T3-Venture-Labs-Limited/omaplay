@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 19:09:32 +0530
+Subject: [PATCH 17/17] Default to software decoding through the visible
+ decoder setting
+
+hw_dec_default=false used to turn off hw-dec, which only the advanced preferences show; the simple
+Input / Codecs page's "Hardware-accelerated decoding" then appeared to do nothing. Keep hw-dec on and
+default the decoder device to none instead, which that page shows as "Disable".
+---
+ meson_options.txt   | 2 +-
+ src/libvlc-module.c | 7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index dad7348f3b..522b461927 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -881,7 +881,7 @@ option('app_identity',
+ option('hw_dec_default',
+     type : 'boolean',
+     value : true,
+-    description : 'Default of the hw-dec preference (hardware decoders enabled)')
++    description : 'Hardware decoding on by default; false sets the decoder device to none (Disable)')
+ option('csd_wizard',
+     type : 'boolean',
+     value : true,
+diff --git a/src/libvlc-module.c b/src/libvlc-module.c
+index b7c77e9a16..5369c862c4 100644
+--- a/src/libvlc-module.c
++++ b/src/libvlc-module.c
+@@ -2051,9 +2051,12 @@ vlc_module_begin ()
+     set_subcategory( SUBCAT_INPUT_VCODEC )
+ 
+     add_string( "codec", "any", CODEC_TEXT, CODEC_LONGTEXT )
+-    add_bool( "hw-dec", VLC_HW_DEC_DEFAULT, HW_DEC_TEXT, HW_DEC_LONGTEXT )
++    /* hw_dec_default=false defaults the decoder device to "none" (shown as "Disable" under
++     * Preferences > Input / Codecs > Hardware-accelerated decoding), so the setting users see is the one
++     * that switches hardware decoding back on. hw-dec itself stays enabled. */
++    add_bool( "hw-dec", true, HW_DEC_TEXT, HW_DEC_LONGTEXT )
+     add_obsolete_string( "encoder" ) /* since 4.0.0 */
+-    add_module("dec-dev", "decoder device", "any", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)
++    add_module("dec-dev", "decoder device", VLC_HW_DEC_DEFAULT ? "any" : "none", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)
+ 
+     //set_subcategory( SUBCAT_INPUT_SCODEC )
+     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )

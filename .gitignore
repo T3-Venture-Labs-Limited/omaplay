@@ -1,0 +1,8 @@
+# Upstream checkout and build output are inputs, not source.
+/vlc/
+/build/
+/build-stock/
+*.pkg.tar.*
+/packaging/src/
+/packaging/pkg/
+/packaging/*.tar.gz

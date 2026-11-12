@@ -1,0 +1,285 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:39:44 +0530
+Subject: [PATCH 07/17] qt: follow the Omarchy font and Hyprland corner radius
+
+OmarchyTheme gains tested parsers for fc-match and hyprctl output. With the
+omarchy_default option the application font becomes the desktop monospace font and
+MainCtx exposes Hyprland's decoration:rounding as omarchyRadius. VLCStyle derives its
+corner radii from it (small controls capped at 4 px, panels and dialogs as is), and
+keeps the stock radii when the value is unavailable.
+---
+ .../qt/dialogs/dialogs/qml/ModalDialog.qml    |  2 +-
+ modules/gui/qt/maininterface/mainctx.cpp      |  4 ++
+ modules/gui/qt/maininterface/mainctx.hpp      |  4 ++
+ modules/gui/qt/qt.cpp                         | 15 +++++++
+ modules/gui/qt/style/VLCStyle.qml             | 21 ++++++---
+ modules/gui/qt/style/omarchytheme.cpp         | 43 +++++++++++++++++++
+ modules/gui/qt/style/omarchytheme.hpp         |  8 ++++
+ modules/gui/qt/tests/test_qt_omarchytheme.cpp | 21 +++++++++
+ 8 files changed, 111 insertions(+), 7 deletions(-)
+
+diff --git a/modules/gui/qt/dialogs/dialogs/qml/ModalDialog.qml b/modules/gui/qt/dialogs/dialogs/qml/ModalDialog.qml
+index 7719dabb04..5a6c20cae1 100644
+--- a/modules/gui/qt/dialogs/dialogs/qml/ModalDialog.qml
++++ b/modules/gui/qt/dialogs/dialogs/qml/ModalDialog.qml
+@@ -79,7 +79,7 @@ Dialog {
+                 hideSource: true
+             }
+ 
+-            radius: 2
++            radius: VLCStyle.radiusFor(2, false)
+         }
+     }
+ 
+diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
+index 79e28893b4..d0b85cabbe 100644
+--- a/modules/gui/qt/maininterface/mainctx.cpp
++++ b/modules/gui/qt/maininterface/mainctx.cpp
+@@ -160,6 +160,10 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
+ 
+     settings = getSettings();
+     m_colorScheme = new ColorSchemeModel(this);
++#if VLC_OMARCHY_DEFAULT
++    /* Read once: changing Hyprland's rounding is rare and takes effect after a restart. */
++    m_omarchyRadius = OmarchyTheme::hyprlandRounding();
++#endif
+ 
+     connect(m_colorScheme, &ColorSchemeModel::currentChanged, this, &MainCtx::applyQtColorScheme);
+ 
+diff --git a/modules/gui/qt/maininterface/mainctx.hpp b/modules/gui/qt/maininterface/mainctx.hpp
+index 6466e58d46..3a9cf4a6a4 100644
+--- a/modules/gui/qt/maininterface/mainctx.hpp
++++ b/modules/gui/qt/maininterface/mainctx.hpp
+@@ -118,6 +118,8 @@ class MainCtx : public QObject
+     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT FINAL)
+     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged FINAL)
+     Q_PROPERTY(bool hasFirstrun READ hasFirstrun CONSTANT FINAL)
++    /// Hyprland's window corner radius in pixels, or -1 to keep VLC's own radii.
++    Q_PROPERTY(int omarchyRadius READ omarchyRadius CONSTANT FINAL)
+     Q_PROPERTY(int  csdBorderSize READ CSDBorderSize NOTIFY useClientSideDecorationChanged FINAL)
+     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu WRITE setHasToolbarMenu NOTIFY hasToolbarMenuChanged FINAL)
+     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT FINAL)
+@@ -248,6 +250,7 @@ public:
+     bool hasVLM() const;
+     bool useClientSideDecoration() const;
+     bool hasFirstrun() const;
++    int omarchyRadius() const { return m_omarchyRadius; }
+     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
+     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
+     inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }
+@@ -450,6 +453,7 @@ protected:
+     Grouping             m_grouping = GROUPING_NONE;
+     ColorSchemeModel*    m_colorScheme = nullptr;
+     OmarchyTheme*        m_omarchyTheme = nullptr;
++    int                  m_omarchyRadius = -1;
+     void applyQtColorScheme();
+     bool                 m_windowTitlebar = true;
+     // NOTE: Ideally this should be a QVLCBool.
+diff --git a/modules/gui/qt/qt.cpp b/modules/gui/qt/qt.cpp
+index 9727bb7f45..19e24fbc89 100644
+--- a/modules/gui/qt/qt.cpp
++++ b/modules/gui/qt/qt.cpp
+@@ -73,6 +73,7 @@ extern "C" char **environ;
+ #include <windows.h>
+ #endif
+ 
++#include "style/omarchytheme.hpp"
+ #include "qt.hpp"
+ 
+ #include "player/player_controller.hpp"    /* THEMIM destruction */
+@@ -947,6 +948,20 @@ static void *Thread( void *obj )
+      * necessary for  RTL locales */
+     app.setLayoutDirection(QLocale().textDirection());
+ 
++#if VLC_OMARCHY_DEFAULT
++    /* Interface text uses the desktop's font, as `omarchy font current` reports it. Keep the
++     * size and other properties of the default font; a missing fc-match leaves it untouched. */
++    {
++        const QString family = OmarchyTheme::systemFontFamily();
++        if (!family.isEmpty())
++        {
++            QFont font = app.font();
++            font.setFamily(family);
++            app.setFont(font);
++        }
++    }
++#endif
++
+     /* All the settings are in the .conf/.ini style */
+ #ifdef _WIN32
+     char *cConfigDir = config_GetUserDir( VLC_CONFIG_DIR );
+diff --git a/modules/gui/qt/style/VLCStyle.qml b/modules/gui/qt/style/VLCStyle.qml
+index af716e73aa..40ba4a64e9 100644
+--- a/modules/gui/qt/style/VLCStyle.qml
++++ b/modules/gui/qt/style/VLCStyle.qml
+@@ -92,10 +92,10 @@ QtObject {
+ 
+     readonly property int listAlbumCover_height: MainCtx.dp(32, scale)
+     readonly property int listAlbumCover_width: listAlbumCover_height * 16.0/9
+-    readonly property int listAlbumCover_radius: MainCtx.dp(3, scale)
++    readonly property int listAlbumCover_radius: radiusFor(MainCtx.dp(3, scale), true)
+     readonly property int trackListAlbumCover_width: MainCtx.dp(32, scale)
+     readonly property int trackListAlbumCover_heigth: MainCtx.dp(32, scale)
+-    readonly property int trackListAlbumCover_radius: MainCtx.dp(3, scale)
++    readonly property int trackListAlbumCover_radius: radiusFor(MainCtx.dp(3, scale), true)
+ 
+     readonly property int tableCoverRow_height: Math.max(listAlbumCover_height, fontHeight_normal) + margin_xsmall * 2
+     readonly property int tableRow_height: fontHeight_normal + margin_small * 2
+@@ -175,7 +175,16 @@ QtObject {
+     readonly property int button_width_normal: MainCtx.dp(96, scale)
+     readonly property int button_width_large: MainCtx.dp(128, scale)
+ 
+-    readonly property real button_radius: MainCtx.dp(4, scale)
++    // Hyprland's corner radius (-1 keeps the stock radii). Panels and dialogs use it as is; small
++    // controls are capped at 4 px so they never look like pills. Circles keep their own radius.
++    readonly property int omarchyRadius: MainCtx.omarchyRadius
++    function radiusFor(stock, small) {
++        if (omarchyRadius < 0)
++            return stock
++        return small ? Math.min(omarchyRadius, 4) : omarchyRadius
++    }
++
++    readonly property real button_radius: radiusFor(MainCtx.dp(4, scale), true)
+ 
+     readonly property int contextButton_width: icon_normal
+     readonly property int contextButton_margin: margin_xxsmall
+@@ -186,7 +195,7 @@ QtObject {
+     readonly property int checkButton_margins: MainCtx.dp(4, scale)
+     readonly property int checkButton_handle_margins: MainCtx.dp(2, scale)
+ 
+-    readonly property int navBoxButton_radius: MainCtx.dp(8, scale)
++    readonly property int navBoxButton_radius: radiusFor(MainCtx.dp(8, scale), false)
+ 
+     readonly property int table_section_width: MainCtx.dp(32, scale)
+     readonly property int table_section_text_margin: MainCtx.dp(10, scale)
+@@ -203,7 +212,7 @@ QtObject {
+     readonly property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
+     readonly property int gridCover_video_border: MainCtx.dp(4, scale)
+ 
+-    readonly property int gridCover_radius: MainCtx.dp(4, scale)
++    readonly property int gridCover_radius: radiusFor(MainCtx.dp(4, scale), true)
+ 
+     readonly property int expandCover_music_height: MainCtx.dp(171, scale)
+     readonly property int expandCover_music_width: MainCtx.dp(171, scale)
+@@ -212,7 +221,7 @@ QtObject {
+ 
+     readonly property int artistGridCover_radius: MainCtx.dp(90, scale)
+ 
+-    readonly property real mainView_topLeftRadius: MainCtx.dp(8, scale)
++    readonly property real mainView_topLeftRadius: radiusFor(MainCtx.dp(8, scale), false)
+ 
+     //GridItem
+     readonly property int gridItemTitle_topMargin: margin_xsmall + margin_xxxsmall
+diff --git a/modules/gui/qt/style/omarchytheme.cpp b/modules/gui/qt/style/omarchytheme.cpp
+index be081fc9bd..35267990f7 100644
+--- a/modules/gui/qt/style/omarchytheme.cpp
++++ b/modules/gui/qt/style/omarchytheme.cpp
+@@ -14,6 +14,9 @@
+ #include <QFileInfo>
+ #include <QFileSystemWatcher>
+ #include <QHash>
++#include <QJsonDocument>
++#include <QJsonObject>
++#include <QProcess>
+ #include <QRegularExpression>
+ #include <QStandardPaths>
+ #include <QtMath>
+@@ -56,6 +59,46 @@ bool parseHexColor(const QString &text, QColor &out)
+ 
+ } // namespace
+ 
++QString OmarchyTheme::parseFontFamily(const QByteArray &out)
++{
++    const QString firstLine = QString::fromUtf8(out).split(QLatin1Char('\n')).value(0);
++    return firstLine.split(QLatin1Char(',')).value(0).trimmed();
++}
++
++int OmarchyTheme::parseRounding(const QByteArray &json)
++{
++    const QJsonValue v = QJsonDocument::fromJson(json).object().value(QLatin1String("int"));
++    // Only a whole, non-negative number is a usable radius.
++    if (!v.isDouble() || v.toDouble() < 0 || v.toDouble() != qFloor(v.toDouble()))
++        return -1;
++    return v.toInt();
++}
++
++namespace {
++QByteArray runTool(const QString &program, const QStringList &args)
++{
++    QProcess p;
++    p.start(program, args);
++    if (!p.waitForFinished(1500) || p.exitStatus() != QProcess::NormalExit || p.exitCode() != 0) {
++        p.kill();
++        return {};
++    }
++    return p.readAllStandardOutput();
++}
++} // namespace
++
++QString OmarchyTheme::systemFontFamily()
++{
++    return parseFontFamily(runTool(QStringLiteral("fc-match"), {QStringLiteral("monospace"), QStringLiteral("-f"),
++                                                                 QStringLiteral("%{family}\n")}));
++}
++
++int OmarchyTheme::hyprlandRounding()
++{
++    return parseRounding(runTool(QStringLiteral("hyprctl"), {QStringLiteral("getoption"),
++                                                              QStringLiteral("decoration:rounding"), QStringLiteral("-j")}));
++}
++
+ QString OmarchyTheme::defaultPath()
+ {
+     QString state = qEnvironmentVariable("XDG_STATE_HOME");
+diff --git a/modules/gui/qt/style/omarchytheme.hpp b/modules/gui/qt/style/omarchytheme.hpp
+index 87d914e8f1..ff100fcf6d 100644
+--- a/modules/gui/qt/style/omarchytheme.hpp
++++ b/modules/gui/qt/style/omarchytheme.hpp
+@@ -62,6 +62,14 @@ public:
+      */
+     QColor ramp(int step) const;
+ 
++    /// First family of `fc-match monospace` output, which is what `omarchy font current` prints.
++    static QString parseFontFamily(const QByteArray &fcMatchOutput);
++    /// `decoration:rounding` from `hyprctl getoption decoration:rounding -j`, or -1 if unusable.
++    static int parseRounding(const QByteArray &hyprctlJson);
++    /// Runs the tools above with a short timeout. Empty string / -1 when they are missing or fail.
++    static QString systemFontFamily();
++    static int hyprlandRounding();
++
+     /// WCAG contrast ratio between two opaque colours, 1 .. 21.
+     static double contrastRatio(const QColor &a, const QColor &b);
+     /// Moves fg towards white or black, whichever side of bg is readable, until
+diff --git a/modules/gui/qt/tests/test_qt_omarchytheme.cpp b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+index f69c5c85b3..272a8124ca 100644
+--- a/modules/gui/qt/tests/test_qt_omarchytheme.cpp
++++ b/modules/gui/qt/tests/test_qt_omarchytheme.cpp
+@@ -242,6 +242,27 @@ private slots:
+         QCOMPARE(theme.accent(), QColor("#fedcba"));
+     }
+ 
++    void parsesTheFirstFontAlias()
++    {
++        // fc-match prints a comma separated alias list; Omarchy takes the first entry.
++        QCOMPARE(OmarchyTheme::parseFontFamily("JetBrainsMono Nerd Font,JetBrainsMono NF\n"),
++                 QString("JetBrainsMono Nerd Font"));
++        QCOMPARE(OmarchyTheme::parseFontFamily("  Iosevka  \nsecond line\n"), QString("Iosevka"));
++        QCOMPARE(OmarchyTheme::parseFontFamily(""), QString());
++        QCOMPARE(OmarchyTheme::parseFontFamily("\n"), QString());
++    }
++
++    void parsesHyprlandRounding()
++    {
++        QCOMPARE(OmarchyTheme::parseRounding(R"({"option": "decoration:rounding", "int": 6, "set": true })"), 6);
++        QCOMPARE(OmarchyTheme::parseRounding(R"({"option": "decoration:rounding", "int": 0, "set": true })"), 0);
++        // Unusable answers mean "keep the stock radii", signalled by -1.
++        QCOMPARE(OmarchyTheme::parseRounding(""), -1);
++        QCOMPARE(OmarchyTheme::parseRounding("not json"), -1);
++        QCOMPARE(OmarchyTheme::parseRounding(R"({"option": "decoration:rounding", "float": 1.5})"), -1);
++        QCOMPARE(OmarchyTheme::parseRounding(R"({"int": -3})"), -1);
++    }
++
+     void doesNotEmitChangedWhenNothingChanged()
+     {
+         install(darkToml);

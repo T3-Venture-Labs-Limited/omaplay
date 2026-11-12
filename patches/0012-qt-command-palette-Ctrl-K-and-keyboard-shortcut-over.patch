@@ -1,0 +1,830 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 17:23:59 +0530
+Subject: [PATCH 12/17] qt: command palette (Ctrl+K) and keyboard shortcut
+ overlay
+
+FuzzyMatch ranks entries (best alignment, word starts and consecutive letters score high; tested
+with mutation checks). HotkeyActions lists every hotkey action from VLC's key configuration with the
+live binding and runs one through the same key-action variable a key press ends in. ActionOverlay
+shows dialogs and hotkeys in a palette, or only the bound ones as a shortcut overlay.
+---
+ modules/gui/qt/maininterface/mainctx.cpp      |   2 +
+ modules/gui/qt/maininterface/mainctx.hpp      |   6 +
+ .../qt/maininterface/qml/MainInterface.qml    |  11 +
+ modules/gui/qt/meson.build                    |  21 ++
+ modules/gui/qt/tests/test_qt_fuzzy_match.cpp  |  80 +++++
+ modules/gui/qt/util/fuzzy_match.cpp           |  84 +++++
+ modules/gui/qt/util/fuzzy_match.hpp           |  29 ++
+ modules/gui/qt/util/hotkey_actions.cpp        |  80 +++++
+ modules/gui/qt/util/hotkey_actions.hpp        |  50 +++
+ modules/gui/qt/widgets/qml/ActionOverlay.qml  | 302 ++++++++++++++++++
+ 10 files changed, 665 insertions(+)
+ create mode 100644 modules/gui/qt/tests/test_qt_fuzzy_match.cpp
+ create mode 100644 modules/gui/qt/util/fuzzy_match.cpp
+ create mode 100644 modules/gui/qt/util/fuzzy_match.hpp
+ create mode 100644 modules/gui/qt/util/hotkey_actions.cpp
+ create mode 100644 modules/gui/qt/util/hotkey_actions.hpp
+ create mode 100644 modules/gui/qt/widgets/qml/ActionOverlay.qml
+
+diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
+index 68c37d4741..bbf648f242 100644
+--- a/modules/gui/qt/maininterface/mainctx.cpp
++++ b/modules/gui/qt/maininterface/mainctx.cpp
+@@ -45,6 +45,7 @@
+ #include "util/color_scheme_model.hpp"
+ #include "style/omarchytheme.hpp"
+ #include "util/recent_media.hpp"
++#include "util/hotkey_actions.hpp"
+ #include "util/model_recovery_agent.hpp"
+ 
+ #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
+@@ -167,6 +168,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
+     // Recent media do not depend on the media library. The title is usually learned a moment
+     // after the input starts, so it is filled in when the name changes.
+     m_recentMedia = new RecentMediaList(settings, this);
++    m_hotkeyActions = new HotkeyActions(p_intf, this);
+     if (p_intf->p_mainPlayerController)
+     {
+         PlayerController *player = p_intf->p_mainPlayerController;
+diff --git a/modules/gui/qt/maininterface/mainctx.hpp b/modules/gui/qt/maininterface/mainctx.hpp
+index f8745c8102..42b2f7173b 100644
+--- a/modules/gui/qt/maininterface/mainctx.hpp
++++ b/modules/gui/qt/maininterface/mainctx.hpp
+@@ -33,6 +33,7 @@
+ 
+ Q_MOC_INCLUDE( "dialogs/toolbar/controlbar_profile_model.hpp" )
+ Q_MOC_INCLUDE("util/recent_media.hpp")
++Q_MOC_INCLUDE("util/hotkey_actions.hpp")
+ Q_MOC_INCLUDE( "util/csdbuttonmodel.hpp" )
+ Q_MOC_INCLUDE( "playlist/playlist_controller.hpp" )
+ Q_MOC_INCLUDE( "maininterface/mainctx_submodels.hpp" )
+@@ -69,6 +70,7 @@ class MediaLib;
+ class ColorSchemeModel;
+ class OmarchyTheme;
+ class RecentMediaList;
++class HotkeyActions;
+ class VLCVarChoiceModel;
+ class SidePanelCtx;
+ #ifdef UPDATE_CHECK
+@@ -126,6 +128,8 @@ class MainCtx : public QObject
+     Q_PROPERTY(bool omarchyStyle READ omarchyStyle CONSTANT FINAL)
+     /// Recently played media, kept independently of the media library.
+     Q_PROPERTY(RecentMediaList* recentMedia READ recentMedia CONSTANT FINAL)
++    /// VLC's hotkey actions, for the command palette and the shortcut overlay.
++    Q_PROPERTY(HotkeyActions* hotkeyActions READ hotkeyActions CONSTANT FINAL)
+     /// False while `omarchy toggle animations off` is in effect. Always true outside an Omarchy build.
+     Q_PROPERTY(bool omarchyAnimations READ omarchyAnimations NOTIFY omarchyAnimationsChanged FINAL)
+     Q_PROPERTY(int  csdBorderSize READ CSDBorderSize NOTIFY useClientSideDecorationChanged FINAL)
+@@ -261,6 +265,7 @@ public:
+     int omarchyRadius() const { return m_omarchyRadius; }
+     bool omarchyStyle() const;
+     RecentMediaList* recentMedia() const { return m_recentMedia; }
++    HotkeyActions* hotkeyActions() const { return m_hotkeyActions; }
+     bool omarchyAnimations();
+     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
+     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
+@@ -466,6 +471,7 @@ protected:
+     OmarchyTheme*        m_omarchyTheme = nullptr;
+     int                  m_omarchyRadius = -1;
+     RecentMediaList*     m_recentMedia = nullptr;
++    HotkeyActions*       m_hotkeyActions = nullptr;
+     void applyQtColorScheme();
+     void applyWidgetPalette();
+     bool                 m_widgetPaletteApplied = false;
+diff --git a/modules/gui/qt/maininterface/qml/MainInterface.qml b/modules/gui/qt/maininterface/qml/MainInterface.qml
+index 5c7fcd3ca9..0e0675182a 100644
+--- a/modules/gui/qt/maininterface/qml/MainInterface.qml
++++ b/modules/gui/qt/maininterface/qml/MainInterface.qml
+@@ -327,6 +327,17 @@ Item {
+             source: "qrc:///qt/qml/VLC/Menus/GlobalShortcuts.qml"
+         }
+ 
++        // Command palette (Ctrl+K) and keyboard shortcut overlay (?).
++        Widgets.ActionOverlay {
++            id: actionOverlay
++
++            anchors.fill: parent
++        }
++
++        ShortcutExt { sequence: "Ctrl+K"; onActivated: actionOverlay.toggle("palette") }
++        // Qt may report "?" as Key_Question, with or without Shift, or as Shift+Slash depending on the layout.
++        ShortcutExt { sequences: ["?", "Shift+?", "Shift+/"]; onActivated: actionOverlay.toggle("shortcuts") }
++
+         Loader {
+             active: {
+                 const windowVisibility = MainCtx.intfMainWindow.visibility
+diff --git a/modules/gui/qt/meson.build b/modules/gui/qt/meson.build
+index b97350e52a..31144fb1ef 100644
+--- a/modules/gui/qt/meson.build
++++ b/modules/gui/qt/meson.build
+@@ -116,6 +116,7 @@ moc_headers = files(
+     'network/standardpathmodel.hpp',
+     'style/omarchytheme.hpp',
+     'style/systempalette.hpp',
++    'util/hotkey_actions.hpp',
+     'util/recent_media.hpp',
+     'style/vlcicons.hpp',
+     'style/colorcontext.hpp',
+@@ -408,6 +409,10 @@ qt_plugin_sources = files(
+     'style/colorcontext.hpp',
+     'style/omarchytheme.cpp',
+     'style/omarchytheme.hpp',
++    'util/fuzzy_match.cpp',
++    'util/fuzzy_match.hpp',
++    'util/hotkey_actions.cpp',
++    'util/hotkey_actions.hpp',
+     'util/recent_media.cpp',
+     'util/recent_media.hpp',
+     'style/systempalette.cpp',
+@@ -869,6 +874,7 @@ qml_modules += {
+         'widgets/qml/ActionButtonOverlay.qml',
+         'widgets/qml/ActionButtonPrimary.qml',
+         'widgets/qml/BannerTabButton.qml',
++        'widgets/qml/ActionOverlay.qml',
+         'widgets/qml/BannerCone.qml',
+         'widgets/qml/BusyIndicatorExt.qml',
+         'widgets/qml/CaptionLabel.qml',
+@@ -1386,6 +1392,21 @@ if qt6_dep.found()
+             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
+         }
+ 
++        vlc_tests += {
++            'name': 'test_qt_fuzzy_match',
++            'sources': files(
++                'tests/test_qt_fuzzy_match.cpp',
++                'util/fuzzy_match.hpp',
++                'util/fuzzy_match.cpp'
++            ),
++            'moc_sources': files(
++                'tests/test_qt_fuzzy_match.cpp'
++            ),
++            'suite': ['qt'],
++            'include_directories' : qt_include_dir,
++            'dependencies': [qt6_dep, qtest_qt6_dep]
++        }
++
+         vlc_tests += {
+             'name': 'test_qt_recent_media',
+             'sources': files(
+diff --git a/modules/gui/qt/tests/test_qt_fuzzy_match.cpp b/modules/gui/qt/tests/test_qt_fuzzy_match.cpp
+new file mode 100644
+index 0000000000..e8e6740572
+--- /dev/null
++++ b/modules/gui/qt/tests/test_qt_fuzzy_match.cpp
+@@ -0,0 +1,80 @@
++/*****************************************************************************
++ * test_qt_fuzzy_match.cpp : ranking for the command palette
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#include <QTest>
++
++#include "util/fuzzy_match.hpp"
++
++using FuzzyMatch::score;
++
++class TestFuzzyMatch : public QObject
++{
++    Q_OBJECT
++
++private slots:
++    void emptyQueryMatchesEverything()
++    {
++        QVERIFY(score("", "Preferences") >= 0);
++        QVERIFY(score("", "") >= 0);
++    }
++
++    void queryMustBeASubsequence()
++    {
++        QVERIFY(score("sync", "Subtitle synchronisation") >= 0);
++        QVERIFY(score("sbtl", "Subtitle track") >= 0);
++        QCOMPARE(score("xyz", "Subtitle synchronisation"), -1);
++        QCOMPARE(score("tilte", "Subtitle"), -1);       // letters in the wrong order
++        QCOMPARE(score("aa", "a"), -1);                 // more query than text
++    }
++
++    void ignoresCase()
++    {
++        QCOMPARE(score("PREFS", "Preferences"), score("prefs", "preferences"));
++        QVERIFY(score("PREFS", "Preferences") >= 0);
++    }
++
++    void aPrefixBeatsAMatchInTheMiddle()
++    {
++        QVERIFY(score("play", "Play / Pause") > score("play", "Display lyrics"));
++    }
++
++    void aWordStartBeatsAMatchInsideAWord()
++    {
++        // "sync" starts the word in the first and sits inside a word in the second.
++        QVERIFY(score("sync", "Subtitle sync") > score("sync", "Asynchronous"));
++    }
++
++    void consecutiveLettersBeatScatteredOnes()
++    {
++        QVERIFY(score("sub", "Subtitle") > score("sub", "Stop unless buffering"));
++    }
++
++    void shorterTextWinsOnAnEqualMatch()
++    {
++        QVERIFY(score("open", "Open file") > score("open", "Open network stream"));
++    }
++
++    void unicodeDoesNotConfuseIt()
++    {
++        QVERIFY(score("cafe", "Café") < 0 || score("cafe", "Café") >= 0);   // must not crash or hang
++        QVERIFY(score("é", "Café") >= 0);
++    }
++
++    void sortingByScorePutsTheBestFirst()
++    {
++        QStringList items = {"Display lyrics", "Play / Pause", "Replay", "Playback speed"};
++        std::stable_sort(items.begin(), items.end(), [](const QString &a, const QString &b) {
++            return score("play", a) > score("play", b);
++        });
++        QCOMPARE(items.first(), QString("Play / Pause"));
++    }
++};
++
++QTEST_GUILESS_MAIN(TestFuzzyMatch)
++#include "test_qt_fuzzy_match.moc"
+diff --git a/modules/gui/qt/util/fuzzy_match.cpp b/modules/gui/qt/util/fuzzy_match.cpp
+new file mode 100644
+index 0000000000..5a17504c68
+--- /dev/null
++++ b/modules/gui/qt/util/fuzzy_match.cpp
+@@ -0,0 +1,84 @@
++/*****************************************************************************
++ * fuzzy_match.cpp : ranking for the command palette
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#include "fuzzy_match.hpp"
++
++#include <QVector>
++#include <algorithm>
++#include <limits>
++
++namespace {
++constexpr int Base = 10;           // every matched letter
++constexpr int WordStart = 80;      // the letter starts a word
++constexpr int TextStart = 60;      // ... and it is the very first letter of the text
++constexpr int Consecutive = 60;    // directly after the previous matched letter
++constexpr int GapPenalty = 10;     // per skipped letter between two matches
++constexpr int LeadPenalty = 5;     // per skipped letter before the first match
++constexpr int LeadPenaltyMax = 30;
++constexpr int NoMatch = std::numeric_limits<int>::min() / 2;
++
++bool startsWord(const QString &t, int j)
++{
++    return j == 0 || !t.at(j - 1).isLetterOrNumber();
++}
++} // namespace
++
++int FuzzyMatch::score(const QString &queryIn, const QString &textIn)
++{
++    const QString query = queryIn.trimmed().toCaseFolded();
++    const QString text = textIn.toCaseFolded();
++    const int n = query.size(), m = text.size();
++    if (n == 0)
++        return 0;
++    if (n > m)
++        return -1;
++
++    // best[i][j]: the best score with query[i] matched at text[j].
++    QVector<QVector<int>> best(n, QVector<int>(m, NoMatch));
++    for (int i = 0; i < n; ++i) {
++        // Running best of the previous row over positions before j, discounted by the gap.
++        int carry = NoMatch;
++        for (int j = 0; j < m; ++j) {
++            if (i > 0 && j > 0) {
++                // Extend a match that ended earlier: each skipped letter costs GapPenalty.
++                const int prev = best[i - 1][j - 1];
++                if (carry != NoMatch)
++                    carry -= GapPenalty;
++                if (prev != NoMatch)
++                    carry = std::max(carry, prev);
++            }
++            if (text.at(j) != query.at(i))
++                continue;
++
++            int bonus = Base;
++            if (startsWord(textIn, j))
++                bonus += WordStart + (j == 0 ? TextStart : 0);
++
++            if (i == 0) {
++                best[i][j] = bonus - std::min(LeadPenaltyMax, j * LeadPenalty);
++            } else if (j > 0) {
++                int via = NoMatch;
++                if (best[i - 1][j - 1] != NoMatch)
++                    via = best[i - 1][j - 1] + Consecutive;           // directly after the last match
++                if (carry != NoMatch)
++                    via = std::max(via, carry);                       // after a gap
++                if (via != NoMatch)
++                    best[i][j] = via + bonus;
++            }
++        }
++    }
++
++    int top = NoMatch;
++    for (int j = 0; j < m; ++j)
++        top = std::max(top, best[n - 1][j]);
++    if (top == NoMatch)
++        return -1;
++    // Shorter texts win a tie; a match never scores below zero, which is reserved for "no match".
++    return std::max(0, top - m);
++}
+diff --git a/modules/gui/qt/util/fuzzy_match.hpp b/modules/gui/qt/util/fuzzy_match.hpp
+new file mode 100644
+index 0000000000..ed78c90f61
+--- /dev/null
++++ b/modules/gui/qt/util/fuzzy_match.hpp
+@@ -0,0 +1,29 @@
++/*****************************************************************************
++ * fuzzy_match.hpp : ranking for the command palette
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#ifndef FUZZY_MATCH_HPP
++#define FUZZY_MATCH_HPP
++
++#include <QString>
++
++namespace FuzzyMatch {
++
++/**
++ * How well `query` matches `text`, or -1 when it does not match at all.
++ *
++ * The query must appear in the text as a subsequence, ignoring case. Among the possible alignments
++ * the best one is scored: letters that start a word or the whole text, and letters that follow the
++ * previous match directly, score high; gaps cost a little; shorter texts win a tie. An empty query
++ * matches everything with score 0.
++ */
++int score(const QString &query, const QString &text);
++
++} // namespace FuzzyMatch
++
++#endif // FUZZY_MATCH_HPP
+diff --git a/modules/gui/qt/util/hotkey_actions.cpp b/modules/gui/qt/util/hotkey_actions.cpp
+new file mode 100644
+index 0000000000..3328ef11b5
+--- /dev/null
++++ b/modules/gui/qt/util/hotkey_actions.cpp
+@@ -0,0 +1,80 @@
++/*****************************************************************************
++ * hotkey_actions.cpp : VLC's hotkey actions, listed and runnable by name
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
++
++#include "hotkey_actions.hpp"
++#include "fuzzy_match.hpp"
++
++#include "qt.hpp"
++
++#include <vlc_actions.h>
++#include <vlc_modules.h>
++#include <vlc_plugin.h>
++
++#include <QVariantMap>
++
++HotkeyActions::HotkeyActions(qt_intf_t *intf, QObject *parent)
++    : QObject(parent)
++    , m_intf(intf)
++{
++    refresh();
++}
++
++void HotkeyActions::refresh()
++{
++    QVariantList list;
++
++    module_t *main = module_get_main();
++    unsigned count = 0;
++    module_config_t *config = main ? module_config_get(main, &count) : nullptr;
++    for (unsigned i = 0; i < count; ++i) {
++        const module_config_t &item = config[i];
++        if (item.i_type != CONFIG_ITEM_KEY || !item.psz_name)
++            continue;
++        // "global-key-..." are desktop-wide duplicates of the same actions.
++        if (strncmp(item.psz_name, "global-", 7) == 0)
++            continue;
++
++        // The live binding, which the preferences may have changed since start-up.
++        char *keys = config_GetPsz(item.psz_name);
++        QString shortcut = keys ? qfu(keys) : QString();
++        free(keys);
++        shortcut.replace(QLatin1Char('\t'), QStringLiteral(" / "));
++        if (shortcut == QStringLiteral("Unset"))
++            shortcut.clear();
++
++        list << QVariantMap{
++            {"name", qfu(item.psz_name)},
++            {"title", qfut(item.psz_text ? item.psz_text : item.psz_name)},
++            {"shortcut", shortcut},
++        };
++    }
++    module_config_free(config);
++
++    m_actions = list;
++    emit changed();
++}
++
++bool HotkeyActions::run(const QString &name)
++{
++    const QByteArray utf8 = name.toUtf8();
++    const vlc_action_id_t id = vlc_actions_get_id(utf8.constData());
++    if (id == ACTIONID_NONE)
++        return false;
++    var_SetInteger(vlc_object_instance(m_intf), "key-action", id);
++    return true;
++}
++
++int HotkeyActions::fuzzyScore(const QString &query, const QString &text) const
++{
++    return FuzzyMatch::score(query, text);
++}
+diff --git a/modules/gui/qt/util/hotkey_actions.hpp b/modules/gui/qt/util/hotkey_actions.hpp
+new file mode 100644
+index 0000000000..5de820b2c3
+--- /dev/null
++++ b/modules/gui/qt/util/hotkey_actions.hpp
+@@ -0,0 +1,50 @@
++/*****************************************************************************
++ * hotkey_actions.hpp : VLC's hotkey actions, listed and runnable by name
++ *****************************************************************************
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *****************************************************************************/
++
++#ifndef HOTKEY_ACTIONS_HPP
++#define HOTKEY_ACTIONS_HPP
++
++#include <QObject>
++#include <QVariantList>
++
++struct qt_intf_t;
++
++/**
++ * Every hotkey action VLC knows (play/pause, seek, subtitle delay, ...), with its label and the keys
++ * currently bound to it. The command palette lists them and the shortcut overlay shows them; running
++ * one goes through the same `key-action` variable a key press ends in, so it behaves exactly like
++ * pressing the key.
++ */
++class HotkeyActions : public QObject
++{
++    Q_OBJECT
++    /// Each entry: { name, title, shortcut }. `shortcut` is empty for an unbound action.
++    Q_PROPERTY(QVariantList actions READ actions NOTIFY changed FINAL)
++
++public:
++    explicit HotkeyActions(qt_intf_t *intf, QObject *parent = nullptr);
++
++    QVariantList actions() const { return m_actions; }
++
++    /// Runs an action by its option name, e.g. "key-play-pause". False if the name is unknown.
++    Q_INVOKABLE bool run(const QString &name);
++    /// Re-reads the bindings, after the user changed them in the preferences.
++    Q_INVOKABLE void refresh();
++    /// Rank of `query` against `text` for the palette, or -1 for no match (see FuzzyMatch::score).
++    Q_INVOKABLE int fuzzyScore(const QString &query, const QString &text) const;
++
++signals:
++    void changed();
++
++private:
++    qt_intf_t *m_intf;
++    QVariantList m_actions;
++};
++
++#endif // HOTKEY_ACTIONS_HPP
+diff --git a/modules/gui/qt/widgets/qml/ActionOverlay.qml b/modules/gui/qt/widgets/qml/ActionOverlay.qml
+new file mode 100644
+index 0000000000..4070cfbe5d
+--- /dev/null
++++ b/modules/gui/qt/widgets/qml/ActionOverlay.qml
+@@ -0,0 +1,302 @@
++/*****************************************************************************
++ * Copyright (C) 2026 the omaplay authors
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * ( at your option ) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
++ *****************************************************************************/
++
++import QtQuick
++import QtQuick.Templates as T
++
++import VLC.MainInterface
++import VLC.Style
++import VLC.Dialogs
++import VLC.Widgets as Widgets
++
++// The command palette (Ctrl+K) and the keyboard shortcut overlay (?).
++//
++// Both list the same entries: dialogs and every hotkey action VLC knows, taken live from its key
++// configuration. The palette filters them by fuzzy search and runs the chosen one; the overlay only
++// shows the entries that have a key bound, so it always reflects the user's own bindings.
++FocusScope {
++    id: root
++
++    // "palette" or "shortcuts"
++    property string mode: "palette"
++    readonly property bool isPalette: mode === "palette"
++    property bool shown: false
++    property Item _restoreFocus: null
++
++    visible: opacity > 0
++    opacity: shown ? 1 : 0
++    z: 100
++
++    Behavior on opacity {
++        NumberAnimation { duration: VLCStyle.duration_short; easing.type: Easing.OutCubic }
++    }
++
++    function open(newMode) {
++        mode = newMode
++        field.text = ""
++        list.currentIndex = 0
++        _restoreFocus = Window.window ? Window.window.activeFocusItem : null
++        MainCtx.hotkeyActions.refresh()
++        shown = true
++        field.forceActiveFocus()
++    }
++
++    function toggle(newMode) {
++        if (shown && mode === newMode)
++            close()
++        else
++            open(newMode)
++    }
++
++    function close() {
++        shown = false
++        if (_restoreFocus)
++            _restoreFocus.forceActiveFocus()
++    }
++
++    function runEntry(entry) {
++        if (!entry || !isPalette)
++            return close()
++        // Close first so a dialog that opens gets the focus.
++        close()
++        if (entry.run)
++            entry.run()
++        else
++            MainCtx.hotkeyActions.run(entry.name)
++    }
++
++    // Dialogs and interface actions. Their shortcuts are VLC's fixed ones (see menus/qml/GlobalShortcuts.qml).
++    readonly property var staticActions: [
++        { title: qsTr("Preferences"), shortcut: "Ctrl+P", run: () => DialogsProvider.prefsDialog() },
++        { title: qsTr("Adjustments and effects"), shortcut: "Ctrl+E", run: () => DialogsProvider.extendedDialog() },
++        { title: qsTr("Subtitle synchronisation"), shortcut: "", run: () => DialogsProvider.synchroDialog() },
++        { title: qsTr("Audio synchronisation"), shortcut: "", run: () => DialogsProvider.synchroDialog() },
++        { title: qsTr("Media information"), shortcut: "Ctrl+I", run: () => DialogsProvider.mediaInfoDialog() },
++        { title: qsTr("Codec information"), shortcut: "Ctrl+J", run: () => DialogsProvider.mediaCodecDialog() },
++        { title: qsTr("Messages"), shortcut: "Ctrl+M", run: () => DialogsProvider.messagesDialog() },
++        { title: qsTr("Bookmarks"), shortcut: "", run: () => DialogsProvider.bookmarksDialog() },
++        { title: qsTr("Open file"), shortcut: "Ctrl+Shift+O", run: () => DialogsProvider.openFileDialog() },
++        { title: qsTr("Open directory"), shortcut: "Ctrl+F", run: () => DialogsProvider.PLOpenDir() },
++        { title: qsTr("Open disc"), shortcut: "Ctrl+D", run: () => DialogsProvider.openDiscDialog() },
++        { title: qsTr("Open network stream"), shortcut: "Ctrl+N", run: () => DialogsProvider.openNetDialog() },
++        { title: qsTr("Open capture device"), shortcut: "Ctrl+C", run: () => DialogsProvider.openCaptureDialog() },
++        { title: qsTr("Open location from clipboard"), shortcut: "", run: () => DialogsProvider.openUrlDialog() },
++        { title: qsTr("Convert / Save"), shortcut: "Ctrl+R", run: () => DialogsProvider.openAndTranscodingDialogs() },
++        { title: qsTr("Stream"), shortcut: "Ctrl+S", run: () => DialogsProvider.openAndStreamingDialogs() },
++        { title: qsTr("Go to time"), shortcut: "Ctrl+T", run: () => DialogsProvider.gotoTimeDialog() },
++        { title: qsTr("Plugins and extensions"), shortcut: "", run: () => DialogsProvider.pluginDialog() },
++        { title: qsTr("VLM configurator"), shortcut: "Ctrl+Shift+W", run: () => DialogsProvider.vlmDialog() },
++        { title: qsTr("Customize toolbar"), shortcut: "", run: () => DialogsProvider.showToolbarEditorDialog() },
++        { title: qsTr("Toggle play queue"), shortcut: "Ctrl+L", run: () => { MainCtx.playqueuePanel.visible = !MainCtx.playqueuePanel.visible } },
++        { title: qsTr("Toggle fullscreen interface"), shortcut: "F11", run: () => MainCtx.toggleInterfaceFullScreen() },
++        { title: qsTr("Help"), shortcut: "F1", run: () => DialogsProvider.helpDialog() },
++        { title: qsTr("About"), shortcut: "", run: () => DialogsProvider.aboutDialog() },
++        { title: qsTr("Quit"), shortcut: "Ctrl+Q", run: () => DialogsProvider.quit() }
++    ]
++
++    readonly property var entries: {
++        const list = staticActions.slice()
++        const hotkeys = MainCtx.hotkeyActions.actions
++        for (let i = 0; i < hotkeys.length; ++i)
++            list.push({ title: hotkeys[i].title, shortcut: hotkeys[i].shortcut, name: hotkeys[i].name })
++        return list
++    }
++
++    readonly property var results: {
++        const query = field.text
++        const scored = []
++        for (let i = 0; i < entries.length; ++i) {
++            const e = entries[i]
++            if (!isPalette && e.shortcut === "")
++                continue
++            const s = MainCtx.hotkeyActions.fuzzyScore(query, e.title)
++            if (s >= 0)
++                scored.push({ score: s, index: i, entry: e })
++        }
++        // Best first; equal scores keep their original order.
++        scored.sort((a, b) => b.score - a.score || a.index - b.index)
++        return scored.map(x => x.entry)
++    }
++
++    readonly property ColorContext colorContext: ColorContext {
++        id: theme
++        colorSet: ColorContext.Window
++    }
++
++    // Dim the interface behind the card; a click outside closes it.
++    Rectangle {
++        anchors.fill: parent
++        color: Qt.alpha(theme.bg.primary, 0.55)
++
++        MouseArea {
++            anchors.fill: parent
++            onClicked: root.close()
++        }
++    }
++
++    Rectangle {
++        id: card
++
++        anchors.horizontalCenter: parent.horizontalCenter
++        anchors.top: parent.top
++        anchors.topMargin: Math.max(VLCStyle.margin_large, root.height * 0.12)
++
++        width: Math.min(VLCStyle.dp(640, VLCStyle.scale), root.width - VLCStyle.margin_large * 2)
++        height: Math.min(root.height - anchors.topMargin - VLCStyle.margin_large,
++                         header.height + list.contentHeight + VLCStyle.margin_normal * 3)
++
++        radius: VLCStyle.radiusFor(VLCStyle.dp(8, VLCStyle.scale), false)
++        color: theme.bg.primary
++        border.width: 1
++        border.color: theme.border
++
++        Column {
++            id: header
++
++            anchors.left: parent.left
++            anchors.right: parent.right
++            anchors.top: parent.top
++            anchors.margins: VLCStyle.margin_normal
++            spacing: VLCStyle.margin_xsmall
++
++            Text {
++                visible: !root.isPalette
++                width: parent.width
++                text: qsTr("Keyboard shortcuts")
++                textFormat: Text.PlainText
++                color: theme.fg.primary
++                font.pixelSize: VLCStyle.fontSize_large
++                font.bold: true
++            }
++
++            T.TextField {
++                id: field
++
++                width: parent.width
++                focus: true
++
++                placeholderText: root.isPalette ? qsTr("Type a command") : qsTr("Filter shortcuts")
++                color: theme.fg.primary
++                placeholderTextColor: theme.fg.secondary
++                font.pixelSize: VLCStyle.fontSize_large
++                selectByMouse: true
++                padding: VLCStyle.margin_xsmall
++
++                background: Rectangle {
++                    radius: VLCStyle.radiusFor(VLCStyle.dp(4, VLCStyle.scale), true)
++                    color: "transparent"
++                    border.width: 1
++                    border.color: field.activeFocus ? theme.accent : theme.border
++                }
++
++                onTextChanged: list.currentIndex = 0
++
++                Keys.onPressed: (event) => {
++                    switch (event.key) {
++                    case Qt.Key_Escape:
++                        root.close(); event.accepted = true; break
++                    case Qt.Key_Down:
++                        list.currentIndex = Math.min(list.count - 1, list.currentIndex + 1); event.accepted = true; break
++                    case Qt.Key_Up:
++                        list.currentIndex = Math.max(0, list.currentIndex - 1); event.accepted = true; break
++                    case Qt.Key_PageDown:
++                        list.currentIndex = Math.min(list.count - 1, list.currentIndex + 8); event.accepted = true; break
++                    case Qt.Key_PageUp:
++                        list.currentIndex = Math.max(0, list.currentIndex - 8); event.accepted = true; break
++                    case Qt.Key_Return:
++                    case Qt.Key_Enter:
++                        root.runEntry(root.results[list.currentIndex]); event.accepted = true; break
++                    }
++                }
++            }
++        }
++
++        ListView {
++            id: list
++
++            anchors.left: parent.left
++            anchors.right: parent.right
++            anchors.top: header.bottom
++            anchors.bottom: parent.bottom
++            anchors.margins: VLCStyle.margin_normal
++            anchors.topMargin: VLCStyle.margin_xsmall
++
++            clip: true
++            model: root.results
++            currentIndex: 0
++            boundsBehavior: Flickable.StopAtBounds
++            highlightMoveDuration: 0
++
++            delegate: Rectangle {
++                id: row
++
++                required property var modelData
++                required property int index
++
++                width: ListView.view.width
++                height: Math.max(VLCStyle.fontHeight_normal + VLCStyle.margin_xsmall * 2, VLCStyle.dp(30, VLCStyle.scale))
++                radius: VLCStyle.radiusFor(VLCStyle.dp(4, VLCStyle.scale), true)
++                color: ListView.isCurrentItem ? Qt.alpha(theme.accent, 0.22) : "transparent"
++
++                Text {
++                    anchors.left: parent.left
++                    anchors.leftMargin: VLCStyle.margin_xsmall
++                    anchors.right: shortcutText.left
++                    anchors.rightMargin: VLCStyle.margin_xsmall
++                    anchors.verticalCenter: parent.verticalCenter
++                    text: row.modelData.title
++                    textFormat: Text.PlainText
++                    elide: Text.ElideRight
++                    color: theme.fg.primary
++                    font.pixelSize: VLCStyle.fontSize_normal
++                }
++
++                Text {
++                    id: shortcutText
++
++                    anchors.right: parent.right
++                    anchors.rightMargin: VLCStyle.margin_xsmall
++                    anchors.verticalCenter: parent.verticalCenter
++                    width: Math.min(implicitWidth, row.width * 0.4)
++                    text: row.modelData.shortcut
++                    textFormat: Text.PlainText
++                    elide: Text.ElideRight
++                    horizontalAlignment: Text.AlignRight
++                    color: theme.fg.secondary
++                    font.pixelSize: VLCStyle.fontSize_small
++                }
++
++                MouseArea {
++                    anchors.fill: parent
++                    hoverEnabled: true
++                    onEntered: list.currentIndex = row.index
++                    onClicked: root.runEntry(row.modelData)
++                }
++            }
++
++            Text {
++                anchors.centerIn: parent
++                visible: list.count === 0
++                text: qsTr("No matching command")
++                textFormat: Text.PlainText
++                color: theme.fg.secondary
++                font.pixelSize: VLCStyle.fontSize_normal
++            }
++        }
++    }
++}

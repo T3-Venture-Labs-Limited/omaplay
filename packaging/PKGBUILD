@@ -1,0 +1,144 @@
+# Maintainer: T3 Venture Labs <https://github.com/T3-Venture-Labs-Limited>
+#
+# omaplay is VLC 4 (a pinned development snapshot) with an Omarchy-themed interface. It installs into
+# /opt/omaplay and does not conflict with the official vlc package. The changes to VLC are the patch
+# series in the omaplay repository, applied to the pinned upstream commit below.
+
+pkgname=omaplay
+pkgver=0.1.0
+pkgrel=1
+_vlc_commit=6b5f85b1d1bb7f4fc0545078338dc040cc3f3d7e
+pkgdesc='Omarchy-themed media player based on VLC 4 (experimental, installs beside vlc)'
+arch=('x86_64')
+url='https://github.com/T3-Venture-Labs-Limited/omaplay'
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
+depends=(
+  'aribb24'
+  'chromaprint'
+  'faad2'
+  'ffmpeg'
+  'fontconfig'
+  'freetype2'
+  'fribidi'
+  'gnutls'
+  'harfbuzz'
+  'libarchive'
+  'libdvbpsi'
+  'libebur128'
+  'libidn'
+  'libmad'
+  'libmatroska'
+  'libmpcdec'
+  'libplacebo'
+  'libsecret'
+  'libupnp'
+  'libxinerama'
+  'libxml2'
+  'libxpm'
+  'qt6-base'
+  'qt6-declarative'
+  'qt6-svg'
+  'qt6-wayland'
+  'rnnoise'
+  'taglib'
+  'xcb-util-keysyms'
+)
+makedepends=(
+  'aom'
+  'aribb25'
+  'avahi'
+  'dav1d'
+  'ffnvcodec-headers'
+  'flac'
+  'fluidsynth'
+  'git'
+  'gst-plugins-base-libs'
+  'gtk3'
+  'jack'
+  'libass'
+  'libavc1394'
+  'libbluray'
+  'libcaca'
+  'libdc1394'
+  'libdvdnav'
+  'libdvdread'
+  'libgme'
+  'libgoom2'
+  'libjpeg-turbo'
+  'libkate'
+  'libmicrodns'
+  'libmodplug'
+  'libmtp'
+  'libnfs'
+  'libnotify'
+  'libogg'
+  'libpng'
+  'libpulse'
+  'librsvg'
+  'libsamplerate'
+  'libshout'
+  'libsoxr'
+  'libssh2'
+  'libtheora'
+  'libtiger'
+  'libvorbis'
+  'libvpx'
+  'libxkbcommon'
+  'lirc'
+  'live-media'
+  'lua'
+  'meson'
+  'mpg123'
+  'opus'
+  'pcsclite'
+  'protobuf'
+  'qt6-shadertools'
+  'qt6-tools'
+  'smbclient'
+  'speex'
+  'srt'
+  'systemd-libs'
+  'twolame'
+  'vulkan-headers'
+  'wayland-protocols'
+  'zvbi'
+)
+optdepends=('omarchy: live theme following and the omaplay bar widget')
+options=('!lto' '!debug')
+install=omaplay.install
+source=("vlc-$_vlc_commit.tar.gz::https://code.videolan.org/videolan/vlc/-/archive/$_vlc_commit/vlc-$_vlc_commit.tar.gz"
+        "$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+# The second checksum is filled in by `updpkgsums` once the v$pkgver tag exists on GitHub.
+sha256sums=('803baccd4f69c606111c46c2f707173fa5b4d1d747da3f986f3d98d2f775f45e'
+            'SKIP')
+
+prepare() {
+  cd "$srcdir/vlc-$_vlc_commit"
+  # git apply, not patch(1): the series carries binary image diffs. It works on a plain source tree.
+  local p
+  for p in "$srcdir/$pkgname-$pkgver"/patches/*.patch; do
+    echo "applying ${p##*/}"
+    git apply --whitespace=nowarn "$p"
+  done
+}
+
+build() {
+  local -a flags
+  mapfile -t flags < <("$srcdir/$pkgname-$pkgver/bin/meson-flags")
+  meson setup build "vlc-$_vlc_commit" "${flags[@]}"
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+
+  # The binary finds its libraries through RUNPATH and its plugins relative to libvlccore.
+  install -dm755 "$pkgdir/usr/bin"
+  printf '#!/bin/sh\nexec /opt/omaplay/bin/vlc "$@"\n' > "$pkgdir/usr/bin/omaplay"
+  chmod 755 "$pkgdir/usr/bin/omaplay"
+
+  local src="$srcdir/$pkgname-$pkgver/packaging"
+  install -Dm644 "$src/omaplay.desktop" "$pkgdir/usr/share/applications/omaplay.desktop"
+  install -Dm644 "$src/omaplay.svg" "$pkgdir/usr/share/icons/hicolor/scalable/apps/omaplay.svg"
+  install -Dm644 "$srcdir/$pkgname-$pkgver/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

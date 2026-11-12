@@ -1,0 +1,88 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 13:20:16 +0530
+Subject: [PATCH 01/17] meson: add omaplay identity and default options
+
+Add user_dir_name, desktop_id, mpris_name, app_identity, hw_dec_default and
+csd_wizard options and expose them through config.h. Defaults keep stock VLC
+behaviour, so only builds that opt in change anything.
+Also declare HAVE_DBUS in config.h.meson; the define is set in src/meson.build.
+---
+ config.h.meson    | 11 +++++++++++
+ meson.build       |  6 ++++++
+ meson_options.txt | 26 ++++++++++++++++++++++++++
+ 3 files changed, 43 insertions(+)
+
+diff --git a/config.h.meson b/config.h.meson
+index 721ae79718..a86cbc70e0 100644
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -515,6 +515,17 @@
+ /* Define to the full name and version of this package. */
+ #mesondefine PACKAGE_STRING
+ 
++/* omaplay identity and defaults (see meson_options.txt) */
++/* Define to 1 if the core is built with D-Bus support. */
++#mesondefine HAVE_DBUS
++
++#mesondefine VLC_USER_DIR_NAME
++#mesondefine VLC_DESKTOP_ID
++#mesondefine VLC_MPRIS_NAME
++#mesondefine VLC_APP_IDENTITY
++#mesondefine VLC_HW_DEC_DEFAULT
++#mesondefine VLC_WIZARD_SETS_CSD
++
+ /* Define to the version of this package. */
+ #mesondefine PACKAGE_VERSION
+ 
+diff --git a/meson.build b/meson.build
+index 83cf1f5f07..dd06424b6e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1031,6 +1031,12 @@ cdata.set('LIBVLC_ABI_MICRO', libvlc_abi_version_micro)
+ cdata.set_quoted('PACKAGE',             vlc_package_name)
+ cdata.set_quoted('PACKAGE_NAME',        vlc_package_name)
+ cdata.set_quoted('PACKAGE_STRING',      f'@vlc_package_name@ @vlc_version@')
++cdata.set_quoted('VLC_USER_DIR_NAME',  get_option('user_dir_name'))
++cdata.set_quoted('VLC_DESKTOP_ID',      get_option('desktop_id'))
++cdata.set_quoted('VLC_MPRIS_NAME',      get_option('mpris_name'))
++cdata.set_quoted('VLC_APP_IDENTITY',    get_option('app_identity'))
++cdata.set10('VLC_HW_DEC_DEFAULT',      get_option('hw_dec_default'))
++cdata.set10('VLC_WIZARD_SETS_CSD',     get_option('csd_wizard'))
+ cdata.set_quoted('COPYRIGHT_YEARS',     vlc_copyright_years)
+ cdata.set_quoted('COPYRIGHT_MESSAGE',   f'Copyright © @vlc_copyright_years@ the VideoLAN team')
+ 
+diff --git a/meson_options.txt b/meson_options.txt
+index c4dcedc48f..ad21b342d9 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -860,3 +860,29 @@ option('wix',
+ # TODO: Missing kwallet
+ # TODO: Missing osx_notifications
+ # TODO: Missing chromecast
++
++# omaplay identity (defaults keep stock VLC behaviour)
++option('user_dir_name',
++    type : 'string',
++    value : 'vlc',
++    description : 'Directory name used under the XDG config, data and cache directories')
++option('desktop_id',
++    type : 'string',
++    value : 'vlc',
++    description : 'Desktop entry id, Wayland app id and MPRIS DesktopEntry')
++option('mpris_name',
++    type : 'string',
++    value : 'vlc',
++    description : 'Suffix of the MPRIS D-Bus name (org.mpris.MediaPlayer2.<name>) and the MPRIS Identity')
++option('app_identity',
++    type : 'string',
++    value : '',
++    description : 'MPRIS Identity override; empty keeps the translated "VLC media player"')
++option('hw_dec_default',
++    type : 'boolean',
++    value : true,
++    description : 'Default of the hw-dec preference (hardware decoders enabled)')
++option('csd_wizard',
++    type : 'boolean',
++    value : true,
++    description : 'Let the first-run wizard turn client-side decorations on (stock behaviour)')

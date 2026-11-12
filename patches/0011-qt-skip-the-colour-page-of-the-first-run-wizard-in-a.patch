@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
+Date: Thu, 12 Nov 2026 17:10:41 +0530
+Subject: [PATCH 11/17] qt: skip the colour page of the first-run wizard in an
+ Omarchy build
+
+initializePage() asserts that the page has one button per colour scheme; the Omarchy scheme
+makes that four against three buttons, so clicking Next onto the page aborted the process.
+The colours come from the desktop theme, so the page is skipped. The layout explainer no
+longer promises client-side decoration, which this build never enables.
+---
+ .../qt/dialogs/firstrun/firstrunwizard.cpp    | 21 +++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp b/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
+index 2ca7a8c830..f7ed7d1401 100644
+--- a/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
++++ b/modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
+@@ -230,10 +230,19 @@ void FirstRunWizard::updateLayoutLabel( QAbstractButton* btn )
+     switch ( ui.layoutGroup->id( btn ) )
+     {
+         case MODERN:
++#if VLC_WIZARD_SETS_CSD
+             ui.layoutExplainer->setText( qtr( "<i>VLC will use a modern layout with no menubar or pinned controls but with client-side decoration</i>" ) );
++#else
++            // This build never switches client-side decoration on (the compositor owns the window frame).
++            ui.layoutExplainer->setText( qtr( "<i>VLC will use a modern layout with no menubar or pinned controls</i>" ) );
++#endif
+             break;
+         case CLASSIC:
++#if VLC_WIZARD_SETS_CSD
+             ui.layoutExplainer->setText( qtr( "<i>VLC will use a classic layout with a menubar and pinned controls but with no client-side decoration</i>" ) );
++#else
++            ui.layoutExplainer->setText( qtr( "<i>VLC will use a classic layout with a menubar and pinned controls</i>" ) );
++#endif
+             break;
+     }
+ }
+@@ -270,15 +279,23 @@ void FirstRunWizard::imageLayoutClick( QAbstractButton* btn )
+  */
+ int FirstRunWizard::nextId() const
+ {
++    // The colour page offers the three stock schemes. An Omarchy build takes its colours from the
++    // desktop theme instead, so the page is skipped (and initializePage() asserts that the page has
++    // one button per scheme, which no longer holds with a fourth scheme).
++#if VLC_OMARCHY_DEFAULT
++    constexpr int afterFolders = LAYOUT_PAGE;
++#else
++    constexpr int afterFolders = COLOR_SCHEME_PAGE;
++#endif
+     switch ( currentId() )
+     {
+         case WELCOME_PAGE:
+             if( ui.enableMl->isChecked() )
+                 return FOLDER_PAGE;
+             else
+-                return COLOR_SCHEME_PAGE;
++                return afterFolders;
+         case FOLDER_PAGE:
+-            return COLOR_SCHEME_PAGE;
++            return afterFolders;
+         case COLOR_SCHEME_PAGE:
+             return LAYOUT_PAGE;
+         default:

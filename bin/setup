@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Prepare vlc/: clone upstream (blobless, full history so rebases work), check out the
+# pinned commit on branch `omaplay`, and apply patches/ in order with `git am`.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+
+read -r sha _ < <(grep -v '^#' UPSTREAM | head -n1)
+[[ $sha =~ ^[0-9a-f]{40}$ ]] || { echo "UPSTREAM does not hold a 40-character commit" >&2; exit 1; }
+
+url=${OMA_VLC_UPSTREAM_URL:-https://code.videolan.org/videolan/vlc.git}
+if [[ ! -d vlc/.git ]]; then
+  git clone --filter=blob:none --no-checkout "$url" vlc
+fi
+
+cd vlc
+git cat-file -e "$sha^{commit}" 2>/dev/null || git fetch origin "$sha" 2>/dev/null || git fetch origin
+git cat-file -e "$sha^{commit}" || { echo "commit $sha not found upstream" >&2; exit 1; }
+
+# Always rebuild the branch from the pin so a stale working tree never leaks into a build.
+git am --abort 2>/dev/null || true
+git checkout -q -f -B omaplay "$sha"
+git clean -fdq
+
+shopt -s nullglob
+patches=("$root"/patches/*.patch)
+if ((${#patches[@]})); then
+  git -c user.name="omaplay" -c user.email="omaplay@localhost" am --3way --no-gpg-sign "${patches[@]}"
+fi
+echo "vlc/ at $(git rev-parse --short "$sha") + ${#patches[@]} patch(es) on branch omaplay"
