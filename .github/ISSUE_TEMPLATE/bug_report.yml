@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in omaplay doesn't work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. If the same problem happens in the official VLC 4 (a codec or streaming bug, for example),
+        please report it to [VideoLAN](https://code.videolan.org/videolan/vlc/-/issues) instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead. Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open omaplay
+        2. ...
+  - type: input
+    id: version
+    attributes:
+      label: omaplay version
+      description: Output of `pacman -Q omaplay`
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: System
+      description: Omarchy version, Omarchy theme, and GPU
+      placeholder: Omarchy 4.5, Tokyo Night, Intel Arc + NVIDIA RTX 4070
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Run `omaplay -vv 2>&1 | tee omaplay.log`, reproduce the problem, and paste the relevant part.
+      render: text

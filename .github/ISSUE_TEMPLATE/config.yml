@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Bar widget problems
+    url: https://github.com/T3-Venture-Labs-Limited/omaplay-plugin/issues
+    about: Issues with the Omarchy bar widget and mini player.
+  - name: VLC bugs (codecs, formats, streaming)
+    url: https://code.videolan.org/videolan/vlc/-/issues
+    about: omaplay does not change VLC's playback code; report problems that also happen in VLC 4 to VideoLAN.

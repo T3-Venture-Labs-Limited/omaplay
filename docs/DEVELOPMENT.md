@@ -73,6 +73,16 @@ Use `--wizard` to show the first-run wizard, `--build DIR` to run another build 
 and `KEEP_STATE=1` to keep settings from the previous run. After any QML change, look for `ReferenceError` or `TypeError` in
 `/tmp/omaplay-h/cage.log`: missing imports only show up at run time.
 
+### README screenshots
+
+The README images were taken at 2x on a real Omarchy desktop without disturbing it: a temporary headless Hyprland
+monitor placed away from the real ones (`hyprctl output create headless OMASHOTS`, then
+`hl.monitor({ output = "OMASHOTS", mode = "2560x1600@60", position = "0x10000", scale = 2 })`), a temporary window rule
+with `no_initial_focus` and `focus_on_activate = false` so the player never takes focus, keys sent to the window with
+`hl.dsp.send_key_state({ ..., window = "address:..." })`, and `grim -o OMASHOTS`. The player ran with throwaway
+`XDG_*_HOME` directories and its own copy of the theme, so themes could be switched without touching the desktop.
+Remove the monitor with `hyprctl output remove OMASHOTS` afterwards.
+
 ## Packaging
 
 ```bash

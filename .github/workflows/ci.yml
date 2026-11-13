@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Patches apply, scripts parse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patches apply to the pinned VLC commit
+        run: |
+          read -r commit _ < <(grep -v '^#' UPSTREAM | head -n1)
+          curl -fsSL "https://code.videolan.org/videolan/vlc/-/archive/$commit/vlc-$commit.tar.gz" | tar xz
+          cd "vlc-$commit"
+          git init -q .
+          for p in ../patches/*.patch; do
+            echo "applying ${p##*/}"
+            git apply --whitespace=nowarn "$p"
+          done
+          grep -q "option('product_name'" meson_options.txt
+
+      - name: Scripts parse
+        run: |
+          for f in bin/*; do bash -n "$f"; done
+          python3 -m py_compile tools/parity.py

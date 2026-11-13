@@ -14,8 +14,9 @@ Catppuccin Latte (light), Nord and Solitude. Tools: `bin/harness` (cage sandbox)
 | omaplay crashes | Verified | player killed with SIGKILL: widget idle within 0.5 s, shell answers ping |
 | Title shown during playback | Verified | bar shows the pause glyph and the file name |
 | Middle click toggles playback | Not verified | code path exists; no pointer injection into the live bar |
-| Seek from panel | Not verified | the panel opens and closes (IPC `panelState`); the seek drag was not exercised |
-| Launch from idle panel | Not verified | as above |
+| Seek from panel | Verified | by hand: dragging the panel's seek bar moves playback. Arrow-key seeks measured over MPRIS: +5.1, +5.1, +5.2, -4.9 s for 5 s steps (they used a cached position before the fix in the plugin's second commit) |
+| Launch from idle panel | Verified | by hand: "Open omaplay" in the idle panel starts the player |
+| Panel keyboard navigation | Verified | by hand: arrows move between controls, Left/Right adjust the sliders, Enter activates, Esc closes |
 | Markup-shaped title | Verified | `status` returns `<b>bold & <i>x.mp4` literally; every text is `Text.PlainText` |
 | Theme switch | Partly | the app followed a real `omarchy theme set nord` and back; the widget uses the bar's colour tokens but its recolour was not measured |
 | Volume step via keybinding | Verified | volume 0 to 0.05 to 0 (5% steps) through `volumeUp`/`volumeDown` |
@@ -54,6 +55,8 @@ Catppuccin Latte (light), Nord and Solitude. Tools: `bin/harness` (cage sandbox)
 | Load external subtitle | Partly | `--sub-file` loads and ticks the track; the "Add subtitle file" menu route was not run |
 | Reorder queue by keyboard | Verified | Alt+Up/Alt+Down (Ctrl+Up/Down are VLC's volume keys) |
 | Unreachable stream | Verified | themed notification and a details dialog naming the URL |
+| Recent list after a playlist | Verified | four files played in order over MPRIS `Next`: the Recent list holds each file once, each with its own title (a title used to land on the previous entry) |
+| Toolbar editor persists | Verified | by hand: a control dragged in the editor, OK, restart; the change was kept |
 
 ## side-by-side-install
 

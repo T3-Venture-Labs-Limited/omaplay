@@ -1,0 +1,16 @@
+name: Feature request
+description: An idea to make omaplay fit Omarchy better
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like?
+      description: What you're trying to do and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How it could work
+      description: Optional. A sketch, a keybinding, or how another Omarchy app does it.
