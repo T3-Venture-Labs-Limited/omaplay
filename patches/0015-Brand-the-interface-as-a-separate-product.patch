@@ -247,10 +247,10 @@ index c66cfce614..098987d1a3 100644
      }
      m_menu->addSeparator();
 diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
-index bbf648f242..51d8fc000a 100644
+index e2671215fa..e3b192b331 100644
 --- a/modules/gui/qt/maininterface/mainctx.cpp
 +++ b/modules/gui/qt/maininterface/mainctx.cpp
-@@ -1193,6 +1193,8 @@ double MainCtx::dp(const double px) const
+@@ -1195,6 +1195,8 @@ double MainCtx::dp(const double px) const
  
  bool MainCtx::useXmasCone() const
  {

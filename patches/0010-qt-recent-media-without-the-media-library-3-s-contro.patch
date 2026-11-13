@@ -14,7 +14,7 @@ dark neutrals with the theme accent for a light one.
  config.h.meson                                |   1 +
  meson.build                                   |   1 +
  meson_options.txt                             |   6 +
- modules/gui/qt/maininterface/mainctx.cpp      |  16 +++
+ modules/gui/qt/maininterface/mainctx.cpp      |  18 +++
  modules/gui/qt/maininterface/mainctx.hpp      |   6 +
  .../qt/maininterface/qml/NoMedialibHome.qml   |  46 +++++++
  modules/gui/qt/meson.build                    |  21 +++
@@ -25,7 +25,7 @@ dark neutrals with the theme accent for a light one.
  modules/gui/qt/util/recent_media.cpp          | 120 +++++++++++++++++
  modules/gui/qt/util/recent_media.hpp          |  57 ++++++++
  src/libvlc-module.c                           |   2 +-
- 14 files changed, 438 insertions(+), 13 deletions(-)
+ 14 files changed, 440 insertions(+), 13 deletions(-)
  create mode 100644 modules/gui/qt/tests/test_qt_recent_media.cpp
  create mode 100644 modules/gui/qt/util/recent_media.cpp
  create mode 100644 modules/gui/qt/util/recent_media.hpp
@@ -69,7 +69,7 @@ index e8e5f6e71c..2d3c0692e5 100644
 +    max : 60000,
 +    description : 'Default mouse-hide-timeout in ms: how long until the cursor and player controls auto-hide')
 diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
-index 0b67e5272f..68c37d4741 100644
+index 0b67e5272f..542b2d4801 100644
 --- a/modules/gui/qt/maininterface/mainctx.cpp
 +++ b/modules/gui/qt/maininterface/mainctx.cpp
 @@ -44,6 +44,7 @@
@@ -80,7 +80,7 @@ index 0b67e5272f..68c37d4741 100644
  #include "util/model_recovery_agent.hpp"
  
  #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
-@@ -162,6 +163,21 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
+@@ -162,6 +163,23 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
  
      settings = getSettings();
      m_colorScheme = new ColorSchemeModel(this);
@@ -95,9 +95,11 @@ index 0b67e5272f..68c37d4741 100644
 +            if (hasInput)
 +                m_recentMedia->add(player->getUrl(), player->getName());
 +        });
-+        connect(player, &PlayerController::nameChanged, this, [this, player](const QString &name) {
-+            m_recentMedia->setTitle(player->getUrl(), name);
-+        });
++        // Queued: on a media change the player announces the new name before it stores the new URL,
++        // so reading the URL in a direct call would put the new title on the previous entry.
++        connect(player, &PlayerController::nameChanged, this, [this, player]() {
++            m_recentMedia->setTitle(player->getUrl(), player->getName());
++        }, Qt::QueuedConnection);
 +    }
  #if VLC_OMARCHY_DEFAULT
      /* Read once: changing Hyprland's rounding is rare and takes effect after a restart. */

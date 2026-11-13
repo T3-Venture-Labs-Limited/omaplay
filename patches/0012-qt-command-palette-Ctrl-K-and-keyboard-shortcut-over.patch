@@ -28,7 +28,7 @@ shows dialogs and hotkeys in a palette, or only the bound ones as a shortcut ove
  create mode 100644 modules/gui/qt/widgets/qml/ActionOverlay.qml
 
 diff --git a/modules/gui/qt/maininterface/mainctx.cpp b/modules/gui/qt/maininterface/mainctx.cpp
-index 68c37d4741..bbf648f242 100644
+index 542b2d4801..e2671215fa 100644
 --- a/modules/gui/qt/maininterface/mainctx.cpp
 +++ b/modules/gui/qt/maininterface/mainctx.cpp
 @@ -45,6 +45,7 @@
