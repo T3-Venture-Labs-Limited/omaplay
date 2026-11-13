@@ -68,7 +68,7 @@ Catppuccin Latte (light), Nord and Solitude. Tools: `bin/harness` (cage sandbox)
 | User enables hardware decoding | Partly | verified at the config-file level, not through the Preferences dialog |
 | Build uses pinned commit | Verified | clean clone applies every patch without fuzz and builds |
 | Upstream update is explicit | See task 8.4 | |
-| Uninstall | Not verified | removal and reinstall not yet exercised |
+| Uninstall | Verified | `pacman -R` of the previous build removed its whole prefix, launcher entry and command; the official VLC 3 kept working; reinstall then passed `bin/verify-install` |
 
 Tested hardware: one x86_64 laptop (Intel + NVIDIA graphics), Omarchy 4.5, Hyprland, Qt 6.12. Other GPUs,
 compositors and Omarchy versions are untested. Reports are welcome.
