@@ -55,30 +55,48 @@ for the mini player:
 
 ## Install
 
-omaplay needs Omarchy 4 (or another Arch-based setup with Hyprland; following the theme needs Omarchy).
+omaplay is two repositories that work together:
 
-**From the AUR** (once published):
+| Part | Repository | What it is | Needs |
+|---|---|---|---|
+| **omaplay** (the player) | this repo | VLC 4 with the Omarchy interface | nothing else; it runs on its own |
+| **omaplay plugin** (bar widget and mini player) | [omaplay-plugin](https://github.com/T3-Venture-Labs-Limited/omaplay-plugin) | shows what is playing in the Omarchy bar | **the player**; it does nothing without it |
 
-```bash
-omarchy pkg aur add omaplay
-```
+Install the player first, then the plugin. For the full experience install both. Following the Omarchy theme needs Omarchy 4;
+other Arch-based Hyprland setups can run the player but will not get the theme or the bar widget.
 
-**From source:**
+> **Instructions for an AI agent.** Run these steps in order and stop at the first failure.
+>
+> 1. Check the system: `omarchy version` (must be Omarchy 4) and `pacman -Q vlc` (optional; the official VLC is left untouched).
+> 2. Install the player (step 1 below). It is **not on the AUR yet**, so `omarchy pkg aur add omaplay` will fail; use the source install.
+> 3. Verify: `bin/verify-install` must end with every line `ok`, and `omaplay --version` must mention `VLC version 4.0`.
+> 4. Install the plugin (step 2 below) and verify with `omarchy plugin list`.
+> 5. Do not remove or change the `vlc` package, and do not set omaplay as the default player unless the user asks.
+
+### 1. Install the player
 
 ```bash
 git clone https://github.com/T3-Venture-Labs-Limited/omaplay.git
 cd omaplay
-bin/install            # builds the package with makepkg (about 5 minutes) and installs it with pacman
+bin/install            # builds the package with makepkg (about 5 minutes), then installs it with pacman (asks for sudo)
+bin/verify-install     # checks the install and that official VLC is untouched
 ```
+
+If the build stops on missing packages, install the `makedepends` listed in [`packaging/PKGBUILD`](packaging/PKGBUILD)
+(`sudo pacman -S --needed base-devel git` covers the build tools) and run `bin/install` again.
 
 Then open **omaplay** from the app launcher, or run `omaplay video.mp4`. It is not made your default player; choose it from
 your file manager's "Open with" if you want that.
 
-Add the bar widget:
+### 2. Add the bar widget (needs the player from step 1)
 
 ```bash
 omarchy plugin add https://github.com/T3-Venture-Labs-Limited/omaplay-plugin.git --enable
 ```
+
+The widget appears on the right of the bar and shows what omaplay is playing. If the player is not installed it stays empty,
+or hidden if you chose "Hide when omaplay is not running". See the
+[plugin README](https://github.com/T3-Venture-Labs-Limited/omaplay-plugin#readme) for its keybindings.
 
 ## Keyboard
 
