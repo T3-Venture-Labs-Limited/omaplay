@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 18:41:12 +0530
-Subject: [PATCH 15/17] Brand the interface as a separate product
+Subject: [PATCH 15/19] Brand the interface as a separate product
 
 product_name sets the application display name (and so every window title), the tray, the reset
 question and the About title. The About box keeps the origin visible ("based on VLC media player by

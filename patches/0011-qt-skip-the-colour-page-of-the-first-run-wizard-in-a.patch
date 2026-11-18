@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 17:10:41 +0530
-Subject: [PATCH 11/17] qt: skip the colour page of the first-run wizard in an
+Subject: [PATCH 11/19] qt: skip the colour page of the first-run wizard in an
  Omarchy build
 
 initializePage() asserts that the page has one button per colour scheme; the Omarchy scheme

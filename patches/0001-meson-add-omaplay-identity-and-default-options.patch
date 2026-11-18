@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:20:16 +0530
-Subject: [PATCH 01/17] meson: add omaplay identity and default options
+Subject: [PATCH 01/19] meson: add omaplay identity and default options
 
 Add user_dir_name, desktop_id, mpris_name, app_identity, hw_dec_default and
 csd_wizard options and expose them through config.h. Defaults keep stock VLC

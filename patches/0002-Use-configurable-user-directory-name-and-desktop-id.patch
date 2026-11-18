@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:20:16 +0530
-Subject: [PATCH 02/17] Use configurable user directory name and desktop id
+Subject: [PATCH 02/19] Use configurable user directory name and desktop id
 
 The XDG config, data and cache directories, the Qt interface QSettings
 organisation and the Wayland/desktop file name come from build options instead

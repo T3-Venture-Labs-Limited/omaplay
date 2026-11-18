@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 18:58:29 +0530
-Subject: [PATCH 16/17] qml: give the command palette's search field a size
+Subject: [PATCH 16/19] qml: give the command palette's search field a size
 
 QtQuick.Templates.TextField has no implicit size, so the field collapsed to zero height: typing
 still filtered the list, but the text and the focus border were invisible.

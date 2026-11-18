@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:20:16 +0530
-Subject: [PATCH 03/17] dbus: configurable MPRIS name, identity and desktop
+Subject: [PATCH 03/19] dbus: configurable MPRIS name, identity and desktop
  entry; wire core D-Bus in meson
 
 The MPRIS bus name, Identity and DesktopEntry and the single-instance hand-off

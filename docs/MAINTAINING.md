@@ -54,3 +54,9 @@ Roll back with `git -C vlc reset --hard omaplay-before-<sha> && bin/setup`.
 - `PlayerView.qml:651: TypeError: Property 'scheduleUpdate' of object DualKawaseBlur` is logged at start-up (harmless).
 - The media library cannot be built: VLC wants libmedialibrary `>= 0.14, < 0.15` while that project's master is 0.15.
   omaplay therefore ships without it and keeps its own recent-media list.
+- **Seeking while paused** ([VLC #30251](https://code.videolan.org/videolan/vlc/-/work_items/30251), open): scrub while
+  paused, press play, and the picture stays frozen until the next scrub. Patches 0018 and 0019 are the two commits of
+  upstream's closed MR !10616, carried as an interim fix. With an audio track playing they remove the freeze and show the
+  new picture on a paused scrub, at the cost of about a second of dropped frames after resuming. **Still frozen without an
+  audio clock** (video-only files, no audio device). The complete fix is upstream's unmerged `pause-pcr` work; when it
+  lands, drop 0018 and 0019 before moving the pin (the rebase in `bin/update-upstream` will otherwise conflict).

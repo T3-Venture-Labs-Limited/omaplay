@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:29:46 +0530
-Subject: [PATCH 05/17] qt: add OmarchyTheme, a live reader for the Omarchy
+Subject: [PATCH 05/19] qt: add OmarchyTheme, a live reader for the Omarchy
  desktop theme
 
 Qt-only class that parses the flat colors.toml of the active Omarchy theme with

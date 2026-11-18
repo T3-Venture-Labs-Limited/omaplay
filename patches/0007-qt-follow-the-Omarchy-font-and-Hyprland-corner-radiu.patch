@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:39:44 +0530
-Subject: [PATCH 07/17] qt: follow the Omarchy font and Hyprland corner radius
+Subject: [PATCH 07/19] qt: follow the Omarchy font and Hyprland corner radius
 
 OmarchyTheme gains tested parsers for fc-match and hyprctl output. With the
 omarchy_default option the application font becomes the desktop monospace font and

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 17:40:45 +0530
-Subject: [PATCH 13/17] qml: move queue items with Alt+Up / Alt+Down
+Subject: [PATCH 13/19] qml: move queue items with Alt+Up / Alt+Down
 
 The stock queue can be reordered only by dragging. Alt+Up and Alt+Down move the selected items one
 position, as a shortcut that acts on the visible queue (a key handler on the list never saw the keys:

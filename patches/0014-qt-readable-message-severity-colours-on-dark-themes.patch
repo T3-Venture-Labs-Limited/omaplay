@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 17:46:03 +0530
-Subject: [PATCH 14/17] qt: readable message severity colours on dark themes
+Subject: [PATCH 14/19] qt: readable message severity colours on dark themes
 
 The Messages dialog coloured severities with darkRed, darkBlue, darkGreen and darkGray, which are
 unreadable on a dark base. Use lighter equivalents when the widget's own base is dark.

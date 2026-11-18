@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 15:45:36 +0530
-Subject: [PATCH 09/17] qml: Omarchy motion, mark and flat surfaces
+Subject: [PATCH 09/19] qml: Omarchy motion, mark and flat surfaces
 
 OmarchyTheme watches Omarchy's no-animations flag; MainCtx exposes omarchyStyle and
 omarchyAnimations. VLCStyle durations are capped at 300 ms in an Omarchy build and

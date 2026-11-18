@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:44:56 +0530
-Subject: [PATCH 08/17] qt: theme the QtWidgets dialogs with the Omarchy
+Subject: [PATCH 08/19] qt: theme the QtWidgets dialogs with the Omarchy
  palette
 
 OmarchyTheme::widgetPalette() maps the theme to QPalette roles (pure data, tested,

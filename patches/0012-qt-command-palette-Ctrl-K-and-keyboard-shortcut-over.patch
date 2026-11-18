@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 17:23:59 +0530
-Subject: [PATCH 12/17] qt: command palette (Ctrl+K) and keyboard shortcut
+Subject: [PATCH 12/19] qt: command palette (Ctrl+K) and keyboard shortcut
  overlay
 
 FuzzyMatch ranks entries (best alignment, word starts and consecutive letters score high; tested

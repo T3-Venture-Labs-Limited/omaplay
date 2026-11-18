@@ -3,6 +3,11 @@
 All notable changes to omaplay. Versions follow [semantic versioning](https://semver.org); the VLC snapshot each release
 is built on is recorded in [`UPSTREAM`](UPSTREAM).
 
+## Unreleased
+
+- Interim fix for the picture staying frozen after scrubbing while paused and pressing play (VLC issue #30251), using two
+  upstream commits. Files without an audio track are still affected; see `docs/MAINTAINING.md`.
+
 ## 0.1.0 (2026-11-13)
 
 First public release, built on VLC 4 at commit `6b5f85b1d1bb` (2026-11-11).

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:36:15 +0530
-Subject: [PATCH 06/17] qt: add the Omarchy colour scheme
+Subject: [PATCH 06/19] qt: add the Omarchy colour scheme
 
 Append an Omarchy scheme to ColorSchemeModel (stock System/Day/Night keep their
 indices) and let omarchy_default make it the default and stop the first-run

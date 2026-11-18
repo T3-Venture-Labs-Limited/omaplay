@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pierre Bogdanovscky <pierrebog@gmail.com>
+Date: Tue, 27 Oct 2026 18:20:21 +0100
+Subject: [PATCH 19/19] vout: don't drop the picture shown after a seek while
+ paused
+
+A flush empties the current picture; while paused, the next one was
+prepared with the late check, against a clock that does not run, and
+dropped as late by the time spent paused, leaving the old picture.
+
+Work item: #30251
+
+(cherry picked from commit 6127c87a7e5886b476b5223455feae106e6f1e0a)
+---
+ src/video_output/video_output.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/video_output/video_output.c b/src/video_output/video_output.c
+index bde65e65ec..f38548340f 100644
+--- a/src/video_output/video_output.c
++++ b/src/video_output/video_output.c
+@@ -1602,7 +1602,9 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
+ 
+     if (sys->displayed.current == NULL)
+     {
+-        sys->displayed.current = PreparePicture(sys, true, false);
++        /* While paused the clock does not run, so no picture is late: the
++         * first one after a flush, the picture of a seek, must be shown. */
++        sys->displayed.current = PreparePicture(sys, true, sys->pause.is_on);
+         return sys->displayed.current != NULL;
+     }
+ 

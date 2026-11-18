@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pierre Bogdanovscky <pierrebog@gmail.com>
+Date: Tue, 27 Oct 2026 18:19:54 +0100
+Subject: [PATCH 18/19] es_out: don't count a pause as PCR lateness
+
+The buffering end takes the pause date as the clock origin while paused,
+but the PCRs sent then, for the picture of a seek, were dated now: each
+looked late by the pause duration, and the late handling reset the clock
+and flushed the decoders, which asked for another picture, in a loop.
+Date them like the buffering end, as is already done when rebuffering.
+
+Work item: #30251
+
+(cherry picked from commit 047207881af7e2165d01f4a199c0b3c4866aebfa)
+---
+ src/input/es_out.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/input/es_out.c b/src/input/es_out.c
+index 1617513cc6..404b3ac5de 100644
+--- a/src/input/es_out.c
++++ b/src/input/es_out.c
+@@ -3723,9 +3723,11 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
+         const bool b_low_delay = priv->b_low_delay;
+         bool b_extra_buffering_allowed = !b_low_delay && EsOutIsExtraBufferingAllowed(p_sys);
+         bool buffering = EsOutIsBuffering(p_sys) || p_sys->p_next_frame_es != NULL;
+-        /* Do not account the download stall as clock lateness. The input
+-         * clock will shift this frozen system date when rebuffering ends. */
+-        const vlc_tick_t system_now = p_sys->b_rebuffering
++        /* Do not account a pause, nor the download stall, as clock lateness:
++         * the demuxer may still be read while paused, for the picture of a
++         * seek. The input clock will shift this frozen system date when the
++         * pause or the rebuffering ends. */
++        const vlc_tick_t system_now = EsOutIsPaused(p_sys)
+                                     ? p_sys->i_pause_date : vlc_tick_now();
+         vlc_tick_t i_late = input_clock_Update(
+                             p_pgrm->p_input_clock,

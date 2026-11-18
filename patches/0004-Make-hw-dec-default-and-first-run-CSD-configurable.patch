@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 13:20:17 +0530
-Subject: [PATCH 04/17] Make hw-dec default and first-run CSD configurable
+Subject: [PATCH 04/19] Make hw-dec default and first-run CSD configurable
 
 hw_dec_default sets the default of the hw-dec preference. csd_wizard=false stops
 the first-run wizard from writing qt-titlebar=0, which switches the interface to

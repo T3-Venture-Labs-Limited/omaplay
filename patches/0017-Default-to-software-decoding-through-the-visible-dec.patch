@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 19:09:32 +0530
-Subject: [PATCH 17/17] Default to software decoding through the visible
+Subject: [PATCH 17/19] Default to software decoding through the visible
  decoder setting
 
 hw_dec_default=false used to turn off hw-dec, which only the advanced preferences show; the simple

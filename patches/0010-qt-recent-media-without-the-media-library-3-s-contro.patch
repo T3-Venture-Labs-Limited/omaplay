@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: zrmnelson <104142635+zrmnelson@users.noreply.github.com>
 Date: Thu, 12 Nov 2026 16:05:23 +0530
-Subject: [PATCH 10/17] qt: recent media without the media library, 3 s control
+Subject: [PATCH 10/19] qt: recent media without the media library, 3 s control
  auto-hide, Omarchy overlay palette
 
 RecentMediaList keeps the last ten played media in the interface settings (VLC 4's own
